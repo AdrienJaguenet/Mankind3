@@ -78,3 +78,27 @@ Chunk *new_Chunk(Map * map, int px, int py, int pz)
 	insert_chunk(map, px, py, pz, chunk);
 	return chunk;
 }
+
+Block *get_block_or_null(Map * map, int x, int y, int z)
+{
+	int cx, cy, cz, bx, by, bz;
+	get_chunk_pos(x, y, z, &cx, &cy, &cz);
+	get_pos_in_chunk(x, y, z, &bx, &by, &bz);
+	Chunk *c = get_chunk_or_null(map, cx, cy, cz);
+	if (c != NULL) {
+		return c->blocks + (bx * CHUNK_SIZE * CHUNK_SIZE + by * CHUNK_SIZE +
+							bz);
+	} else {
+		return NULL;
+	}
+}
+
+void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6])
+{
+	neighbours[0] = get_block_or_null(map, x - 1, y, z);
+	neighbours[1] = get_block_or_null(map, x + 1, y, z);
+	neighbours[2] = get_block_or_null(map, x, y - 1, z);
+	neighbours[3] = get_block_or_null(map, x, y + 1, z);
+	neighbours[4] = get_block_or_null(map, x, y, z - 1);
+	neighbours[5] = get_block_or_null(map, x, y, z + 1);
+}
