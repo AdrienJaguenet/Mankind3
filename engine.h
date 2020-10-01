@@ -7,15 +7,17 @@
 #include "mesh.h"
 #include "utilities.h"
 #include "map.h"
+#include "program.h"
 
 typedef struct engine_t {
 	SDL_Window *window;
 	SDL_GLContext context;
 
+	program_t program;
 	mesh_t mesh;
 	Map map;
-	bool running;
 
+	bool running;
 } engine_t;
 
 engine_t engine_new();
