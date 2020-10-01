@@ -1,10 +1,25 @@
 #include <stdio.h>
 
+#include "engine.h"
+#include "utilities.h"
+
 #define VERSION "0.0.1"
 
 int main()
 {
-  printf("Mankind %s\n", VERSION);
+  engine_t engine = engine_new();
+
+  while (engine.running) {
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event)) {
+      engine_handle_event(&engine, &event);
+    }
+
+    engine_update(&engine);
+    engine_render(&engine);
+  }
+
+  INFO("Mankind %s", VERSION);
   return 0;
 }
-

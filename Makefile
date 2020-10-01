@@ -1,4 +1,4 @@
-SRC=main.c
+SRC=main.c engine.c
 OBJ=$(SRC:.c=.o)
 CFLAGS=-Werror -Wextra -Wall
 LDFLAGS=`pkg-config --libs sdl2`
