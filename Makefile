@@ -1,7 +1,7 @@
-SRC=main.c engine.c map.c position.c mesh.c
+SRC=main.c engine.c map.c position.c mesh.c texture.c
 OBJ=$(SRC:.c=.o)
 CFLAGS=-g -Werror -Wextra -Wall
-LDFLAGS=`pkg-config --libs sdl2 gl glew`
+LDFLAGS=`pkg-config --libs sdl2 SDL2_image gl glew`
 TARGET=mankind
 CC=gcc
 LD=gcc
