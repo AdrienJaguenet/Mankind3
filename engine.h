@@ -3,12 +3,13 @@
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
+#include <GL/gl.h>
 
 #include "utilities.h"
 
 typedef struct engine_t {
   SDL_Window *window;
-  SDL_Renderer *renderer;
+  SDL_GLContext context;
 
   bool running;
 } engine_t;

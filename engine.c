@@ -12,11 +12,10 @@ engine_t engine_new()
     FATAL("Failed to create SDL window: %s", SDL_GetError());
   }
 
-  engine.renderer =
-    SDL_CreateRenderer(engine.window, -1, SDL_RENDERER_ACCELERATED);
+  engine.context = SDL_GL_CreateContext(engine.window);
 
-  if (!engine.renderer) {
-    FATAL("Failed to create SDL renderer: %s", SDL_GetError());
+  if (!engine.context) {
+    FATAL("Failed to create OpenGL context: %s", SDL_GetError());
   }
 
   engine.running = true;
@@ -39,13 +38,15 @@ void engine_update(engine_t * engine)
 
 void engine_render(engine_t * engine)
 {
-  SDL_RenderClear(engine->renderer);
+  glClearColor(0.f, 0.f, 1.f, 0.f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  SDL_RenderPresent(engine->renderer);
+  /* Render shit here. */
+
+  SDL_GL_SwapWindow(engine->window);
 }
 
 void engine_terminate(engine_t * engine)
 {
-  SDL_DestroyRenderer(engine->renderer);
   SDL_DestroyWindow(engine->window);
 }
