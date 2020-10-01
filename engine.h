@@ -6,12 +6,14 @@
 #include <GL/gl.h>
 
 #include "utilities.h"
+#include "map.h"
 
 typedef struct engine_t {
-  SDL_Window *window;
-  SDL_GLContext context;
+	SDL_Window *window;
+	SDL_GLContext context;
 
-  bool running;
+	Map map;
+	bool running;
 } engine_t;
 
 engine_t engine_new();

@@ -1,4 +1,4 @@
-SRC=main.c engine.c
+SRC=main.c engine.c map.c position.c
 OBJ=$(SRC:.c=.o)
 CFLAGS=-Werror -Wextra -Wall
 LDFLAGS=`pkg-config --libs sdl2 gl glew`

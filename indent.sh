@@ -2,7 +2,7 @@
 
 for f in *.c *.h
 do
-    indent -kr -ci2 -cli2 -i2 -l80 -nut $f &
+    indent -ts4 -kr -ci2 -cli2 -l80 $f &
 done
 
 wait
