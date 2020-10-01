@@ -26,6 +26,9 @@ engine_t engine_new()
 
 	engine.running = true;
 
+	engine.program =
+	  program_new("./resources/default.vs", "./resources/default.fs");
+
 	vec3_t vertices[] = {
 		vec3(-1.0, 1.0, 0.0),
 		vec3(1.0, -1.0, 0.0),
