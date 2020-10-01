@@ -36,7 +36,7 @@ engine_t engine_new()
 
 	GLuint indices[] = { 0, 1, 2 };
 
-	engine.mesh = mesh_new(vertices, indices);
+	engine.mesh = mesh_new(vertices, NULL, NULL, indices);
 
 	load_texture(&engine.tilemap, "gfx/tilemap.png");
 

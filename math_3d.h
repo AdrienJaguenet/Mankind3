@@ -85,7 +85,6 @@ v1.0  2016-02-15  Initial release
 #define M_PI 3.14159265358979323846
 #endif
 
-
 //
 // 3D vectors
 // 
