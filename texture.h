@@ -9,5 +9,4 @@ typedef struct {
 	GLuint index;
 } Texture;
 
-bool load_texture(Texture * texture, const char* path);
-
+bool load_texture(Texture * texture, const char *path);
