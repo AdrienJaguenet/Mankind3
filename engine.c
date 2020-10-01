@@ -62,7 +62,7 @@ void engine_render(engine_t * engine)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Render shit here. */
-	program_use (&engine->program);
+	program_use(&engine->program);
 	mesh_render(&engine->mesh);
 
 	SDL_GL_SwapWindow(engine->window);

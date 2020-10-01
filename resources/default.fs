@@ -1,5 +1,8 @@
-#version 330 core
-out vec3 color;
+#version 130
+
+in vec3 fragment_position;
+out vec3 fragment_color;
+
 void main(){
-  color = vec3(1,0,0);
+  fragment_color = vec3(1, 1, 1);
 }

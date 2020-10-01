@@ -1,7 +1,9 @@
-#version 330 core
-layout(location = 0) in vec3 vertexPosition_modelspace;
+#version 130
 
-void main(){
-  gl_Position.xyz = vertexPosition_modelspace;
-  gl_Position.w = 1.0;
+in vec3 position;
+out vec3 fragment_position;
+
+void main() {
+  gl_Position = vec4(position, 1.0);
+  fragment_position = position;
 }

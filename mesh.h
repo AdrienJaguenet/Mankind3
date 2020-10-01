@@ -8,8 +8,8 @@
 
 typedef struct mesh_t {
 	GLuint vao, vbo, ebo;
-  vec3_t *vertices;
-  GLuint *indices;
+	vec3_t *vertices;
+	GLuint *indices;
 } mesh_t;
 
 mesh_t mesh_new(vec3_t * vertices, GLuint * indices);
