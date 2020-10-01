@@ -8,6 +8,7 @@
 #include "utilities.h"
 #include "map.h"
 #include "program.h"
+#include "texture.h"
 
 typedef struct engine_t {
 	SDL_Window *window;
@@ -16,6 +17,7 @@ typedef struct engine_t {
 	program_t program;
 	mesh_t mesh;
 	Map map;
+	Texture tilemap;
 
 	bool running;
 } engine_t;
