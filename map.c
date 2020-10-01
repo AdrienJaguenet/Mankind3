@@ -60,7 +60,7 @@ void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk)
 	} else {
 		map->root = new_MapBucket(get_key(px, py, pz), chunk);
 	}
-	map->chunks_no ++;
+	map->chunks_no++;
 }
 
 Chunk *get_chunk_or_null(Map * map, int px, int py, int pz)
