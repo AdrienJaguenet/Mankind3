@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-mesh_t mesh_new(vec3_t * vertices, vec3_t * indices)
+mesh_t mesh_new(vec3_t * vertices, GLuint * indices)
 {
 	mesh_t mesh;
 

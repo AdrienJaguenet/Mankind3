@@ -35,7 +35,9 @@ engine_t engine_new()
 		vec3(0.0, 1.0, 0.0)
 	};
 
-	engine.mesh = mesh_new(vertices, NULL);
+	GLuint indices[] = { 0, 1, 2 };
+
+	engine.mesh = mesh_new(vertices, indices);
 
 	return engine;
 }
@@ -58,6 +60,7 @@ void engine_render(engine_t * engine)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Render shit here. */
+	program_use (&engine->program);
 	mesh_render(&engine->mesh);
 
 	SDL_GL_SwapWindow(engine->window);
