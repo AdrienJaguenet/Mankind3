@@ -24,7 +24,6 @@ engine_t engine_new()
 		FATAL("Failed to initialize GLEW");
 	}
 
-
 	engine.program =
 	  program_new("./resources/default.vs", "./resources/default.fs");
 
@@ -40,6 +39,7 @@ engine_t engine_new()
 
 	load_texture(&engine.tilemap, "gfx/tilemap.png");
 
+	engine.last_time = SDL_GetPerformanceCounter();
 	engine.running = true;
 	return engine;
 }
@@ -54,7 +54,12 @@ void engine_handle_event(engine_t * engine, SDL_Event * event)
 
 void engine_update(engine_t * engine)
 {
-	(void) engine;
+	unsigned int current_time = SDL_GetPerformanceCounter();
+	engine->delta_time =
+	  (float) ((current_time -
+				engine->last_time) * 1000 /
+			   (double) SDL_GetPerformanceFrequency());
+	engine->last_time = current_time;
 }
 
 void engine_render(engine_t * engine)

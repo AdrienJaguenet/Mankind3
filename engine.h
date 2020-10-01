@@ -14,12 +14,15 @@ typedef struct engine_t {
 	SDL_Window *window;
 	SDL_GLContext context;
 
+	unsigned int last_time;
+	float delta_time;
+
+	bool running;
+
 	program_t program;
 	mesh_t mesh;
 	Map map;
 	Texture tilemap;
-
-	bool running;
 } engine_t;
 
 engine_t engine_new();
