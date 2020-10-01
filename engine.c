@@ -29,14 +29,14 @@ engine_t engine_new()
 	  program_new("./resources/default.vs", "./resources/default.fs");
 
 	vec3_t vertices[] = {
-		vec3(-1.0, 1.0, 0.0),
+		vec3(-1.0, -1.0, 0.0),
 		vec3(1.0, -1.0, 0.0),
 		vec3(0.0, 1.0, 0.0)
 	};
 
 	GLuint indices[] = { 0, 1, 2 };
 
-	engine.mesh = mesh_new(vertices, indices);
+	engine.mesh = mesh_new(vertices, NULL, NULL, indices);
 
 	load_texture(&engine.tilemap, "gfx/tilemap.png");
 
