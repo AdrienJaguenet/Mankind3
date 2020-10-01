@@ -24,7 +24,6 @@ engine_t engine_new()
 		FATAL("Failed to initialize GLEW");
 	}
 
-	engine.running = true;
 
 	engine.program =
 	  program_new("./resources/default.vs", "./resources/default.fs");
@@ -39,6 +38,9 @@ engine_t engine_new()
 
 	engine.mesh = mesh_new(vertices, indices);
 
+	load_texture(&engine.tilemap, "gfx/tilemap.png");
+
+	engine.running = true;
 	return engine;
 }
 
