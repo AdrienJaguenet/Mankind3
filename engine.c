@@ -18,7 +18,19 @@ engine_t engine_new()
     FATAL("Failed to create OpenGL context: %s", SDL_GetError());
   }
 
+  if (glewInit() != GLEW_OK) {
+	 FATAL("Failed to initialize GLEW");
+  }
+  
   engine.running = true;
+
+  vec3_t vertices[] = {
+							  vec3 (-1.0, 1.0, 0.0),
+							  vec3 (1.0, -1.0, 0.0),
+							  vec3 (0.0, 1.0, 0.0)
+  };
+
+  engine.mesh = mesh_new (vertices, NULL);
 
   return engine;
 }
@@ -38,11 +50,11 @@ void engine_update(engine_t * engine)
 
 void engine_render(engine_t * engine)
 {
-  glClearColor(0.f, 0.f, 1.f, 0.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   /* Render shit here. */
-
+  mesh_render (&engine->mesh);
+  
   SDL_GL_SwapWindow(engine->window);
 }
 

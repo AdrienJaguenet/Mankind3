@@ -3,8 +3,8 @@
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
-#include <GL/gl.h>
 
+#include "mesh.h"
 #include "utilities.h"
 
 typedef struct engine_t {
@@ -12,6 +12,8 @@ typedef struct engine_t {
   SDL_GLContext context;
 
   bool running;
+
+  mesh_t mesh;
 } engine_t;
 
 engine_t engine_new();
