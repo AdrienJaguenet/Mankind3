@@ -19,4 +19,3 @@ bool load_texture(Texture * texture, const char *path)
 	SDL_FreeSurface(surface);
 	return true;
 }
-
