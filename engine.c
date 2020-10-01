@@ -29,7 +29,7 @@ engine_t engine_new()
 	  program_new("./resources/default.vs", "./resources/default.fs");
 
 	vec3_t vertices[] = {
-		vec3(-1.0, 1.0, 0.0),
+		vec3(-1.0, -1.0, 0.0),
 		vec3(1.0, -1.0, 0.0),
 		vec3(0.0, 1.0, 0.0)
 	};
