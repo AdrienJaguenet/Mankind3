@@ -55,11 +55,10 @@ Chunk *btree_get_chunk(MapBucket * root, int key)
 
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk)
 {
-	if (map->root) {
-		btree_insert_chunk(map->root, get_key(px, py, pz), chunk);
-	} else {
+	if (!map->root) {
 		map->root = new_MapBucket(get_key(px, py, pz), chunk);
 	}
+	btree_insert_chunk(map->root, get_key(px, py, pz), chunk);
 	map->chunks_no++;
 }
 
@@ -74,7 +73,7 @@ Chunk *get_chunk_or_null(Map * map, int px, int py, int pz)
 
 Chunk *new_Chunk(Map * map, int px, int py, int pz)
 {
-	Chunk *chunk = calloc(sizeof(Chunk), 0);
+	Chunk *chunk = calloc(sizeof(Chunk), 1);
 	insert_chunk(map, px, py, pz, chunk);
 	return chunk;
 }

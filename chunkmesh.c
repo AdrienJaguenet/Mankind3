@@ -1,8 +1,5 @@
 #include "chunkmesh.h"
-
-typedef struct {
-	float x, y;
-} vec2_t;
+#include <stdlib.h>
 
 void push_vertex(mesh_t * mesh, vec3_t vertex, vec2_t uv, vec3_t normal)
 {
@@ -31,6 +28,12 @@ void push_face(mesh_t * mesh, vec3_t v0, vec3_t v1, vec3_t v2, vec3_t v3,
 
 void generate_chunk_mesh(Chunk * chunk, Map * map)
 {
+	if (chunk->mesh) {
+		mesh_terminate(chunk->mesh);
+	} else {
+		chunk->mesh = calloc(sizeof(mesh_t), 1);
+	}
+	resize_mesh(chunk->mesh, 512);
 	vec3_t vertices[(CHUNK_SIZE + 1) * (CHUNK_SIZE + 1) * (CHUNK_SIZE + 1)];
 	for (int i = 0; i <= CHUNK_SIZE; ++i) {
 		for (int j = 0; j <= CHUNK_SIZE; ++j) {
@@ -132,5 +135,6 @@ void generate_chunk_mesh(Chunk * chunk, Map * map)
 			}
 		}
 	}
+	mesh_load(chunk->mesh);
 
 }

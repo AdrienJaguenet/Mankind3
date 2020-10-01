@@ -20,12 +20,12 @@ typedef struct engine_t {
 	bool running;
 
 	program_t program;
-	mesh_t mesh;
+	mesh_t *mesh;
 	Map map;
 	Texture tilemap;
 } engine_t;
 
-engine_t engine_new();
+engine_t *engine_new();
 void engine_handle_event(engine_t * engine, SDL_Event * event);
 void engine_update(engine_t * engine);
 void engine_render(engine_t * engine);

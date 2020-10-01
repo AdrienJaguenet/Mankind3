@@ -1,22 +1,23 @@
 #include "engine.h"
+#include "chunkmesh.h"
 
-engine_t engine_new()
+engine_t *engine_new()
 {
-	engine_t engine;
-	engine.map.chunks_no = 0;
-	engine.map.root = NULL;
+	engine_t *engine = calloc(sizeof(engine_t), 1);
+	engine->map.chunks_no = 0;
+	engine->map.root = NULL;
 
-	engine.window = SDL_CreateWindow("Mankind 3", SDL_WINDOWPOS_UNDEFINED,
-									 SDL_WINDOWPOS_UNDEFINED, 800, 600,
-									 SDL_WINDOW_OPENGL);
+	engine->window = SDL_CreateWindow("Mankind 3", SDL_WINDOWPOS_UNDEFINED,
+									  SDL_WINDOWPOS_UNDEFINED, 800, 600,
+									  SDL_WINDOW_OPENGL);
 
-	if (!engine.window) {
+	if (!engine->window) {
 		FATAL("Failed to create SDL window: %s", SDL_GetError());
 	}
 
-	engine.context = SDL_GL_CreateContext(engine.window);
+	engine->context = SDL_GL_CreateContext(engine->window);
 
-	if (!engine.context) {
+	if (!engine->context) {
 		FATAL("Failed to create OpenGL context: %s", SDL_GetError());
 	}
 
@@ -24,23 +25,17 @@ engine_t engine_new()
 		FATAL("Failed to initialize GLEW");
 	}
 
-	engine.program =
+	engine->program =
 	  program_new("./resources/default.vs", "./resources/default.fs");
 
-	vec3_t vertices[] = {
-		vec3(-1.0, -1.0, 0.0),
-		vec3(1.0, -1.0, 0.0),
-		vec3(0.0, 1.0, 0.0)
-	};
+	Chunk *chunk = new_Chunk(&engine->map, 0, 0, 0);
+	generate_chunk_mesh(chunk, &engine->map);
+	engine->mesh = chunk->mesh;
 
-	GLuint indices[] = { 0, 1, 2 };
+	load_texture(&engine->tilemap, "gfx/tilemap.png");
 
-	engine.mesh = mesh_new(vertices, NULL, NULL, indices);
-
-	load_texture(&engine.tilemap, "gfx/tilemap.png");
-
-	engine.last_time = SDL_GetPerformanceCounter();
-	engine.running = true;
+	engine->last_time = SDL_GetPerformanceCounter();
+	engine->running = true;
 	return engine;
 }
 
@@ -68,12 +63,13 @@ void engine_render(engine_t * engine)
 
 	/* Render shit here. */
 	program_use(&engine->program);
-	mesh_render(&engine->mesh);
+	mesh_render(engine->mesh);
 
 	SDL_GL_SwapWindow(engine->window);
 }
 
 void engine_terminate(engine_t * engine)
 {
+	mesh_terminate(engine->mesh);
 	SDL_DestroyWindow(engine->window);
 }
