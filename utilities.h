@@ -6,3 +6,9 @@
 typedef struct vec2_t {
 	float x, y;
 } vec2_t;
+
+static inline vec2_t vec2(float x, float y)
+{
+	return (vec2_t) {
+	x, y};
+}
