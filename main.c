@@ -56,15 +56,8 @@ int main()
 	GFXContext gfx_context;
 	init_GFX(&gfx_context, 800, 600);
 	Map map = { 0 };
-	for (int i = 0; i < 4; ++i) {
-		for (int j = 0; j < 1; ++j) {
-			for (int k = 0; k < 4; ++k) {
-				Chunk *c = new_Chunk(&map, i, j, k);
-				randomly_populate(c);
-				generate_chunk_mesh(c, &map, &gfx_context.tilemap);
-			}
-		}
-	}
+	gen_Map(&map);
+	gen_Chunk_meshes(&gfx_context, &map);
 
 	bool running = true;
 	unsigned int delta_ticks;

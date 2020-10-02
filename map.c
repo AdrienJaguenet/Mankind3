@@ -79,6 +79,7 @@ Chunk *new_Chunk(Map * map, int px, int py, int pz)
 	chunk->x = px;
 	chunk->y = py;
 	chunk->z = pz;
+	chunk->mesh = NULL;
 	insert_chunk(map, px, py, pz, chunk);
 	return chunk;
 }
@@ -128,3 +129,16 @@ void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
 		btree_foreach(map->root, fun, custom_arg);
 	}
 }
+
+void gen_Map(Map* map)
+{
+	for (int i = 0; i < 4; ++i) {
+	  for (int j = 0; j < 1; ++j) {
+		for (int k = 0; k < 4; ++k) {
+			Chunk *c = new_Chunk(map, i, j, k);
+			randomly_populate(c);
+		}
+	  }
+	}
+}
+

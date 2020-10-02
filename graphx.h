@@ -33,3 +33,6 @@ void quit_GFX(GFXContext * gfx_context);
 void begin_draw(GFXContext * gfx_context);
 
 void end_draw(GFXContext * gfx_context);
+
+void gen_Chunk_meshes(GFXContext* gfx_context, Map* map);
+

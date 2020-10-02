@@ -20,9 +20,8 @@ void generate_chunk_mesh(Chunk * chunk, Map * map, Texture * tilemap)
 {
 	if (chunk->mesh) {
 		mesh_terminate(chunk->mesh);
-	} else {
-		chunk->mesh = calloc(sizeof(mesh_t), 1);
 	}
+	chunk->mesh = calloc(sizeof(mesh_t), 1);
 	resize_mesh(chunk->mesh, 512);
 	chunk->mesh->texture = tilemap;
 

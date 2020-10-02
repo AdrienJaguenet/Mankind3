@@ -1,5 +1,7 @@
 #include "graphx.h"
 
+#include "chunkmesh.h"
+
 void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 {
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
@@ -80,3 +82,23 @@ void quit_GFX(GFXContext * gfx_context)
 	SDL_DestroyWindow(gfx_context->window);
 	SDL_Quit();
 }
+
+typedef struct {
+  Texture *tilemap;
+  Map *map;
+} ChunkMeshStruct;
+
+void gen_single_Chunk_mesh(Chunk* c, void* data)
+{
+  ChunkMeshStruct* cms = (ChunkMeshStruct*) data;
+  generate_chunk_mesh(c, cms->map, cms->tilemap);
+}
+
+void gen_Chunk_meshes(GFXContext* gfx_context, Map* map)
+{
+  ChunkMeshStruct cms;
+  cms.tilemap = &gfx_context->tilemap;
+  cms.map = map;
+  for_each_Chunk(map, gen_single_Chunk_mesh, &cms);
+}
+
