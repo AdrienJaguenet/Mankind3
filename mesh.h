@@ -2,6 +2,7 @@
 
 #include "graphx.h"
 #include "utilities.h"
+#include "texture.h"
 
 typedef struct mesh_t {
 	GLuint vao, vbo, nbo, uvbo, ebo;
@@ -10,6 +11,7 @@ typedef struct mesh_t {
 	vec3_t *vertices, *normals;
 	vec2_t *uvs;
 	GLuint *indices;
+	Texture *texture;
 } mesh_t;
 
 mesh_t mesh_new(vec3_t * vertices, vec3_t * normals, vec2_t * uvs,

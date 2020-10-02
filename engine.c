@@ -27,13 +27,13 @@ engine_t *engine_new()
 
 	engine->program =
 	  program_new("./resources/default.vs", "./resources/default.fs");
+	load_texture(&engine->tilemap, "gfx/tilemap.png");
 
 	Chunk *chunk = new_Chunk(&engine->map, 0, 0, 0);
 	randomly_populate(chunk);
-	generate_chunk_mesh(chunk, &engine->map);
+	generate_chunk_mesh(chunk, &engine->map, &engine->tilemap);
 	engine->mesh = chunk->mesh;
 
-	load_texture(&engine->tilemap, "gfx/tilemap.png");
 
 	engine->last_time = SDL_GetPerformanceCounter();
 	engine->running = true;

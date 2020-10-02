@@ -28,8 +28,10 @@ program_t program_new(const char *vs_path, const char *fs_path)
 	glGetShaderiv(vs_id, GL_COMPILE_STATUS, &compiled);
 
 	if (compiled == GL_FALSE) {
-		/* TODO: Make this more detailed, like in Mankind 2. */
-		FATAL("Couldn't compile vertex shader.");
+		char error_txt[1024];
+		int max_length = 1024;
+		glGetShaderInfoLog(vs_id, 1024, &max_length, error_txt);
+		FATAL("Couldn't compile vertex shader.\n%s", error_txt);
 	}
 
 	/* Then, load the fragment shader. */
@@ -54,8 +56,10 @@ program_t program_new(const char *vs_path, const char *fs_path)
 	glGetShaderiv(fs_id, GL_COMPILE_STATUS, &compiled);
 
 	if (compiled == GL_FALSE) {
-		/* TODO: Make this more detailed, like in Mankind 2. */
-		FATAL("Couldn't compile fragment shader.");
+		char error_txt[1024];
+		int max_length = 1024;
+		glGetShaderInfoLog(fs_id, 1024, &max_length, error_txt);
+		FATAL("Couldn't compile fragment shader.\n%s", error_txt);
 	}
 
 	/* And now, create the program. */

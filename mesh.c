@@ -61,6 +61,9 @@ void mesh_load(mesh_t * mesh)
 
 void mesh_render(mesh_t * mesh)
 {
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->texture->index);
+
 	glBindVertexArray(mesh->vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
 

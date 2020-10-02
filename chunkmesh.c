@@ -4,21 +4,19 @@
 void push_face(mesh_t * mesh, vec3_t v0, vec3_t v1, vec3_t v2, vec3_t v3,
 			   vec3_t norm, int type)
 {
-	(void) type;
-	vec2_t top_right = { 0.0f, 0.0f },
-	  top_left = { 1.0f, 0.0f },
-	  bottom_left = { 0.0f, 1.0f }, bottom_right = { 1.0f, 1.0f };
+	vec2_t uv_corners[4];
+	get_tex_quad(mesh->texture, type, 128, uv_corners);
 
-	mesh_push_vertex(mesh, v0, top_left, norm);
-	mesh_push_vertex(mesh, v1, top_right, norm);
-	mesh_push_vertex(mesh, v2, bottom_left, norm);
+	mesh_push_vertex(mesh, v0, uv_corners[UV_TOP_LEFT], norm);
+	mesh_push_vertex(mesh, v1, uv_corners[UV_TOP_RIGHT], norm);
+	mesh_push_vertex(mesh, v2, uv_corners[UV_BOTTOM_LEFT], norm);
 	//--
-	mesh_push_vertex(mesh, v3, bottom_right, norm);
-	mesh_push_vertex(mesh, v2, bottom_left, norm);
-	mesh_push_vertex(mesh, v1, top_right, norm);
+	mesh_push_vertex(mesh, v3, uv_corners[UV_BOTTOM_RIGHT], norm);
+	mesh_push_vertex(mesh, v2, uv_corners[UV_BOTTOM_LEFT], norm);
+	mesh_push_vertex(mesh, v1, uv_corners[UV_TOP_RIGHT], norm);
 }
 
-void generate_chunk_mesh(Chunk * chunk, Map * map)
+void generate_chunk_mesh(Chunk * chunk, Map * map, Texture * tilemap)
 {
 	if (chunk->mesh) {
 		mesh_terminate(chunk->mesh);
@@ -26,6 +24,8 @@ void generate_chunk_mesh(Chunk * chunk, Map * map)
 		chunk->mesh = calloc(sizeof(mesh_t), 1);
 	}
 	resize_mesh(chunk->mesh, 512);
+	chunk->mesh->texture = tilemap;
+
 	vec3_t vertices[(CHUNK_SIZE + 1) * (CHUNK_SIZE + 1) * (CHUNK_SIZE + 1)];
 	for (int i = 0; i <= CHUNK_SIZE; ++i) {
 		for (int j = 0; j <= CHUNK_SIZE; ++j) {

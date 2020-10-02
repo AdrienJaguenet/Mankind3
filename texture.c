@@ -9,6 +9,10 @@ bool load_texture(Texture * texture, const char *path)
 		INFO("Could not load texture from path '%s'\n", path);
 		return false;
 	}
+	if (surface->w != surface->h) {
+		WARN("Texture '%s' is not a square\n", path);
+	}
+	texture->size = surface->w;
 	glGenTextures(1, &texture->index);
 	glBindTexture(GL_TEXTURE_2D, texture->index);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
@@ -18,4 +22,15 @@ bool load_texture(Texture * texture, const char *path)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SDL_FreeSurface(surface);
 	return true;
+}
+
+void get_tex_quad(Texture * texture, int index, int quad_size,
+				  vec2_t corners[4])
+{
+	int tex_grid_size = texture->size / quad_size;
+	int quad_y = index / tex_grid_size, quad_x = index % tex_grid_size;
+	corners[UV_TOP_LEFT] = vec2(quad_x, quad_y);
+	corners[UV_TOP_RIGHT] = vec2(quad_x + 1, quad_y);
+	corners[UV_BOTTOM_LEFT] = vec2(quad_x, quad_y + 1);
+	corners[UV_BOTTOM_RIGHT] = vec2(quad_x + 1, quad_y + 1);
 }
