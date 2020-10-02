@@ -29,5 +29,5 @@ typedef struct engine_t {
 engine_t *engine_new();
 void engine_handle_event(engine_t * engine, SDL_Event * event);
 void engine_update(engine_t * engine);
-void engine_render(engine_t * engine, Camera* camera);
+void engine_render(engine_t * engine, Camera * camera);
 void engine_terminate(engine_t * engine);

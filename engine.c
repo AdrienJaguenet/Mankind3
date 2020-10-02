@@ -70,8 +70,9 @@ void engine_render(engine_t * engine, Camera * camera)
 	/* Render shit here. */
 	program_use(&engine->program);
 	/* The ONE chunk at 1,1,1 */
-	mat4_t model = m4_translation(vec3(1,1,1));
-	glUniformMatrix4fv(glGetUniformLocation(engine->program.id, "model"), 1, GL_FALSE, (float*) &model);
+	mat4_t model = m4_translation(vec3(1, 1, 1));
+	glUniformMatrix4fv(glGetUniformLocation(engine->program.id, "model"), 1,
+					   GL_FALSE, (float *) &model);
 	mesh_render(engine->mesh);
 
 	SDL_GL_SwapWindow(engine->window);
