@@ -15,7 +15,9 @@ typedef struct {
 	int chunks_no;
 } Map;
 
-int64_t get_key(int px, int py, int pz);
+typedef int64_t Key;
+
+Key get_key(int px, int py, int pz);
 
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk);
 
