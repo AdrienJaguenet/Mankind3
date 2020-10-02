@@ -70,7 +70,8 @@ program_t program_new(const char *vs_path, const char *fs_path)
 
 	// Binding attribute locations to the program.
 	glBindAttribLocation(program.id, 0, "position");
-	glBindAttribLocation(program.id, 1, "uv");
+	glBindAttribLocation(program.id, 1, "normal");
+	glBindAttribLocation(program.id, 2, "uv");
 	glUniform1i(glGetUniformLocation(program.id, "texture_1"), 0);
 
 	glLinkProgram(program.id);
