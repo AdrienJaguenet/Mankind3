@@ -34,7 +34,25 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 
 void draw_Map(GFXContext * gfx_context, Map * map)
 {
-	for_each_Chunk(map, draw_Chunk, gfx_context);
+  Camera *camera = &gfx_context->camera;
+  vec3_t *campos = &camera->position;
+  int cx, cy, cz;
+  get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
+  for (int i = cx - 2; i < cx + 2; ++i) {
+	for (int j = cy - 2; j < cy + 2; ++j) {
+	  for (int k = cz - 2; k < cz + 2; ++k) {
+		Chunk *c = get_chunk_or_null(map, i, j, k);
+		if (! c){
+		  c = new_Chunk(map, i, j, k);
+		  randomly_populate(c);
+		}
+		if (! c->mesh || c->dirty) {
+		  generate_chunk_mesh(c, map, &gfx_context->tilemap);
+		}
+		draw_Chunk(c, gfx_context);
+	  }
+	}
+  }
 }
 
 void draw_Chunk(Chunk * chunk, void *gfx_context_ptr)

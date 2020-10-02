@@ -15,6 +15,11 @@ typedef struct {
 	Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
 	int x, y, z;
 	mesh_t *mesh;
+	bool empty;
+	bool dirty;
 } Chunk;
 
 void randomly_populate(Chunk * chunk);
+
+void set_Chunk_block_type(Chunk* c, int x, int y, int z, int type);
+

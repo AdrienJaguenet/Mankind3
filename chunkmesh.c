@@ -18,9 +18,15 @@ void push_face(mesh_t * mesh, vec3_t v0, vec3_t v1, vec3_t v2, vec3_t v3,
 
 void generate_chunk_mesh(Chunk * chunk, Map * map, Texture * tilemap)
 {
+	chunk->dirty = false;
 	if (chunk->mesh) {
 		mesh_terminate(chunk->mesh);
 	}
+	if (chunk->empty){
+	  chunk->mesh = NULL;
+	  return;
+	}
+
 	chunk->mesh = calloc(sizeof(mesh_t), 1);
 	resize_mesh(chunk->mesh, 512);
 	chunk->mesh->texture = tilemap;

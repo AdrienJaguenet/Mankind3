@@ -4,7 +4,7 @@
 
 Key get_key(int px, int py, int pz)
 {
-	return (Key) px << 40 | (Key) py << 20 | (Key) pz;
+	return (Key) (px & 0x0007ffff) << 40 | (Key) (py & 0x0007ffff) << 20 | (Key) (pz & 0x0007ffff);
 }
 
 MapBucket *new_MapBucket(Key key, Chunk * chunk)
@@ -19,6 +19,10 @@ MapBucket *new_MapBucket(Key key, Chunk * chunk)
 
 void btree_insert_chunk(MapBucket * root, Key key, Chunk * chunk)
 {
+	if (key == root->key) {
+	  WARN("Key collision for chunk %d, %d, %d (with %d, %d, %d): (colliding key is %zu).",
+		  chunk->x, chunk->y, chunk->z, root->chunk->x, root->chunk->y, root->chunk->z, key);
+	}
 	if (key > root->key) {
 		if (root->larger) {
 			btree_insert_chunk(root->larger, key, chunk);
@@ -80,7 +84,19 @@ Chunk *new_Chunk(Map * map, int px, int py, int pz)
 	chunk->y = py;
 	chunk->z = pz;
 	chunk->mesh = NULL;
+	chunk->empty = true;
+	chunk->dirty = true;
 	insert_chunk(map, px, py, pz, chunk);
+	for (int i = -1; i <= 1; ++i) {
+	  for (int j = -1; j <= 1; ++j) {
+		for (int k = -1; k <= 1; ++k) {
+		  Chunk *neighbour = get_chunk_or_null(map, px + i, py + j, pz + k);
+		  if (neighbour) {
+			neighbour->dirty = true;
+		  }
+		}
+	  }
+	}
 	return chunk;
 }
 
@@ -132,9 +148,9 @@ void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
 
 void gen_Map(Map* map)
 {
-	for (int i = 0; i < 4; ++i) {
-	  for (int j = 0; j < 1; ++j) {
-		for (int k = 0; k < 4; ++k) {
+  for (int i = -2; i < 2; ++i) {
+	  for (int j = -2; j < 2; ++j) {
+		for (int k = -2; k < 2; ++k) {
 			Chunk *c = new_Chunk(map, i, j, k);
 			randomly_populate(c);
 		}
