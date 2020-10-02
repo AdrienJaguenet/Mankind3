@@ -12,6 +12,9 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	if (!gfx_context->window) {
 		FATAL("Failed to create SDL window: %s", SDL_GetError());
 	}
+
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+
 	gfx_context->gl_context = SDL_GL_CreateContext(gfx_context->window);
 	if (!gfx_context->gl_context) {
 		FATAL("Failed to create OpenGL context: %s", SDL_GetError());
