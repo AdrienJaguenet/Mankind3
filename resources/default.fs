@@ -3,8 +3,8 @@
 uniform sampler2D texture0;
 in vec3 fragment_position;
 in vec2 fragment_uv;
-out vec4 fragment_color;
+out vec3 fragment_color;
 
 void main(){
-  fragment_color = texture(texture0, fragment_uv);
+  fragment_color = texture(texture0, fragment_uv).rgb;
 }
