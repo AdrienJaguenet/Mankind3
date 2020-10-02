@@ -56,7 +56,7 @@ void mesh_load(mesh_t * mesh)
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvbo);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-	printf("Loaded mesh with %u vertices\n", mesh->vertices_no);
+	INFO("Loaded mesh with %u vertices", mesh->vertices_no);
 }
 
 void mesh_render(mesh_t * mesh)
@@ -89,7 +89,7 @@ void mesh_terminate(mesh_t * mesh)
 
 void resize_mesh(mesh_t * mesh, int new_size)
 {
-	INFO("Resizing mesh. Old size: %d, new size: %d, vertices_no: %d\n",
+	INFO("Resizing mesh. Old size: %d, new size: %d, vertices_no: %d",
 		 mesh->vertices_max, new_size, mesh->vertices_no);
 	mesh->vertices_max = new_size;
 	mesh->vertices =
@@ -99,7 +99,7 @@ void resize_mesh(mesh_t * mesh, int new_size)
 	mesh->uvs = reallocarray(mesh->uvs, sizeof(vec2_t), mesh->vertices_max);
 	mesh->indices =
 	  reallocarray(mesh->indices, sizeof(GLuint), mesh->vertices_max);
-	INFO("Mesh resized.\n");
+	INFO("Mesh resized.");
 }
 
 void mesh_push_vertex(mesh_t * mesh, vec3_t vertex, vec2_t uv, vec3_t normal)

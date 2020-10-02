@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphx.h"
+#include "math_3d.h"
 #include "utilities.h"
 #include "texture.h"
 

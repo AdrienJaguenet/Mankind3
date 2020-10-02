@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "graphx.h"
+#include <GL/glew.h>
+#include <GL/gl.h>
+
 #include "utilities.h"
 
 typedef struct program_t {

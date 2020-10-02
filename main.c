@@ -1,28 +1,44 @@
 #include <stdio.h>
 
-#include "engine.h"
 #include "utilities.h"
+#include "graphx.h"
+#include "chunkmesh.h"
 
 #define VERSION "0.0.1"
+
+bool handle_event(SDL_Event * e)
+{
+	if (e->type == SDL_QUIT) {
+		return false;
+	} else {
+		return true;
+	}
+}
 
 int main()
 {
 	INFO("Mankind %s", VERSION);
-	engine_t *engine = engine_new();
-	new_Chunk(&engine->map, 1, 1, 1);
-	Camera camera = { 0 };
+	GFXContext gfx_context;
+	init_GFX(&gfx_context, 800, 600);
+	Map map;
+	Chunk *c = new_Chunk(&map, 1, 1, 1);
+	randomly_populate(c);
+	generate_chunk_mesh(c, &map, &gfx_context.tilemap);
 
-	while (engine->running) {
+	bool running = true;
+
+	while (running) {
 		SDL_Event event;
 
 		while (SDL_PollEvent(&event)) {
-			engine_handle_event(engine, &event);
+			running = handle_event(&event);
 		}
-
-		engine_update(engine);
-		engine_render(engine, &camera);
+		begin_draw(&gfx_context);
+		draw_Chunk(&gfx_context, c);
+		end_draw(&gfx_context);
 	}
 
-	engine_terminate(engine);
+	quit_GFX(&gfx_context);
+	INFO("Goodbye!");
 	return 0;
 }
