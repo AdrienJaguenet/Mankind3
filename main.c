@@ -13,23 +13,32 @@ bool handle_event(SDL_Event * e, Camera * camera, unsigned int delta_ticks)
 		return false;
 	} else if (e->type == SDL_KEYDOWN) {
 		switch (e->key.keysym.sym) {
-		case SDLK_w:
-		  camera->position = v3_add(camera->position, v3_muls(get_Camera_lookAt(camera), 0.05 * delta_ticks));
-		  break;
-		case SDLK_s:
-		  camera->position = v3_sub(camera->position, v3_muls(get_Camera_lookAt(camera), 0.05 * delta_ticks));
-		  break;
-		case SDLK_a:
-		  camera->position = v3_sub(camera->position, v3_muls(get_Camera_right(camera), 0.05 * delta_ticks));
-		  break;
-		case SDLK_d:
-		  camera->position = v3_add(camera->position, v3_muls(get_Camera_right(camera), 0.05 * delta_ticks));
-		  break;
+		  case SDLK_w:
+			  camera->position =
+				v3_add(camera->position,
+					   v3_muls(get_Camera_lookAt(camera), 0.05 * delta_ticks));
+			  break;
+		  case SDLK_s:
+			  camera->position =
+				v3_sub(camera->position,
+					   v3_muls(get_Camera_lookAt(camera), 0.05 * delta_ticks));
+			  break;
+		  case SDLK_a:
+			  camera->position =
+				v3_sub(camera->position,
+					   v3_muls(get_Camera_right(camera), 0.05 * delta_ticks));
+			  break;
+		  case SDLK_d:
+			  camera->position =
+				v3_add(camera->position,
+					   v3_muls(get_Camera_right(camera), 0.05 * delta_ticks));
+			  break;
 		}
 	} else if (e->type == SDL_MOUSEMOTION) {
 		camera->rotation.x -= e->motion.xrel / 100.f;
 		camera->rotation.y -= e->motion.yrel / 100.f;
-		camera->rotation.y = CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
+		camera->rotation.y =
+		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	}
 	return true;
 }
@@ -47,17 +56,17 @@ int main()
 
 	bool running = true;
 	unsigned int delta_ticks;
-	unsigned int last_ticks = SDL_GetTicks ();
+	unsigned int last_ticks = SDL_GetTicks();
 
 	while (running) {
 		SDL_Event event;
 
-		unsigned int new_ticks = SDL_GetTicks ();
+		unsigned int new_ticks = SDL_GetTicks();
 		delta_ticks = new_ticks - last_ticks;
 		last_ticks = new_ticks;
 
 		while (SDL_PollEvent(&event)) {
-		  running = handle_event(&event, &gfx_context.camera, delta_ticks);
+			running = handle_event(&event, &gfx_context.camera, delta_ticks);
 		}
 		begin_draw(&gfx_context);
 		draw_Chunk(&gfx_context, c);
