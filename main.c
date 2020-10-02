@@ -33,8 +33,8 @@ bool handle_event(SDL_Event * e, Camera * camera)
 			  break;
 		}
 	} else if (e->type == SDL_MOUSEMOTION) {
-	  camera->rotation.x -= e->motion.xrel / 100.f;
-	  camera->rotation.y -= e->motion.yrel / 100.f;
+		camera->rotation.x -= e->motion.xrel / 100.f;
+		camera->rotation.y -= e->motion.yrel / 100.f;
 	}
 	return true;
 }
