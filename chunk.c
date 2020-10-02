@@ -12,15 +12,15 @@ void randomly_populate(Chunk * chunk)
 		for (int k = 0; k < CHUNK_SIZE; ++k) {
 			int height = get_height(i, k);
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
-			  int type = 0;
-			  if (j < height - 4) {
-				type = 1;
-			  } else if (j < height - 1) {
-				type = 3;
-			  } else if (j == height - 1) {
-				type = 2;
-			  }
-			  chunk->blocks[INCHUNK_INDEX(i, j, k)].type = type;
+				int type = 0;
+				if (j < height - 4) {
+					type = 1;
+				} else if (j < height - 1) {
+					type = 3;
+				} else if (j == height - 1) {
+					type = 2;
+				}
+				chunk->blocks[INCHUNK_INDEX(i, j, k)].type = type;
 			}
 		}
 	}
