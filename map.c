@@ -74,6 +74,11 @@ Chunk *get_chunk_or_null(Map * map, int px, int py, int pz)
 Chunk *new_Chunk(Map * map, int px, int py, int pz)
 {
 	Chunk *chunk = calloc(sizeof(Chunk), 1);
+	int cx, cy, cz;
+	get_chunk_pos(px, py, pz, &cx, &cy, &cz);
+	chunk->x = cx;
+	chunk->y = cy;
+	chunk->z = cz;
 	insert_chunk(map, px, py, pz, chunk);
 	return chunk;
 }
@@ -85,8 +90,8 @@ Block *get_block_or_null(Map * map, int x, int y, int z)
 	get_pos_in_chunk(x, y, z, &bx, &by, &bz);
 	Chunk *c = get_chunk_or_null(map, cx, cy, cz);
 	if (c != NULL) {
-		return c->blocks + (bx * CHUNK_SIZE * CHUNK_SIZE + by * CHUNK_SIZE +
-							bz);
+		int block_index = bx * CHUNK_SIZE * CHUNK_SIZE + by * CHUNK_SIZE + bz;
+		return c->blocks + block_index;
 	} else {
 		return NULL;
 	}
@@ -94,10 +99,10 @@ Block *get_block_or_null(Map * map, int x, int y, int z)
 
 void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6])
 {
-	neighbours[0] = get_block_or_null(map, x - 1, y, z);
-	neighbours[1] = get_block_or_null(map, x + 1, y, z);
-	neighbours[2] = get_block_or_null(map, x, y - 1, z);
-	neighbours[3] = get_block_or_null(map, x, y + 1, z);
-	neighbours[4] = get_block_or_null(map, x, y, z - 1);
-	neighbours[5] = get_block_or_null(map, x, y, z + 1);
+	neighbours[NEIGHBOUR_LEFT] = get_block_or_null(map, x - 1, y, z);
+	neighbours[NEIGHBOUR_RIGHT] = get_block_or_null(map, x + 1, y, z);
+	neighbours[NEIGHBOUR_UP] = get_block_or_null(map, x, y - 1, z);
+	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y + 1, z);
+	neighbours[NEIGHBOUR_FRONT] = get_block_or_null(map, x, y, z - 1);
+	neighbours[NEIGHBOUR_BACK] = get_block_or_null(map, x, y, z + 1);
 }

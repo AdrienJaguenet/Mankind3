@@ -1,14 +1,6 @@
 #include "chunkmesh.h"
 #include <stdlib.h>
 
-void push_vertex(mesh_t * mesh, vec3_t vertex, vec2_t uv, vec3_t normal)
-{
-	(void) mesh;
-	(void) vertex;
-	(void) uv;
-	(void) normal;
-}
-
 void push_face(mesh_t * mesh, vec3_t v0, vec3_t v1, vec3_t v2, vec3_t v3,
 			   vec3_t norm, int type)
 {
@@ -17,13 +9,13 @@ void push_face(mesh_t * mesh, vec3_t v0, vec3_t v1, vec3_t v2, vec3_t v3,
 	  top_left = { 1.0f, 0.0f },
 	  bottom_left = { 0.0f, 1.0f }, bottom_right = { 1.0f, 1.0f };
 
-	push_vertex(mesh, v0, top_left, norm);
-	push_vertex(mesh, v1, top_right, norm);
-	push_vertex(mesh, v2, bottom_left, norm);
+	mesh_push_vertex(mesh, v0, top_left, norm);
+	mesh_push_vertex(mesh, v1, top_right, norm);
+	mesh_push_vertex(mesh, v2, bottom_left, norm);
 	//--
-	push_vertex(mesh, v3, bottom_right, norm);
-	push_vertex(mesh, v2, bottom_left, norm);
-	push_vertex(mesh, v1, top_right, norm);
+	mesh_push_vertex(mesh, v3, bottom_right, norm);
+	mesh_push_vertex(mesh, v2, bottom_left, norm);
+	mesh_push_vertex(mesh, v1, top_right, norm);
 }
 
 void generate_chunk_mesh(Chunk * chunk, Map * map)
@@ -46,7 +38,10 @@ void generate_chunk_mesh(Chunk * chunk, Map * map)
 	for (int i = 0; i < CHUNK_SIZE; ++i) {
 		for (int j = 0; j < CHUNK_SIZE; ++j) {
 			for (int k = 0; k < CHUNK_SIZE; ++k) {
-				Block *b = chunk->blocks + INDEX(i, j, k);
+				Block *b = chunk->blocks + INCHUNK_INDEX(i, j, k);
+				if (!b->type) {
+					continue;
+				}
 				vec3_t vertex_alias[8] = {
 					vertices[INDEX(i, j, k)],	// 0
 					vertices[INDEX(i, j, k + 1)],	// 1
@@ -136,5 +131,4 @@ void generate_chunk_mesh(Chunk * chunk, Map * map)
 		}
 	}
 	mesh_load(chunk->mesh);
-
 }

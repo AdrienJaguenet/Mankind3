@@ -1,5 +1,8 @@
 #pragma once
 
+#define INCHUNK_INDEX(x, y, z)\
+  (((x) * CHUNK_SIZE * CHUNK_SIZE) + ((y) *  CHUNK_SIZE) + (z))
+
 #include "mesh.h"
 #include "position.h"
 
@@ -12,3 +15,5 @@ typedef struct {
 	int x, y, z;
 	mesh_t *mesh;
 } Chunk;
+
+void randomly_populate(Chunk * chunk);

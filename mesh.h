@@ -5,8 +5,8 @@
 
 typedef struct mesh_t {
 	GLuint vao, vbo, nbo, uvbo, ebo;
-	int vertices_no;
-	int vertices_max;
+	uint32_t vertices_no;
+	uint32_t vertices_max;
 	vec3_t *vertices, *normals;
 	vec2_t *uvs;
 	GLuint *indices;

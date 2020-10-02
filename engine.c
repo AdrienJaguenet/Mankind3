@@ -29,6 +29,7 @@ engine_t *engine_new()
 	  program_new("./resources/default.vs", "./resources/default.fs");
 
 	Chunk *chunk = new_Chunk(&engine->map, 0, 0, 0);
+	randomly_populate(chunk);
 	generate_chunk_mesh(chunk, &engine->map);
 	engine->mesh = chunk->mesh;
 

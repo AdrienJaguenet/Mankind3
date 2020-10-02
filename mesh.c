@@ -56,6 +56,7 @@ void mesh_load(mesh_t * mesh)
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvbo);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+	printf("Loaded mesh with %u vertices\n", mesh->vertices_no);
 }
 
 void mesh_render(mesh_t * mesh)
@@ -85,6 +86,8 @@ void mesh_terminate(mesh_t * mesh)
 
 void resize_mesh(mesh_t * mesh, int new_size)
 {
+	INFO("Resizing mesh. Old size: %d, new size: %d, vertices_no: %d\n",
+		 mesh->vertices_max, new_size, mesh->vertices_no);
 	mesh->vertices_max = new_size;
 	mesh->vertices =
 	  reallocarray(mesh->vertices, sizeof(vec3_t), mesh->vertices_max);
@@ -93,18 +96,18 @@ void resize_mesh(mesh_t * mesh, int new_size)
 	mesh->uvs = reallocarray(mesh->uvs, sizeof(vec2_t), mesh->vertices_max);
 	mesh->indices =
 	  reallocarray(mesh->indices, sizeof(GLuint), mesh->vertices_max);
-
+	INFO("Mesh resized.\n");
 }
 
 void mesh_push_vertex(mesh_t * mesh, vec3_t vertex, vec2_t uv, vec3_t normal)
 {
-	++mesh->vertices_no;
 	/* Resize arrays */
-	if (mesh->vertices_no > mesh->vertices_max) {
+	if (mesh->vertices_no >= mesh->vertices_max) {
 		resize_mesh(mesh, mesh->vertices_max * 2);
 	}
-	memcpy(mesh->vertices + mesh->vertices_no, &vertex, sizeof(vec3_t));
-	memcpy(mesh->uvs + mesh->vertices_no, &uv, sizeof(vec3_t));
-	memcpy(mesh->normals + mesh->vertices_no, &normal, sizeof(vec3_t));
-	mesh->indices[mesh->vertices_no] = mesh->vertices_no - 1;
+	memcpy(mesh->vertices + mesh->vertices_no, &vertex, sizeof(vertex));
+	memcpy(mesh->uvs + mesh->vertices_no, &uv, sizeof(uv));
+	memcpy(mesh->normals + mesh->vertices_no, &normal, sizeof(normal));
+	mesh->indices[mesh->vertices_no] = mesh->vertices_no;
+	++mesh->vertices_no;
 }
