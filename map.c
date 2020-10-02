@@ -103,8 +103,8 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6])
 {
 	neighbours[NEIGHBOUR_LEFT] = get_block_or_null(map, x - 1, y, z);
 	neighbours[NEIGHBOUR_RIGHT] = get_block_or_null(map, x + 1, y, z);
-	neighbours[NEIGHBOUR_UP] = get_block_or_null(map, x, y - 1, z);
-	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y + 1, z);
+	neighbours[NEIGHBOUR_UP] = get_block_or_null(map, x, y + 1, z);
+	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y - 1, z);
 	neighbours[NEIGHBOUR_FRONT] = get_block_or_null(map, x, y, z - 1);
 	neighbours[NEIGHBOUR_BACK] = get_block_or_null(map, x, y, z + 1);
 }

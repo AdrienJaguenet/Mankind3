@@ -47,6 +47,8 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position)
 	glUniformMatrix4fv(glGetUniformLocation
 					   (gfx_context->main_program.id, "model"), 1, GL_FALSE,
 					   (float *) &model);
+	glUniform3f(glGetUniformLocation(gfx_context->main_program.id, "ambient_light"),
+		.5f, 1.f, .5f);
 	mesh_render(mesh);
 }
 
@@ -60,6 +62,7 @@ void begin_draw(GFXContext * gfx_context)
 	/* Render shit here. */
 	program_use(&gfx_context->main_program);
 
+	glEnable(GL_DEPTH_TEST);
 }
 
 void end_draw(GFXContext * gfx_context)

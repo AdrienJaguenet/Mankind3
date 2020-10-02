@@ -67,7 +67,7 @@ void mesh_render(mesh_t * mesh)
 	glBindVertexArray(mesh->vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
 
-	glDrawElements(GL_TRIANGLES, sizeof(mesh->indices), GL_UNSIGNED_INT,
+	glDrawElements(GL_TRIANGLES, mesh->vertices_no, GL_UNSIGNED_INT,
 				   (void *) 0);
 
 	glBindVertexArray(0);

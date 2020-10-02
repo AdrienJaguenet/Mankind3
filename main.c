@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 
 #include "utilities.h"
 #include "graphx.h"
@@ -31,12 +32,16 @@ bool handle_event(SDL_Event * e, Camera * camera)
 			  camera->position.y -= .5f;
 			  break;
 		}
+	} else if (e->type == SDL_MOUSEMOTION) {
+	  camera->rotation.x -= e->motion.xrel / 100.f;
+	  camera->rotation.y -= e->motion.yrel / 100.f;
 	}
 	return true;
 }
 
 int main()
 {
+	srand(time(NULL));
 	INFO("Mankind %s", VERSION);
 	GFXContext gfx_context;
 	init_GFX(&gfx_context, 800, 600);

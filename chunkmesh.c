@@ -26,15 +26,6 @@ void generate_chunk_mesh(Chunk * chunk, Map * map, Texture * tilemap)
 	resize_mesh(chunk->mesh, 512);
 	chunk->mesh->texture = tilemap;
 
-	vec3_t vertices[(CHUNK_SIZE + 1) * (CHUNK_SIZE + 1) * (CHUNK_SIZE + 1)];
-	for (int i = 0; i <= CHUNK_SIZE; ++i) {
-		for (int j = 0; j <= CHUNK_SIZE; ++j) {
-			for (int k = 0; k <= CHUNK_SIZE; ++k) {
-				vertices[INDEX(i, j, k)] = vec3(i, j, k);
-			}
-		}
-	}
-
 	for (int i = 0; i < CHUNK_SIZE; ++i) {
 		for (int j = 0; j < CHUNK_SIZE; ++j) {
 			for (int k = 0; k < CHUNK_SIZE; ++k) {
@@ -43,14 +34,14 @@ void generate_chunk_mesh(Chunk * chunk, Map * map, Texture * tilemap)
 					continue;
 				}
 				vec3_t vertex_alias[8] = {
-					vertices[INDEX(i, j, k)],	// 0
-					vertices[INDEX(i, j, k + 1)],	// 1
-					vertices[INDEX(i, j + 1, k)],	// 2
-					vertices[INDEX(i, j + 1, k + 1)],	// 3
-					vertices[INDEX(i + 1, j, k)],	// 4
-					vertices[INDEX(i + 1, j, k + 1)],	// 5
-					vertices[INDEX(i + 1, j + 1, k)],	// 6
-					vertices[INDEX(i + 1, j + 1, k + 1)],	// 7
+					vec3(i, j, k),	// 0
+					vec3(i, j, k + 1),	// 1
+					vec3(i, j + 1, k),	// 2
+					vec3(i, j + 1, k + 1),	// 3
+					vec3(i + 1, j, k),	// 4
+					vec3(i + 1, j, k + 1),	// 5
+					vec3(i + 1, j + 1, k),	// 6
+					vec3(i + 1, j + 1, k + 1),	// 7
 				};
 				Block *neighbourhood[6] = { NULL };
 				get_neighbourhood(map, i + chunk->x * CHUNK_SIZE,
