@@ -32,15 +32,17 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 
 void draw_Map(GFXContext * gfx_context, Map * map)
 {
-	(void) gfx_context;
-	(void) map;
-	draw_Chunk(gfx_context, get_chunk_or_null(map, 1, 1, 1));
+	for_each_Chunk(map, draw_Chunk, gfx_context);
 }
 
-void draw_Chunk(GFXContext * gfx_context, Chunk * chunk)
+void draw_Chunk(Chunk * chunk, void *gfx_context_ptr)
 {
+	GFXContext *gfx_context = (GFXContext *) gfx_context_ptr;
 	if (chunk->mesh) {
-		draw_Mesh(gfx_context, chunk->mesh, vec3(chunk->x, chunk->y, chunk->z));
+		draw_Mesh(gfx_context, chunk->mesh,
+				  vec3(chunk->x * CHUNK_SIZE * BLOCK_SIZE,
+					   chunk->y * CHUNK_SIZE * BLOCK_SIZE,
+					   chunk->z * CHUNK_SIZE * BLOCK_SIZE));
 	}
 }
 

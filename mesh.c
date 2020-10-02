@@ -89,8 +89,6 @@ void mesh_terminate(mesh_t * mesh)
 
 void resize_mesh(mesh_t * mesh, int new_size)
 {
-	INFO("Resizing mesh. Old size: %d, new size: %d, vertices_no: %d",
-		 mesh->vertices_max, new_size, mesh->vertices_no);
 	mesh->vertices_max = new_size;
 	mesh->vertices =
 	  reallocarray(mesh->vertices, sizeof(vec3_t), mesh->vertices_max);
@@ -99,7 +97,6 @@ void resize_mesh(mesh_t * mesh, int new_size)
 	mesh->uvs = reallocarray(mesh->uvs, sizeof(vec2_t), mesh->vertices_max);
 	mesh->indices =
 	  reallocarray(mesh->indices, sizeof(GLuint), mesh->vertices_max);
-	INFO("Mesh resized.");
 }
 
 void mesh_push_vertex(mesh_t * mesh, vec3_t vertex, vec2_t uv, vec3_t normal)

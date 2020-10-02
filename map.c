@@ -76,12 +76,10 @@ Chunk *get_chunk_or_null(Map * map, int px, int py, int pz)
 Chunk *new_Chunk(Map * map, int px, int py, int pz)
 {
 	Chunk *chunk = calloc(sizeof(Chunk), 1);
-	int cx, cy, cz;
-	get_chunk_pos(px, py, pz, &cx, &cy, &cz);
-	chunk->x = cx;
-	chunk->y = cy;
-	chunk->z = cz;
-	insert_chunk(map, cx, cy, cz, chunk);
+	chunk->x = px;
+	chunk->y = py;
+	chunk->z = pz;
+	insert_chunk(map, px, py, pz, chunk);
 	return chunk;
 }
 
@@ -107,4 +105,26 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6])
 	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y - 1, z);
 	neighbours[NEIGHBOUR_FRONT] = get_block_or_null(map, x, y, z - 1);
 	neighbours[NEIGHBOUR_BACK] = get_block_or_null(map, x, y, z + 1);
+}
+
+void btree_foreach(MapBucket * bc, void (*fun)(Chunk * c, void *custom),
+				   void *custom_arg)
+{
+	fun(bc->chunk, custom_arg);
+	if (bc->larger) {
+		btree_foreach(bc->larger, fun, custom_arg);
+	}
+	if (bc->smaller) {
+		btree_foreach(bc->smaller, fun, custom_arg);
+	}
+}
+
+void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
+					void *custom_arg)
+{
+	if(!map->root) {
+		return;
+	} else {
+		btree_foreach(map->root, fun, custom_arg);
+	}
 }
