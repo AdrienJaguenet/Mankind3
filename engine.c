@@ -1,5 +1,7 @@
 #include "engine.h"
 #include "chunkmesh.h"
+#include "camera.h"
+#include "math_3d.h"
 
 engine_t *engine_new()
 {
@@ -58,12 +60,18 @@ void engine_update(engine_t * engine)
 	engine->last_time = current_time;
 }
 
-void engine_render(engine_t * engine)
+void engine_render(engine_t * engine, Camera * camera)
 {
+	setup_camera(&engine->program, engine->window, camera);
+
+	/* clean */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Render shit here. */
 	program_use(&engine->program);
+	/* The ONE chunk at 1,1,1 */
+	mat4_t model = m4_translation(vec3(1,1,1));
+	glUniformMatrix4fv(glGetUniformLocation(engine->program.id, "model"), 1, GL_FALSE, (float*) &model);
 	mesh_render(engine->mesh);
 
 	SDL_GL_SwapWindow(engine->window);
