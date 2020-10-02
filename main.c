@@ -46,9 +46,15 @@ int main()
 	GFXContext gfx_context;
 	init_GFX(&gfx_context, 800, 600);
 	Map map = { 0 };
-	Chunk *c = new_Chunk(&map, 1, 1, 1);
-	randomly_populate(c);
-	generate_chunk_mesh(c, &map, &gfx_context.tilemap);
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 1; ++j) {
+			for (int k = 0; k < 4; ++k) {
+				Chunk *c = new_Chunk(&map, i, j, k);
+				randomly_populate(c);
+				generate_chunk_mesh(c, &map, &gfx_context.tilemap);
+			}
+		}
+	}
 
 	bool running = true;
 
@@ -59,7 +65,7 @@ int main()
 			running = handle_event(&event, &gfx_context.camera);
 		}
 		begin_draw(&gfx_context);
-		draw_Chunk(&gfx_context, c);
+		draw_Map(&gfx_context, &map);
 		end_draw(&gfx_context);
 	}
 

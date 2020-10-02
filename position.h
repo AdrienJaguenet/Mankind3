@@ -1,6 +1,7 @@
 #pragma once
 
 #define CHUNK_SIZE 16
+#define BLOCK_SIZE 1.f
 
 typedef enum {
 	NEIGHBOUR_LEFT = 0,
