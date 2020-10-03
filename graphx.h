@@ -10,12 +10,7 @@
 #include "map.h"
 #include "texture.h"
 #include "camera.h"
-
-typedef struct ChunkGenQueue ChunkGenQueue;
-struct ChunkGenQueue{
-  Chunk *chunk;
-  ChunkGenQueue* next;
-};
+#include "heap.h"
 
 typedef struct {
 	SDL_Window *window;
@@ -24,9 +19,8 @@ typedef struct {
 	program_t main_program;
 	Texture tilemap;
 	Camera camera;
-	ChunkGenQueue* first_gen_chunk;
-	ChunkGenQueue* last_gen_chunk;
 	int queue_size;
+	Heap meshgen_pqueue;
 } GFXContext;
 
 void init_GFX(GFXContext * gfx_context, int window_width, int window_height);
@@ -43,7 +37,6 @@ void begin_draw(GFXContext * gfx_context);
 
 void end_draw(GFXContext * gfx_context);
 
-void push_Chunk_to_queue(GFXContext* gfx_context, Chunk* chunk);
+void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk);
 
-void gen_Chunks_in_queue(GFXContext* gfx_context, Map* map, int max_gens);
-
+void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens);

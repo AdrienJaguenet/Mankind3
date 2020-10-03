@@ -56,7 +56,6 @@ void mesh_load(mesh_t * mesh)
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvbo);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-	INFO("Loaded mesh with %u vertices", mesh->vertices_no);
 }
 
 void mesh_render(mesh_t * mesh)

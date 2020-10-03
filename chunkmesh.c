@@ -22,9 +22,9 @@ void generate_chunk_mesh(Chunk * chunk, Map * map, Texture * tilemap)
 	if (chunk->mesh) {
 		mesh_terminate(chunk->mesh);
 	}
-	if (chunk->empty){
-	  chunk->mesh = NULL;
-	  return;
+	if (chunk->empty) {
+		chunk->mesh = NULL;
+		return;
 	}
 
 	chunk->mesh = calloc(sizeof(mesh_t), 1);

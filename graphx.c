@@ -30,34 +30,35 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	  program_new("./resources/default.vs", "./resources/default.fs");
 	load_texture(&gfx_context->tilemap, "gfx/tilemap.png");
 
-	gfx_context->first_gen_chunk = NULL;
-	gfx_context->last_gen_chunk = NULL;
-	gfx_context->queue_size = 0;
+	gfx_context->camera.position = vec3(0, CHUNK_SIZE * 2, 0);
+	gfx_context->camera.rotation = vec3(0, -3.1415 / 4, 0);
+
+	init_Heap(&gfx_context->meshgen_pqueue);
 }
 
 void draw_Map(GFXContext * gfx_context, Map * map)
 {
-  Camera *camera = &gfx_context->camera;
-  vec3_t *campos = &camera->position;
-  int cx, cy, cz;
-  get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
-  for (int i = cx - 3; i < cx + 3; ++i) {
-	for (int j = cy - 3; j < cy + 3; ++j) {
-	  for (int k = cz - 3; k < cz + 3; ++k) {
-		Chunk *c = get_chunk_or_null(map, i, j, k);
-		if (! c){
-		  c = new_Chunk(map, i, j, k);
-		  randomly_populate(c);
+	Camera *camera = &gfx_context->camera;
+	vec3_t *campos = &camera->position;
+	int cx, cy, cz;
+	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
+	for (int i = cx - 5; i < cx + 5; ++i) {
+		for (int j = cy - 5; j < cy + 5; ++j) {
+			for (int k = cz - 5; k < cz + 5; ++k) {
+				Chunk *c = get_chunk_or_null(map, i, j, k);
+				if (!c) {
+					c = new_Chunk(map, i, j, k);
+					randomly_populate(c);
+					continue;
+				}
+				if (!c->pending_meshgen
+					&& ((!c->mesh && !c->empty) || (c->dirty))) {
+					push_Chunk_to_queue(gfx_context, c);
+				}
+				draw_Chunk(c, gfx_context);
+			}
 		}
-		if ((! c->mesh && !  c->empty) || (c->dirty && ! c->pending_meshgen)) {
-		  if (! c->mesh) {
-		  }
-		  push_Chunk_to_queue(gfx_context, c);
-		}
-		draw_Chunk(c, gfx_context);
-	  }
 	}
-  }
 }
 
 void draw_Chunk(Chunk * chunk, void *gfx_context_ptr)
@@ -102,35 +103,35 @@ void end_draw(GFXContext * gfx_context)
 
 void quit_GFX(GFXContext * gfx_context)
 {
+	clean_Heap(&gfx_context->meshgen_pqueue);
 	SDL_DestroyWindow(gfx_context->window);
 	SDL_Quit();
 }
 
-void push_Chunk_to_queue(GFXContext* gfx_context, Chunk* chunk)
+void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk)
 {
-  ChunkGenQueue* elm = malloc(sizeof(ChunkGenQueue));
-  chunk->pending_meshgen = true;
-  elm->next = gfx_context->first_gen_chunk;
-  elm->chunk = chunk;
-  if (gfx_context->last_gen_chunk == NULL) {
-	gfx_context->last_gen_chunk = elm;
-  }
-  gfx_context->first_gen_chunk = elm;
-  gfx_context->queue_size++;
+	chunk->pending_meshgen = true;
+	/* The closer the chunk, the higher its priority */
+	int distance =
+	  v3_length(v3_sub
+				(gfx_context->camera.position,
+				 vec3(chunk->x * CHUNK_SIZE, chunk->y * CHUNK_SIZE,
+					  chunk->z * CHUNK_SIZE)));
+	insert_HeapNode(&gfx_context->meshgen_pqueue, chunk, distance);
+	gfx_context->queue_size++;
 }
 
-void gen_Chunks_in_queue(GFXContext* gfx_context, Map* map, int max_gens)
+void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 {
-  for (int i = 0; i < max_gens; ++i) {
-	ChunkGenQueue* elm = gfx_context->first_gen_chunk;
-	if (! elm) {
-	  break;
+	int i;
+	for (i = 0; i < max_gens; ++i) {
+		Chunk *c = extract_HeapNode(&gfx_context->meshgen_pqueue);
+		if (c == NULL) {
+			break;
+		}
+		c->pending_meshgen = false;
+		generate_chunk_mesh(c, map, &gfx_context->tilemap);
+		gfx_context->queue_size--;
 	}
-	generate_chunk_mesh(elm->chunk, map, &gfx_context->tilemap);
-	elm->chunk->pending_meshgen = false;
-	gfx_context->first_gen_chunk = elm->next;
-	free(elm);
-	gfx_context->queue_size--;
-  }
+	INFO("Generated %d meshes, %d to go", i, gfx_context->queue_size);
 }
-

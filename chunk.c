@@ -27,11 +27,10 @@ void randomly_populate(Chunk * chunk)
 	}
 }
 
-void set_Chunk_block_type(Chunk* c, int x, int y, int z, int type)
+void set_Chunk_block_type(Chunk * c, int x, int y, int z, int type)
 {
-  if (type) {
-	c->empty = false;
-  }
-  c->blocks[INCHUNK_INDEX(x, y, z)].type = type;
+	if (type) {
+		c->empty = false;
+	}
+	c->blocks[INCHUNK_INDEX(x, y, z)].type = type;
 }
-

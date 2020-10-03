@@ -32,5 +32,4 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6]);
 void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
 					void *custom_arg);
 
-void gen_Map(Map* map);
-
+void gen_Map(Map * map);
