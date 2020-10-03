@@ -56,8 +56,6 @@ int main()
 	GFXContext gfx_context;
 	init_GFX(&gfx_context, 800, 600);
 	Map map = { 0 };
-	gen_Map(&map);
-	gen_Chunk_meshes(&gfx_context, &map);
 
 	bool running = true;
 	unsigned int delta_ticks;
@@ -77,6 +75,7 @@ int main()
 		handle_keystates(SDL_GetKeyboardState(NULL), &gfx_context.camera,
 						 delta_ticks);
 
+		gen_Chunks_in_queue(&gfx_context, &map, 10);
 		begin_draw(&gfx_context);
 		draw_Map(&gfx_context, &map);
 		end_draw(&gfx_context);

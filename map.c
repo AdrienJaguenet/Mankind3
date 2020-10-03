@@ -85,13 +85,13 @@ Chunk *new_Chunk(Map * map, int px, int py, int pz)
 	chunk->z = pz;
 	chunk->mesh = NULL;
 	chunk->empty = true;
-	chunk->dirty = true;
 	insert_chunk(map, px, py, pz, chunk);
 	for (int i = -1; i <= 1; ++i) {
 	  for (int j = -1; j <= 1; ++j) {
 		for (int k = -1; k <= 1; ++k) {
 		  Chunk *neighbour = get_chunk_or_null(map, px + i, py + j, pz + k);
 		  if (neighbour) {
+			INFO("Setting %d, %d, %d to dirty", px + i, py + j, pz + k);
 			neighbour->dirty = true;
 		  }
 		}
@@ -143,18 +143,6 @@ void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
 		return;
 	} else {
 		btree_foreach(map->root, fun, custom_arg);
-	}
-}
-
-void gen_Map(Map* map)
-{
-  for (int i = -2; i < 2; ++i) {
-	  for (int j = -2; j < 2; ++j) {
-		for (int k = -2; k < 2; ++k) {
-			Chunk *c = new_Chunk(map, i, j, k);
-			randomly_populate(c);
-		}
-	  }
 	}
 }
 

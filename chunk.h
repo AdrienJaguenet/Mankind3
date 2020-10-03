@@ -17,6 +17,7 @@ typedef struct {
 	mesh_t *mesh;
 	bool empty;
 	bool dirty;
+	bool pending_meshgen;
 } Chunk;
 
 void randomly_populate(Chunk * chunk);

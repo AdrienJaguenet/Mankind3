@@ -8,7 +8,6 @@ int get_height(int x, int z)
 
 void randomly_populate(Chunk * chunk)
 {
-	INFO("Populating chunk %d, %d, %d", chunk->x, chunk->y, chunk->z);
 	int base_height = chunk->y * CHUNK_SIZE;
 	for (int i = 0; i < CHUNK_SIZE; ++i) {
 		for (int k = 0; k < CHUNK_SIZE; ++k) {

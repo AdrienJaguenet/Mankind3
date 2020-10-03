@@ -30,6 +30,9 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	  program_new("./resources/default.vs", "./resources/default.fs");
 	load_texture(&gfx_context->tilemap, "gfx/tilemap.png");
 
+	gfx_context->first_gen_chunk = NULL;
+	gfx_context->last_gen_chunk = NULL;
+	gfx_context->queue_size = 0;
 }
 
 void draw_Map(GFXContext * gfx_context, Map * map)
@@ -38,16 +41,18 @@ void draw_Map(GFXContext * gfx_context, Map * map)
   vec3_t *campos = &camera->position;
   int cx, cy, cz;
   get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
-  for (int i = cx - 2; i < cx + 2; ++i) {
-	for (int j = cy - 2; j < cy + 2; ++j) {
-	  for (int k = cz - 2; k < cz + 2; ++k) {
+  for (int i = cx - 3; i < cx + 3; ++i) {
+	for (int j = cy - 3; j < cy + 3; ++j) {
+	  for (int k = cz - 3; k < cz + 3; ++k) {
 		Chunk *c = get_chunk_or_null(map, i, j, k);
 		if (! c){
 		  c = new_Chunk(map, i, j, k);
 		  randomly_populate(c);
 		}
-		if (! c->mesh || c->dirty) {
-		  generate_chunk_mesh(c, map, &gfx_context->tilemap);
+		if ((! c->mesh && !  c->empty) || (c->dirty && ! c->pending_meshgen)) {
+		  if (! c->mesh) {
+		  }
+		  push_Chunk_to_queue(gfx_context, c);
 		}
 		draw_Chunk(c, gfx_context);
 	  }
@@ -101,22 +106,31 @@ void quit_GFX(GFXContext * gfx_context)
 	SDL_Quit();
 }
 
-typedef struct {
-  Texture *tilemap;
-  Map *map;
-} ChunkMeshStruct;
-
-void gen_single_Chunk_mesh(Chunk* c, void* data)
+void push_Chunk_to_queue(GFXContext* gfx_context, Chunk* chunk)
 {
-  ChunkMeshStruct* cms = (ChunkMeshStruct*) data;
-  generate_chunk_mesh(c, cms->map, cms->tilemap);
+  ChunkGenQueue* elm = malloc(sizeof(ChunkGenQueue));
+  chunk->pending_meshgen = true;
+  elm->next = gfx_context->first_gen_chunk;
+  elm->chunk = chunk;
+  if (gfx_context->last_gen_chunk == NULL) {
+	gfx_context->last_gen_chunk = elm;
+  }
+  gfx_context->first_gen_chunk = elm;
+  gfx_context->queue_size++;
 }
 
-void gen_Chunk_meshes(GFXContext* gfx_context, Map* map)
+void gen_Chunks_in_queue(GFXContext* gfx_context, Map* map, int max_gens)
 {
-  ChunkMeshStruct cms;
-  cms.tilemap = &gfx_context->tilemap;
-  cms.map = map;
-  for_each_Chunk(map, gen_single_Chunk_mesh, &cms);
+  for (int i = 0; i < max_gens; ++i) {
+	ChunkGenQueue* elm = gfx_context->first_gen_chunk;
+	if (! elm) {
+	  break;
+	}
+	generate_chunk_mesh(elm->chunk, map, &gfx_context->tilemap);
+	elm->chunk->pending_meshgen = false;
+	gfx_context->first_gen_chunk = elm->next;
+	free(elm);
+	gfx_context->queue_size--;
+  }
 }
 
