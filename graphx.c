@@ -112,11 +112,10 @@ void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk)
 {
 	chunk->pending_meshgen = true;
 	/* The closer the chunk, the higher its priority */
-	int distance =
-	  v3_length(v3_sub
-				(gfx_context->camera.position,
-				 vec3(chunk->x * CHUNK_SIZE, chunk->y * CHUNK_SIZE,
-					  chunk->z * CHUNK_SIZE)));
+	int distance = v3_length(v3_sub(gfx_context->camera.position,
+									vec3(chunk->x * CHUNK_SIZE,
+										 chunk->y * CHUNK_SIZE,
+										 chunk->z * CHUNK_SIZE)));
 	insert_HeapNode(&gfx_context->meshgen_pqueue, chunk, distance);
 	gfx_context->queue_size++;
 }
