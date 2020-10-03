@@ -2,79 +2,20 @@
 #include <stdlib.h>
 #include "position.h"
 
-Key get_key(int px, int py, int pz)
-{
-	return (Key) (px & 0x0007ffff) << 40 | (Key) (py & 0x0007ffff) << 20 |
-	  (Key) (pz & 0x0007ffff);
-}
-
-MapBucket *new_MapBucket(Key key, Chunk * chunk)
-{
-	MapBucket *bucket = malloc(sizeof(MapBucket));
-	bucket->larger = NULL;
-	bucket->smaller = NULL;
-	bucket->key = key;
-	bucket->chunk = chunk;
-	return bucket;
-}
-
-void btree_insert_chunk(MapBucket * root, Key key, Chunk * chunk)
-{
-	if (key == root->key) {
-		WARN
-		  ("Key collision for chunk %d, %d, %d (with %d, %d, %d): (colliding key is %zu).",
-		   chunk->x, chunk->y, chunk->z, root->chunk->x, root->chunk->y,
-		   root->chunk->z, key);
-	}
-	if (key > root->key) {
-		if (root->larger) {
-			btree_insert_chunk(root->larger, key, chunk);
-		} else {
-			root->larger = new_MapBucket(key, chunk);
-		}
-	} else {
-		if (root->smaller) {
-			btree_insert_chunk(root->smaller, key, chunk);
-		} else {
-			root->smaller = new_MapBucket(key, chunk);
-		}
-	}
-}
-
-Chunk *btree_get_chunk(MapBucket * root, Key key)
-{
-	if (key == root->key) {
-		return root->chunk;
-	} else if (key > root->key) {
-		if (root->larger) {
-			return btree_get_chunk(root->larger, key);
-		} else {
-			return NULL;
-		}
-	} else {
-		if (root->smaller) {
-			return btree_get_chunk(root->smaller, key);
-		} else {
-			return NULL;
-		}
-	}
-}
-
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk)
 {
-	Key key = get_key(px, py, pz);
-	if (!map->root) {
-		map->root = new_MapBucket(key, chunk);
+	int chunk_pos = CHUNK_INMAP(px, py, pz);
+	if (chunk_pos < MAX_CHUNKS_NO) {
+		map->chunks[CHUNK_INMAP(px, py, pz)] = chunk;
+		map->chunks_no++;
 	}
-	btree_insert_chunk(map->root, key, chunk);
-	map->chunks_no++;
 }
 
 Chunk *get_chunk_or_null(Map * map, int px, int py, int pz)
 {
-	Key key = get_key(px, py, pz);
-	if (map->root) {
-		return btree_get_chunk(map->root, key);
+	int chunk_pos = CHUNK_INMAP(px, py, pz);
+	if (chunk_pos < MAX_CHUNKS_NO) {
+		return map->chunks[CHUNK_INMAP(px, py, pz)];
 	} else {
 		return NULL;
 	}
@@ -125,26 +66,4 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6])
 	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y - 1, z);
 	neighbours[NEIGHBOUR_FRONT] = get_block_or_null(map, x, y, z - 1);
 	neighbours[NEIGHBOUR_BACK] = get_block_or_null(map, x, y, z + 1);
-}
-
-void btree_foreach(MapBucket * bc, void (*fun)(Chunk * c, void *custom),
-				   void *custom_arg)
-{
-	fun(bc->chunk, custom_arg);
-	if (bc->larger) {
-		btree_foreach(bc->larger, fun, custom_arg);
-	}
-	if (bc->smaller) {
-		btree_foreach(bc->smaller, fun, custom_arg);
-	}
-}
-
-void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
-					void *custom_arg)
-{
-	if (!map->root) {
-		return;
-	} else {
-		btree_foreach(map->root, fun, custom_arg);
-	}
 }

@@ -2,22 +2,17 @@
 #include "chunk.h"
 #include <stdint.h>
 
-typedef struct MapBucket MapBucket;
-struct MapBucket {
-	int64_t key;
-	Chunk *chunk;
-	MapBucket *larger;
-	MapBucket *smaller;
-};
+#define MAP_SIZE_IN_CHUNKS 32
+#define MAX_CHUNKS_NO MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS
+#define CHUNK_INMAP(x, y, z)\
+  (((x) + MAP_SIZE_IN_CHUNKS / 2) * MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS +\
+   ((y) + MAP_SIZE_IN_CHUNKS / 2) * MAP_SIZE_IN_CHUNKS +\
+   ((z) + MAP_SIZE_IN_CHUNKS / 2))
 
 typedef struct {
-	MapBucket *root;
+	Chunk *chunks[32 * 32 * 32];
 	int chunks_no;
 } Map;
-
-typedef int64_t Key;
-
-Key get_key(int px, int py, int pz);
 
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk);
 
