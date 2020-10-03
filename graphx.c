@@ -43,7 +43,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	int cx, cy, cz;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
 	for (int i = cx - 5; i < cx + 5; ++i) {
-		for (int j = cy - 5; j < cy + 5; ++j) {
+		for (int j = cy - 2; j < cy + 1; ++j) {
 			for (int k = cz - 5; k < cz + 5; ++k) {
 				Chunk *c = get_chunk_or_null(map, i, j, k);
 				/* if the chunk does not exist */
@@ -56,14 +56,15 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 											  c->y * CHUNK_SIZE * BLOCK_SIZE,
 											  c->z * CHUNK_SIZE * BLOCK_SIZE),
 										 *campos);
+				float distance = v3_length(to_chunk);
+				to_chunk = v3_norm(to_chunk);
 				/* if the chunk is behind us and not the chunk we are in */
-				if (v3_dot(to_chunk, get_Camera_lookAt(camera)) < 0.2f &&
-					!(cx == i && cy == j && cz == k)) {
+				if (v3_dot(to_chunk, get_Camera_lookAt(camera)) < -.0f
+					&& distance > CHUNK_SIZE * BLOCK_SIZE) {
 					continue;
 				}
 				if (!c->pending_meshgen
 					&& ((!c->mesh && !c->empty) || (c->dirty))) {
-					int distance = v3_length(to_chunk);
 					push_Chunk_to_queue(gfx_context, c, distance);
 				}
 				draw_Chunk(c, gfx_context);

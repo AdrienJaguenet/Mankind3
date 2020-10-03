@@ -142,7 +142,7 @@ void btree_foreach(MapBucket * bc, void (*fun)(Chunk * c, void *custom),
 void for_each_Chunk(Map * map, void (*fun)(Chunk * c, void *custom),
 					void *custom_arg)
 {
-	if(!map->root) {
+	if (!map->root) {
 		return;
 	} else {
 		btree_foreach(map->root, fun, custom_arg);
