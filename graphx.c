@@ -46,14 +46,25 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 		for (int j = cy - 5; j < cy + 5; ++j) {
 			for (int k = cz - 5; k < cz + 5; ++k) {
 				Chunk *c = get_chunk_or_null(map, i, j, k);
+				/* if the chunk does not exist */
 				if (!c) {
 					c = new_Chunk(map, i, j, k);
 					randomly_populate(c);
 					continue;
 				}
+				vec3_t to_chunk = v3_sub(vec3(c->x * CHUNK_SIZE * BLOCK_SIZE,
+											  c->y * CHUNK_SIZE * BLOCK_SIZE,
+											  c->z * CHUNK_SIZE * BLOCK_SIZE),
+										 *campos);
+				/* if the chunk is behind us and not the chunk we are in */
+				if (v3_dot(to_chunk, get_Camera_lookAt(camera)) < 0.2f &&
+					!(cx == i && cy == j && cz == k)) {
+					continue;
+				}
 				if (!c->pending_meshgen
 					&& ((!c->mesh && !c->empty) || (c->dirty))) {
-					push_Chunk_to_queue(gfx_context, c);
+					int distance = v3_length(to_chunk);
+					push_Chunk_to_queue(gfx_context, c, distance);
 				}
 				draw_Chunk(c, gfx_context);
 			}
@@ -108,15 +119,11 @@ void quit_GFX(GFXContext * gfx_context)
 	SDL_Quit();
 }
 
-void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk)
+void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority)
 {
 	chunk->pending_meshgen = true;
 	/* The closer the chunk, the higher its priority */
-	int distance = v3_length(v3_sub(gfx_context->camera.position,
-									vec3(chunk->x * CHUNK_SIZE,
-										 chunk->y * CHUNK_SIZE,
-										 chunk->z * CHUNK_SIZE)));
-	insert_HeapNode(&gfx_context->meshgen_pqueue, chunk, distance);
+	insert_HeapNode(&gfx_context->meshgen_pqueue, chunk, priority);
 	gfx_context->queue_size++;
 }
 

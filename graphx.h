@@ -37,6 +37,6 @@ void begin_draw(GFXContext * gfx_context);
 
 void end_draw(GFXContext * gfx_context);
 
-void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk);
+void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority);
 
 void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens);
