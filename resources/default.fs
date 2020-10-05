@@ -1,4 +1,4 @@
-#version 130
+#version 420
 
 uniform sampler2D texture0;
 uniform vec3 ambient_light;

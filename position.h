@@ -1,7 +1,32 @@
 #pragma once
 
-#define CHUNK_SIZE 16
+#define MAP_SIZE_IN_CHUNKS 32
+#define MAX_CHUNKS_NO MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS
 #define BLOCK_SIZE 1.f
+#define CHUNK_SIZE 16
+#define INCHUNK_INDEX(x, y, z)\
+  (((z) * CHUNK_SIZE * CHUNK_SIZE) + ((y) *  CHUNK_SIZE) + (x))
+#define CHUNK_INMAP(x, y, z)\
+  (((x) + MAP_SIZE_IN_CHUNKS / 2) * MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS +\
+   ((y) + MAP_SIZE_IN_CHUNKS / 2) * MAP_SIZE_IN_CHUNKS +\
+   ((z) + MAP_SIZE_IN_CHUNKS / 2))
+
+typedef enum {
+	FACE_LEFT = 0,
+	FACE_RIGHT = 1,
+	FACE_UP = 2,
+	FACE_DOWN = 3,
+	FACE_FRONT = 4,
+	FACE_BACK = 5
+} EFace;
+
+typedef enum {
+	CORNER_TOP_LEFT = 0,
+	CORNER_TOP_RIGHT = 1,
+	CORNER_BOTTOM_LEFT = 2,
+	CORNER_BOTTOM_RIGHT = 3
+} ECorner;
+
 
 typedef enum {
 	NEIGHBOUR_LEFT = 0,

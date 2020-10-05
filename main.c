@@ -55,7 +55,8 @@ int main()
 	INFO("Mankind %s", VERSION);
 	GFXContext gfx_context;
 	init_GFX(&gfx_context, 800, 600);
-	Map map = { 0 };
+	Map *map = calloc(sizeof(Map), 1);
+	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 
 	bool running = true;
 	unsigned int delta_ticks;
@@ -75,13 +76,16 @@ int main()
 		handle_keystates(SDL_GetKeyboardState(NULL), &gfx_context.camera,
 						 delta_ticks);
 
-		gen_Chunks_in_queue(&gfx_context, &map, 10);
+		gen_Chunks_in_queue(&gfx_context, map, 10);
 		begin_draw(&gfx_context);
-		draw_Map(&gfx_context, &map);
+		draw_Map(&gfx_context, map);
 		end_draw(&gfx_context);
 	}
 
 	quit_GFX(&gfx_context);
+	delete_Map(map);
+	free(map->chunks);
+	free(map);
 	INFO("Goodbye!");
 	return 0;
 }

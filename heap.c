@@ -37,7 +37,7 @@ void insert_HeapNode(Heap * heap, void *data, int cmp_value)
 	node->data = data;
 	node->cmp_value = cmp_value;
 
-	while (index != 0
+	while (index != 1
 		   && heap->nodes[index / 2].cmp_value > heap->nodes[index].cmp_value) {
 		swap_HeapNodes(&heap->nodes[index / 2], &heap->nodes[index]);
 		index /= 2;

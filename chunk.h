@@ -1,9 +1,5 @@
 #pragma once
 
-#define INCHUNK_INDEX(x, y, z)\
-  (((x) * CHUNK_SIZE * CHUNK_SIZE) + ((y) *  CHUNK_SIZE) + (z))
-#define CUBE_SIZE 1.f
-
 #include "mesh.h"
 #include "position.h"
 

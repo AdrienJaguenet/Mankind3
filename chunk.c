@@ -3,7 +3,10 @@
 
 int get_height(int x, int z)
 {
-	return CHUNK_SIZE / 2 + (x + z) % (CHUNK_SIZE / 2) - rand() % 3;
+	(void) x;
+	(void) z;
+	return 10 + rand() % 10;
+	//return CHUNK_SIZE / 2 + (x + z) % (CHUNK_SIZE / 2) - rand() % 3;
 }
 
 void randomly_populate(Chunk * chunk)
@@ -29,6 +32,7 @@ void randomly_populate(Chunk * chunk)
 
 void set_Chunk_block_type(Chunk * c, int x, int y, int z, int type)
 {
+	c->dirty = true;
 	if (type) {
 		c->empty = false;
 	}

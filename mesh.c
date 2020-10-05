@@ -3,21 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-mesh_t mesh_new(vec3_t * vertices, vec3_t * normals, vec2_t * uvs,
-				GLuint * indices)
-{
-	mesh_t mesh;
-
-	mesh.vertices = vertices;
-	mesh.normals = normals;
-	mesh.uvs = uvs;
-	mesh.indices = indices;
-
-	INFO("Got here!");
-	mesh_load(&mesh);
-	return mesh;
-}
-
 void mesh_load(mesh_t * mesh)
 {
 	/* Generate the VAO. */
@@ -25,20 +10,10 @@ void mesh_load(mesh_t * mesh)
 	glBindVertexArray(mesh->vao);
 
 	/* Generate the buffer objects.. */
-	glGenBuffers(1, &mesh->vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-	glBufferData(GL_ARRAY_BUFFER, mesh->vertices_no * sizeof(vec3_t),
-				 mesh->vertices, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &mesh->nbo);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->nbo);
-	glBufferData(GL_ARRAY_BUFFER, mesh->vertices_no * sizeof(vec3_t),
-				 mesh->normals, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &mesh->uvbo);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvbo);
-	glBufferData(GL_ARRAY_BUFFER, mesh->vertices_no * sizeof(vec2_t),
-				 mesh->uvs, GL_STATIC_DRAW);
+	glGenBuffers(1, &mesh->pbo);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->pbo);
+	glBufferData(GL_ARRAY_BUFFER, mesh->vertices_no * sizeof(GLuint),
+				 mesh->packed, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &mesh->ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
@@ -46,16 +21,8 @@ void mesh_load(mesh_t * mesh)
 				 mesh->indices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->nbo);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvbo);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->pbo);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, (void *) 0);
 }
 
 void mesh_render(mesh_t * mesh)
@@ -74,39 +41,39 @@ void mesh_render(mesh_t * mesh)
 
 void mesh_terminate(mesh_t * mesh)
 {
-	free(mesh->vertices);
-	free(mesh->normals);
-	free(mesh->uvs);
+	free(mesh->packed);
 	free(mesh->indices);
-	glDeleteBuffers(1, &mesh->vbo);
-	glDeleteBuffers(1, &mesh->nbo);
-	glDeleteBuffers(1, &mesh->uvbo);
+	glDeleteBuffers(1, &mesh->pbo);
 	glDeleteBuffers(1, &mesh->ebo);
 
 	glDeleteVertexArrays(1, &mesh->vao);
+	free(mesh);
 }
 
 void resize_mesh(mesh_t * mesh, int new_size)
 {
 	mesh->vertices_max = new_size;
-	mesh->vertices =
-	  reallocarray(mesh->vertices, sizeof(vec3_t), mesh->vertices_max);
-	mesh->normals =
-	  reallocarray(mesh->normals, sizeof(vec3_t), mesh->vertices_max);
-	mesh->uvs = reallocarray(mesh->uvs, sizeof(vec2_t), mesh->vertices_max);
+	mesh->packed =
+	  reallocarray(mesh->packed, sizeof(GLuint), mesh->vertices_max);
 	mesh->indices =
 	  reallocarray(mesh->indices, sizeof(GLuint), mesh->vertices_max);
 }
 
-void mesh_push_vertex(mesh_t * mesh, vec3_t vertex, vec2_t uv, vec3_t normal)
+void mesh_push_vertex(mesh_t * mesh, ECorner corner, EFace face,
+					  vec3_t position, int type)
 {
 	/* Resize arrays */
 	if (mesh->vertices_no >= mesh->vertices_max) {
 		resize_mesh(mesh, mesh->vertices_max * 2);
 	}
-	memcpy(mesh->vertices + mesh->vertices_no, &vertex, sizeof(vertex));
-	memcpy(mesh->uvs + mesh->vertices_no, &uv, sizeof(uv));
-	memcpy(mesh->normals + mesh->vertices_no, &normal, sizeof(normal));
+	GLuint pack = ((face & FACE_MASK) << FACE_OFFSET) |
+	  (((GLuint) position.x & POS_MASK) << POSX_OFFSET) |
+	  (((GLuint) position.y & POS_MASK) << POSY_OFFSET) |
+	  (((GLuint) position.z & POS_MASK) << POSZ_OFFSET) |
+	  ((corner & CORNER_MASK) << CORNER_OFFSET) |
+	  ((type & TYPE_MASK) << TYPE_OFFSET);
+
+	mesh->packed[mesh->vertices_no] = pack;
 	mesh->indices[mesh->vertices_no] = mesh->vertices_no;
 	++mesh->vertices_no;
 }

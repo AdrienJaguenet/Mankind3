@@ -17,7 +17,15 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	gfx_context->gl_context = SDL_GL_CreateContext(gfx_context->window);
+
+	INFO("Graphic card vendor: '%s'", glGetString(GL_VENDOR));
+	INFO("Renderer: '%s'", glGetString(GL_RENDERER));
+	INFO("GL version: '%s'", glGetString(GL_VERSION));
+	INFO("GLSL version: '%s'", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
 	if (!gfx_context->gl_context) {
 		FATAL("Failed to create OpenGL context: %s", SDL_GetError());
 	}
@@ -43,7 +51,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	int cx, cy, cz;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
 	for (int i = cx - 5; i < cx + 5; ++i) {
-		for (int j = cy - 2; j < cy + 1; ++j) {
+		for (int j = cy - 5; j < cy + 5; ++j) {
 			for (int k = cz - 5; k < cz + 5; ++k) {
 				Chunk *c = get_chunk_or_null(map, i, j, k);
 				/* if the chunk does not exist */
@@ -59,10 +67,10 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 				float distance = v3_length(to_chunk);
 				to_chunk = v3_norm(to_chunk);
 				/* if the chunk is behind us and not the chunk we are in */
-				if (v3_dot(to_chunk, get_Camera_lookAt(camera)) < -.0f
-					&& distance > CHUNK_SIZE * BLOCK_SIZE) {
-					continue;
-				}
+				/*if (v3_dot(to_chunk, get_Camera_lookAt(camera)) < -.0f
+				   && distance > CHUNK_SIZE * BLOCK_SIZE) {
+				   continue;
+				   } */
 				if (!c->pending_meshgen
 					&& ((!c->mesh && !c->empty) || (c->dirty))) {
 					push_Chunk_to_queue(gfx_context, c, distance);
@@ -92,6 +100,8 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position)
 					   (float *) &model);
 	glUniform3f(glGetUniformLocation
 				(gfx_context->main_program.id, "ambient_light"), .5f, 1.f, .5f);
+	glUniform1i(glGetUniformLocation
+				(gfx_context->main_program.id, "tilemap_grid_size"), 8);
 	mesh_render(mesh);
 }
 
@@ -116,6 +126,7 @@ void end_draw(GFXContext * gfx_context)
 void quit_GFX(GFXContext * gfx_context)
 {
 	clean_Heap(&gfx_context->meshgen_pqueue);
+	SDL_GL_DeleteContext(gfx_context->gl_context);
 	SDL_DestroyWindow(gfx_context->window);
 	SDL_Quit();
 }
@@ -140,5 +151,4 @@ void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 		generate_chunk_mesh(c, map, &gfx_context->tilemap);
 		gfx_context->queue_size--;
 	}
-	INFO("Generated %d meshes, %d to go", i, gfx_context->queue_size);
 }
