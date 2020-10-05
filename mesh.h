@@ -27,7 +27,7 @@ typedef struct mesh_t {
 } mesh_t;
 
 void mesh_load(mesh_t * mesh);
-void mesh_render(mesh_t * mesh, Texture* texture);
+void mesh_render(mesh_t * mesh, Texture * texture);
 void mesh_terminate(mesh_t * mesh);
 void mesh_push_vertex(mesh_t * mesh, ECorner corner, EFace face,
 					  vec3_t position, int type);

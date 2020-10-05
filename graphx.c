@@ -97,7 +97,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 				}
 				int lod = 0;
 				if (distance > 64.f) {
-				  lod = 1;
+					lod = 1;
 				}
 				draw_Chunk(c, gfx_context, lod);
 			}
@@ -105,7 +105,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	}
 }
 
-void draw_Chunk(Chunk * chunk, GFXContext* gfx_context, int lod)
+void draw_Chunk(Chunk * chunk, GFXContext * gfx_context, int lod)
 {
 	if (chunk->mesh[lod]) {
 		draw_Mesh(gfx_context, chunk->mesh[lod],
@@ -115,7 +115,8 @@ void draw_Chunk(Chunk * chunk, GFXContext* gfx_context, int lod)
 	}
 }
 
-void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position, int lod)
+void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
+			   int lod)
 {
 	mat4_t model = m4_translation(position);
 	glUniformMatrix4fv(glGetUniformLocation
@@ -125,8 +126,7 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position, int lod
 				(gfx_context->main_program.id, "ambient_light"), .5f, 1.f, .5f);
 	glUniform1i(glGetUniformLocation
 				(gfx_context->main_program.id, "tilemap_grid_size"), 8);
-	glUniform1i(glGetUniformLocation
-		(gfx_context->main_program.id, "lod"), lod);
+	glUniform1i(glGetUniformLocation(gfx_context->main_program.id, "lod"), lod);
 	mesh_render(mesh, &gfx_context->tilemap);
 }
 

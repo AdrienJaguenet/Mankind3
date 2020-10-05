@@ -27,9 +27,10 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height);
 
 void draw_Map(GFXContext * gfx_context, Map * map);
 
-void draw_Chunk(Chunk * chunk, GFXContext *gfx_context, int lod);
+void draw_Chunk(Chunk * chunk, GFXContext * gfx_context, int lod);
 
-void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position, int lod);
+void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
+			   int lod);
 
 void quit_GFX(GFXContext * gfx_context);
 
