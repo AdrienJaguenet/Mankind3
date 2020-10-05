@@ -44,15 +44,42 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	init_Heap(&gfx_context->meshgen_pqueue);
 }
 
+bool cull_chunk(Chunk * chunk, Camera * camera, float *distance)
+{
+	vec3_t *campos = &camera->position;
+	float factor = CHUNK_SIZE * BLOCK_SIZE;
+	vec3_t chunkpos =
+	  vec3(chunk->x * factor, chunk->y * factor, chunk->z * factor);
+	vec3_t to_corner = v3_sub(chunkpos, *campos);
+	*distance = v3_length(to_corner);
+	if (*distance >= 512.f) {
+		return true;
+	}
+	/* Look for any corner that we should be seeing */
+	for (int i = 0; i < 2; ++i) {
+		for (int j = 0; j < 2; ++j) {
+			for (int k = 0; k < 2; ++k) {
+				vec3_t corner =
+				  v3_add(vec3(i * factor, j * factor, k * factor), chunkpos);
+				to_corner = v3_norm(v3_sub(corner, *campos));
+				if (v3_dot(to_corner, get_Camera_lookAt(camera)) >= 0.f) {
+					return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+
 void draw_Map(GFXContext * gfx_context, Map * map)
 {
 	Camera *camera = &gfx_context->camera;
 	vec3_t *campos = &camera->position;
 	int cx, cy, cz;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
-	for (int i = cx - 5; i < cx + 5; ++i) {
-		for (int j = cy - 5; j < cy + 5; ++j) {
-			for (int k = cz - 5; k < cz + 5; ++k) {
+	for (int i = cx - 8; i < cx + 8; ++i) {
+		for (int j = cy - 8; j < cy + 8; ++j) {
+			for (int k = cz - 8; k < cz + 8; ++k) {
 				Chunk *c = get_chunk_or_null(map, i, j, k);
 				/* if the chunk does not exist */
 				if (!c) {
@@ -60,17 +87,10 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 					randomly_populate(c);
 					continue;
 				}
-				vec3_t to_chunk = v3_sub(vec3(c->x * CHUNK_SIZE * BLOCK_SIZE,
-											  c->y * CHUNK_SIZE * BLOCK_SIZE,
-											  c->z * CHUNK_SIZE * BLOCK_SIZE),
-										 *campos);
-				float distance = v3_length(to_chunk);
-				to_chunk = v3_norm(to_chunk);
-				/* if the chunk is behind us and not the chunk we are in */
-				/*if (v3_dot(to_chunk, get_Camera_lookAt(camera)) < -.0f
-				   && distance > CHUNK_SIZE * BLOCK_SIZE) {
-				   continue;
-				   } */
+				float distance;
+				if (cull_chunk(c, camera, &distance)) {
+					continue;
+				}
 				if (!c->pending_meshgen
 					&& ((!c->mesh && !c->empty) || (c->dirty))) {
 					push_Chunk_to_queue(gfx_context, c, distance);
