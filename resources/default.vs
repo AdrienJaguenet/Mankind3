@@ -4,6 +4,7 @@ layout(location = 0) in int pack;
 
 uniform mat4 model, view, projection;
 uniform int tilemap_grid_size;
+uniform int lod;
 
 out vec3 fragment_position;
 out vec3 fragment_normal;
@@ -33,7 +34,7 @@ void main()
   int z      = (pack >> 13) & 0x01f;
   int corner = (pack >> 18) & 0x003;
   int type   = (pack >> 20) & 0x1ff;
-  vec3 position = vec3(x, y, z);
+  vec3 position = vec3(x << lod, y << lod, z << lod);
   vec3 normal = normals[face];
   float cell_size = 1.f / float(tilemap_grid_size);
   int quad_x = type % tilemap_grid_size, quad_y = type / tilemap_grid_size;

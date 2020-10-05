@@ -25,10 +25,10 @@ void mesh_load(mesh_t * mesh)
 	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, (void *) 0);
 }
 
-void mesh_render(mesh_t * mesh)
+void mesh_render(mesh_t * mesh, Texture* texture)
 {
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mesh->texture->index);
+	glBindTexture(GL_TEXTURE_2D, texture->index);
 
 	glBindVertexArray(mesh->vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);

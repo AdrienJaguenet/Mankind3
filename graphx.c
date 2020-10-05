@@ -52,7 +52,7 @@ bool cull_chunk(Chunk * chunk, Camera * camera, float *distance)
 	  vec3(chunk->x * factor, chunk->y * factor, chunk->z * factor);
 	vec3_t to_corner = v3_sub(chunkpos, *campos);
 	*distance = v3_length(to_corner);
-	if (*distance >= 512.f) {
+	if (*distance >= 1024.f) {
 		return true;
 	}
 	/* Look for any corner that we should be seeing */
@@ -92,27 +92,30 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 					continue;
 				}
 				if (!c->pending_meshgen
-					&& ((!c->mesh && !c->empty) || (c->dirty))) {
+					&& ((!c->mesh[0] && !c->empty) || (c->dirty))) {
 					push_Chunk_to_queue(gfx_context, c, distance);
 				}
-				draw_Chunk(c, gfx_context);
+				int lod = 0;
+				if (distance > 64.f) {
+				  lod = 1;
+				}
+				draw_Chunk(c, gfx_context, lod);
 			}
 		}
 	}
 }
 
-void draw_Chunk(Chunk * chunk, void *gfx_context_ptr)
+void draw_Chunk(Chunk * chunk, GFXContext* gfx_context, int lod)
 {
-	GFXContext *gfx_context = (GFXContext *) gfx_context_ptr;
-	if (chunk->mesh) {
-		draw_Mesh(gfx_context, chunk->mesh,
+	if (chunk->mesh[lod]) {
+		draw_Mesh(gfx_context, chunk->mesh[lod],
 				  vec3(chunk->x * CHUNK_SIZE * BLOCK_SIZE,
 					   chunk->y * CHUNK_SIZE * BLOCK_SIZE,
-					   chunk->z * CHUNK_SIZE * BLOCK_SIZE));
+					   chunk->z * CHUNK_SIZE * BLOCK_SIZE), lod);
 	}
 }
 
-void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position)
+void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position, int lod)
 {
 	mat4_t model = m4_translation(position);
 	glUniformMatrix4fv(glGetUniformLocation
@@ -122,7 +125,9 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position)
 				(gfx_context->main_program.id, "ambient_light"), .5f, 1.f, .5f);
 	glUniform1i(glGetUniformLocation
 				(gfx_context->main_program.id, "tilemap_grid_size"), 8);
-	mesh_render(mesh);
+	glUniform1i(glGetUniformLocation
+		(gfx_context->main_program.id, "lod"), lod);
+	mesh_render(mesh, &gfx_context->tilemap);
 }
 
 void begin_draw(GFXContext * gfx_context)
@@ -168,7 +173,7 @@ void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 			break;
 		}
 		c->pending_meshgen = false;
-		generate_chunk_mesh(c, map, &gfx_context->tilemap);
+		generate_chunk_mesh(c, map);
 		gfx_context->queue_size--;
 	}
 }

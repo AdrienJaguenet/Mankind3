@@ -10,6 +10,7 @@
   (((x) + MAP_SIZE_IN_CHUNKS / 2) * MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS +\
    ((y) + MAP_SIZE_IN_CHUNKS / 2) * MAP_SIZE_IN_CHUNKS +\
    ((z) + MAP_SIZE_IN_CHUNKS / 2))
+#define MAX_LOD 4
 
 typedef enum {
 	FACE_LEFT = 0,

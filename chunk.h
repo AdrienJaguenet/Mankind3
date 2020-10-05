@@ -10,7 +10,7 @@ typedef struct {
 typedef struct {
 	Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
 	int x, y, z;
-	mesh_t *mesh;
+	mesh_t *mesh[MAX_LOD];
 	bool empty;
 	bool dirty;
 	bool pending_meshgen;

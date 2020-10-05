@@ -5,7 +5,7 @@ int get_height(int x, int z)
 {
 	(void) x;
 	(void) z;
-	return x * z;
+	return x / 2 + z / 2;
 }
 
 void randomly_populate(Chunk * chunk)
