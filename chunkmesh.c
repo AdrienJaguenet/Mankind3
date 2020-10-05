@@ -28,7 +28,7 @@ void push_face(mesh_t * mesh, int x, int y, int z, EFace face, int type)
 		vec3(x + 1, y + 1, z),
 		vec3(x + 1, y + 1, z + 1),
 	};
-	int indices[4];
+	int indices[4] = { 0 };
 	switch (face) {
 	  case FACE_LEFT:
 		  indices[CORNER_TOP_LEFT] = 3;

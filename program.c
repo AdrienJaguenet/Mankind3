@@ -11,7 +11,8 @@ bool compile_shader(GLint * shader_id, const char *path)
 	char *source = calloc(sizeof(char), length);
 
 	rewind(file);
-	fread(source, sizeof(char), length, file);
+	INFO("Read %zu bytes from shader.",
+		 fread(source, sizeof(char), length, file));
 	fclose(file);
 
 	glShaderSource(*shader_id, 1, (const char **) &source, NULL);
