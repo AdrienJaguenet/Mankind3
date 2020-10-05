@@ -30,8 +30,9 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 		FATAL("Failed to create OpenGL context: %s", SDL_GetError());
 	}
 
+	int error = glewInit();
 	if (glewInit() != GLEW_OK) {
-		FATAL("Failed to initialize GLEW");
+		FATAL("Failed to initialize GLEW: %s", glewGetErrorString(error));
 	}
 
 	gfx_context->main_program =
