@@ -2,6 +2,7 @@
 #include <time.h>
 
 #include "utilities.h"
+#include "sfx.h"
 #include "graphx.h"
 #include "chunkmesh.h"
 
@@ -54,7 +55,10 @@ int main()
 	srand(time(NULL));
 	INFO("Mankind %s", VERSION);
 	GFXContext gfx_context;
+	SFXContext sfx_context;
+	(void) sfx_context;
 	init_GFX(&gfx_context, 800, 600);
+	init_SFX();
 	Map *map = calloc(sizeof(Map), 1);
 	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 

@@ -39,4 +39,5 @@ typedef enum {
 } NeighbourhoodPosition;
 
 void get_chunk_pos(int px, int py, int pz, int *cx, int *cy, int *cz);
-void get_pos_in_chunk(int px, int py, int pz, int *bx, int *by, int *bz);
+void get_pos_in_chunk(int px, int py, int pz, int *bx, int *by, int *bz,
+					  int lod);

@@ -9,9 +9,10 @@ void get_chunk_pos(int px, int py, int pz, int *cx, int *cy, int *cz)
 	*cz = floor((float) pz / CHUNK_SIZE);
 }
 
-void get_pos_in_chunk(int px, int py, int pz, int *bx, int *by, int *bz)
+void get_pos_in_chunk(int px, int py, int pz, int *bx, int *by, int *bz,
+					  int lod)
 {
-	*bx = ((px % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
-	*by = ((py % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
-	*bz = ((pz % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+	*bx = (((px % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE) >> lod;
+	*by = (((py % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE) >> lod;
+	*bz = (((pz % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE) >> lod;
 }

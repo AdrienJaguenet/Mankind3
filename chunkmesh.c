@@ -2,19 +2,19 @@
 #include <stdlib.h>
 
 /*
-   Y  Z
-   ^ /
-   |/
-   0--> X
+	Y  Z
+	^ /
+	|/
+	0--> X
 
-   3 -- 7
-   /|   /|
-   2 +- 6 |
-   | |  | |
-   | 1 -+ 5
-   |/   |/
-   0 -- 4
-   */
+	  3 -- 7
+	 /|   /|
+	2 +- 6 |
+	| |  | |
+	| 1 -+ 5
+	|/   |/
+	0 -- 4
+ */
 
 void push_face(mesh_t * mesh, int x, int y, int z, EFace face, int type)
 {
@@ -89,6 +89,7 @@ void push_face(mesh_t * mesh, int x, int y, int z, EFace face, int type)
 
 void generate_single_chunk_mesh(Chunk * chunk, Map * map, int lod)
 {
+	(void) map;
 	if (chunk->mesh[lod]) {
 		mesh_terminate(chunk->mesh[lod]);
 	}
@@ -100,121 +101,48 @@ void generate_single_chunk_mesh(Chunk * chunk, Map * map, int lod)
 	chunk->mesh[lod] = calloc(sizeof(mesh_t), 1);
 	resize_mesh(chunk->mesh[lod], 512);
 
-	/* i, j, k: fake coordinates, must be multiplied by 2^LOD to get in-chunk coordinates */
 	for (int i = 0; i < CHUNK_SIZE >> lod; ++i) {
 		for (int j = 0; j < CHUNK_SIZE >> lod; ++j) {
 			for (int k = 0; k < CHUNK_SIZE >> lod; ++k) {
-
-				/* Real world coordinates of the top left front block of the cube of size 2^LOD that we are checking */
-				int bx = (i << lod) + (chunk->x * CHUNK_SIZE),
-				  by = (j << lod) + (chunk->y * CHUNK_SIZE),
-				  bz = (k << lod) + (chunk->z * CHUNK_SIZE);
-				int type = 0;
-				for (int m = 0; m < 1 << lod && !type; ++m) {
-					for (int n = 0; n < 1 << lod && !type; ++n) {
-						for (int o = 0; o < 1 << lod; ++o) {
-							Block *b =
-							  chunk->blocks + INCHUNK_INDEX((i << lod) + m,
-															(j << lod) + n,
-															(k << lod) + o);
-							if (b->type != 0) {
-								type = b->type;
-								break;
-							}
-						}
-					}
-				}
-				if (type == 0) {
+				Block *b = chunk->blocks[INCHUNK_INDEX(i, j, k)] + lod;
+				if (b->type == 0) {
 					continue;
 				}
-				Block *block = NULL;
-				bool neighbour_empty;
-				neighbour_empty = false;
-				for (int m = 0; m < 1 << lod; ++m) {
-					for (int n = 0; n < 1 << lod && !neighbour_empty; ++n) {
-						block = get_block_or_null(map, bx - 1, by + n, bz + n);
-						if (block && block->type == 0) {
-							neighbour_empty = true;
-							break;
-						}
-					}
-				}
-				if (neighbour_empty) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_LEFT, type);
+				int bx = i + ((chunk->x * CHUNK_SIZE) << lod),
+				  by = j + ((chunk->y * CHUNK_SIZE) << lod),
+				  bz = k + ((chunk->z * CHUNK_SIZE) << lod);
+				Block *neighbours[6] = { NULL };
+				get_neighbourhood(map, bx, by, bz, neighbours, lod);
+
+				if (neighbours[NEIGHBOUR_LEFT]
+					&& neighbours[NEIGHBOUR_LEFT]->has_void) {
+					push_face(chunk->mesh[lod], i, j, k, FACE_LEFT, b->type);
 				}
 
-				neighbour_empty = false;
-				for (int m = 0; m < 1 << lod; ++m) {
-					for (int n = 0; n < 1 << lod && !neighbour_empty; ++n) {
-						block =
-						  get_block_or_null(map, bx + (1 << lod), by + n,
-											bz + n);
-						if (block && block->type == 0) {
-							neighbour_empty = true;
-							break;
-						}
-					}
-				}
-				if (neighbour_empty) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_RIGHT, type);
+				if (neighbours[NEIGHBOUR_RIGHT]
+					&& neighbours[NEIGHBOUR_RIGHT]->has_void) {
+					push_face(chunk->mesh[lod], i, j, k, FACE_RIGHT, b->type);
 				}
 
-				neighbour_empty = false;
-				for (int m = 0; m < 1 << lod; ++m) {
-					for (int n = 0; n < 1 << lod && !neighbour_empty; ++n) {
-						block = get_block_or_null(map, bx + m, by + n, bz - 1);
-						if (block && block->type == 0) {
-							neighbour_empty = true;
-							break;
-						}
-					}
-				}
-				if (neighbour_empty) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_FRONT, type);
+
+				if (neighbours[NEIGHBOUR_FRONT]
+					&& neighbours[NEIGHBOUR_FRONT]->has_void) {
+					push_face(chunk->mesh[lod], i, j, k, FACE_FRONT, b->type);
 				}
 
-				neighbour_empty = false;
-				for (int m = 0; m < 1 << lod; ++m) {
-					for (int n = 0; n < 1 << lod && !neighbour_empty; ++n) {
-						block =
-						  get_block_or_null(map, bx + m, by + n,
-											bz + (1 << lod));
-						if (block && block->type == 0) {
-							neighbour_empty = true;
-							break;
-						}
-					}
-				}
-				if (neighbour_empty) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_BACK, type);
+				if (neighbours[NEIGHBOUR_BACK]
+					&& neighbours[NEIGHBOUR_BACK]->has_void) {
+					push_face(chunk->mesh[lod], i, j, k, FACE_BACK, b->type);
 				}
 
-				neighbour_empty = false;
-				for (int m = 0; m < 1 << lod; ++m) {
-					for (int n = 0; n < 1 << lod && !neighbour_empty; ++n) {
-						block = get_block_or_null(map, bx + m, by - 1, bz + n);
-						if (block && block->type == 0) {
-							neighbour_empty = true;
-							break;
-						}
-					}
-				}
-				if (neighbour_empty) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_DOWN, type);
+				if (neighbours[NEIGHBOUR_DOWN]
+					&& neighbours[NEIGHBOUR_DOWN]->has_void) {
+					push_face(chunk->mesh[lod], i, j, k, FACE_DOWN, b->type);
 				}
 
-				neighbour_empty = false;
-				for (int m = 0; m < 1 << lod; ++m) {
-					for (int n = 0; n < 1 << lod && !neighbour_empty; ++n) {
-						block = get_block_or_null(map, bx + m, by + 1, bz + n);
-						if (block && block->type == 0) {
-							neighbour_empty = true;
-							break;
-						}
-					}
-				}
-				if (neighbour_empty) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_UP, type);
+				if (neighbours[NEIGHBOUR_UP]
+					&& neighbours[NEIGHBOUR_UP]->has_void) {
+					push_face(chunk->mesh[lod], i, j, k, FACE_UP, b->type);
 				}
 			}
 		}

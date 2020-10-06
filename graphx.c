@@ -30,8 +30,9 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 		FATAL("Failed to create OpenGL context: %s", SDL_GetError());
 	}
 
+	int error = glewInit();
 	if (glewInit() != GLEW_OK) {
-		FATAL("Failed to initialize GLEW");
+		FATAL("Failed to initialize GLEW: %s", glewGetErrorString(error));
 	}
 
 	gfx_context->main_program =
@@ -76,15 +77,17 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	Camera *camera = &gfx_context->camera;
 	vec3_t *campos = &camera->position;
 	int cx, cy, cz;
+	const int RENDER_DISTANCE = 8;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
-	for (int i = cx - 8; i < cx + 8; ++i) {
-		for (int j = cy - 8; j < cy + 8; ++j) {
-			for (int k = cz - 8; k < cz + 8; ++k) {
+	for (int i = cx - RENDER_DISTANCE; i < cx + RENDER_DISTANCE; ++i) {
+		for (int j = cy - RENDER_DISTANCE; j < cy + RENDER_DISTANCE; ++j) {
+			for (int k = cz - RENDER_DISTANCE; k < cz + RENDER_DISTANCE; ++k) {
 				Chunk *c = get_chunk_or_null(map, i, j, k);
 				/* if the chunk does not exist */
 				if (!c) {
 					c = new_Chunk(map, i, j, k);
-					randomly_populate(c);
+					randomly_populate(map, c);
+					gen_Chunk_LOD(c);
 					continue;
 				}
 				float distance;
@@ -95,7 +98,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 					&& ((!c->mesh[0] && !c->empty) || (c->dirty))) {
 					push_Chunk_to_queue(gfx_context, c, distance);
 				}
-				int lod = 0;
+				int lod = 1;
 				if (distance > 64.f) {
 					lod = 1;
 				}
