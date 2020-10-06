@@ -87,10 +87,7 @@ void delete_Map(Map * map)
 
 int get_height(int x, int z)
 {
-	(void) z;
-	(void) x;
-	return z + x + rand() % 3;
-	//return perlin(x, z) * 4.f;
+	return perlin(x, z) * 8.f;
 }
 
 void randomly_populate(Map * m, Chunk * chunk)

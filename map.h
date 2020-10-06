@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "position.h"
 #include "mesh.h"
+#include "noise.h"
 
 #define BLOCK_TYPES_NO 4
 

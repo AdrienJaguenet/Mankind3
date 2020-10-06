@@ -33,8 +33,8 @@ float noise_stretched(float x, float y, float stretch)
 	int xw = floor(x);
 	int yw = floor(y);
 	/* Fractional parts. */
-	int xf = x - xw;
-	int yf = y - yw;
+	float xf = x - xw;
+	float yf = y - yw;
 
 	float p[4] = { 0 };
 
