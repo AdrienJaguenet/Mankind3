@@ -35,6 +35,8 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 		FATAL("Failed to initialize GLEW: %s", glewGetErrorString(error));
 	}
 
+	glClearColor(0.53, 0.81, 0.92, 1.0);
+
 	gfx_context->main_program =
 	  program_new("./resources/shaders/default.vs",
 				  "./resources/shaders/default.fs");
@@ -78,7 +80,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	Camera *camera = &gfx_context->camera;
 	vec3_t *campos = &camera->position;
 	int cx, cy, cz;
-	const int RENDER_DISTANCE = 8;
+	const int RENDER_DISTANCE = 4;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
 	for (int i = cx - RENDER_DISTANCE; i < cx + RENDER_DISTANCE; ++i) {
 		for (int j = cy - RENDER_DISTANCE; j < cy + RENDER_DISTANCE; ++j) {
@@ -104,7 +106,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 				}
 				int lod = 0;
 				if (distance > 64.f) {
-					lod = 1;
+					lod = 0;
 				}
 				draw_Chunk(c, gfx_context, lod);
 			}

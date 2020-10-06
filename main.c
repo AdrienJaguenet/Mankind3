@@ -52,7 +52,6 @@ void handle_keystates(const Uint8 * keystates, Camera * camera,
 
 int main()
 {
-	srand(time(NULL));
 	INFO("Mankind %s", VERSION);
 	GFXContext gfx_context;
 	SFXContext sfx_context;
@@ -60,6 +59,8 @@ int main()
 	init_GFX(&gfx_context, 800, 600);
 	init_SFX();
 	Map *map = calloc(sizeof(Map), 1);
+	map->hash = shuffled_hash();
+
 	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 
 	bool running = true;

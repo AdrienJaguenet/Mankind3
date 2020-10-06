@@ -85,20 +85,21 @@ void delete_Map(Map * map)
 	}
 }
 
-int get_height(int x, int z)
+int get_height(int x, int z, int *hash)
 {
-	return perlin(x, z) * 16.f;
+	return perlin(x, z, hash) * 32.f;
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
 {
-	(void) m;
-	INFO("Randomly populating chunk %d, %d, %d", chunk->x, chunk->y, chunk->z);
+	srand(SEED);
+
 	int base_height = chunk->y * CHUNK_SIZE;
 	for (int i = 0; i < CHUNK_SIZE; ++i) {
 		for (int k = 0; k < CHUNK_SIZE; ++k) {
 			int height =
-			  get_height(i + chunk->x * CHUNK_SIZE, k + chunk->z * CHUNK_SIZE);
+			  get_height(i + chunk->x * CHUNK_SIZE, k + chunk->z * CHUNK_SIZE,
+						 m->hash);
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 				int type = 0;
 				if (j + base_height < height - 4) {
@@ -108,6 +109,7 @@ void randomly_populate(Map * m, Chunk * chunk)
 				} else if (j + base_height == height - 1) {
 					type = 2;
 				}
+
 				set_Chunk_block_type(chunk, i, j, k, type);
 			}
 		}

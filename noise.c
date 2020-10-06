@@ -1,13 +1,38 @@
 #include "noise.h"
 #include <math.h>
+#include <stdlib.h>
 
-float noise(int x, int y)
+#include "utilities.h"
+
+#define SEED 1337
+
+const int hash_size = 256;
+const int hash_mask = 255;
+
+int *shuffled_hash()
 {
-	int n = x + y * 57;
-	n = (n << 13) ^ n;
-	return (float) (1.0 -
-					((n * (n * n * 15731 + 789221) +
-					  1376312589) & 0x7fffffff) / 1073741824.0);
+	int *hash = malloc(sizeof(int) * hash_size);
+	for (int i = 0; i < hash_size; ++i) {
+		hash[i] = i;
+	}
+
+	for (int i = 0; i < hash_size; ++i) {
+		int j = i + rand() / (RAND_MAX / (hash_size - i) + 1);
+		int t = hash[j];
+		hash[j] = hash[i];
+		hash[i] = t;
+	}
+
+	return hash;
+}
+
+/* Returns a random float between -1 and 1 that's predictable. */
+
+float noise(int x, int y, int *hash)
+{
+	x &= hash_mask;
+	y &= hash_mask;
+	return hash[(hash[x] + y) & hash_mask] * (1.0 / hash_mask);
 }
 
 float cubic_interpolation(float p[4], float x)
@@ -19,7 +44,7 @@ float cubic_interpolation(float p[4], float x)
 	return P * x * x * x + Q * x * x + R * x + S;	/* The fuck is that */
 }
 
-float noise_stretched(float x, float y, float stretch)
+float noise_stretched(float x, float y, float stretch, int *hash)
 {
 	// stretch
 	x /= stretch;
@@ -36,7 +61,7 @@ float noise_stretched(float x, float y, float stretch)
 	for (int j = 0; j < 4; j++) {
 		float p2[4] = { 0 };
 		for (int i = 0; i < 4; i++) {
-			p2[i] = noise(xw + i - 1, yw + j - 1);
+			p2[i] = noise(xw + i - 1, yw + j - 1, hash);
 		}
 		/* Interpolate each row. */
 		p[j] = cubic_interpolation(p2, xf);
@@ -45,14 +70,17 @@ float noise_stretched(float x, float y, float stretch)
 	return (float) cubic_interpolation(p, yf);
 }
 
-float perlin(float x, float y)
+float perlin(float x, float y, int *hash)
 {
 	float noise = 0;
 	/* So, you should add to noise noise_stretched calls multiplied by
 	   their INFLUENCE. The more influence they have, the more
 	   influential they are. Yeah. */
-	noise += noise_stretched(x, y, 80) * 4;	/* Hilly stuff. */
-	noise += noise_stretched(x, y, 20) * 1;	/* Hilly stuff. */
+	noise += noise_stretched(x, y, 160, hash) * 10;	/* Hilly stuff. */
+	noise += noise_stretched(x, y, 80, hash) * 8;	/* Hilly stuff. */
+	noise += noise_stretched(x, y, 20, hash) * 2;	/* Hilly stuff. */
+	noise += noise_stretched(x, y, 8, hash) * 1;	/* Hilly stuff. */
+	noise += noise_stretched(x, y, 3, hash) * 0.5;	/* Hilly stuff. */
 	/* We can keep layering the stretched noise here to create more interesting terrains. */
-	return noise / (4 + 1);		/* 1 + 2, because of the multipliers above. */
+	return noise / (10 + 8 + 2 + 1 + 0.5);	/* 1 + 2, because of the multipliers above. */
 }

@@ -5,6 +5,7 @@
 #include "noise.h"
 
 #define BLOCK_TYPES_NO 4
+#define SEED 1337
 
 typedef enum {
 	PENDING_MESHGEN,
@@ -28,6 +29,7 @@ typedef struct {
 typedef struct {
 	Chunk **chunks;
 	int chunks_no;
+	int *hash;
 } Map;
 
 void randomly_populate(Map * m, Chunk * chunk);
