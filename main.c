@@ -80,6 +80,7 @@ int main()
 		handle_keystates(SDL_GetKeyboardState(NULL), &gfx_context.camera,
 						 delta_ticks);
 
+		gen_ChunkMesh_in_queue(&gfx_context, map, 10);
 		gen_Chunks_in_queue(&gfx_context, map, 10);
 		begin_draw(&gfx_context);
 		draw_Map(&gfx_context, map);

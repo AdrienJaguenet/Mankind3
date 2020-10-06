@@ -43,14 +43,14 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	gfx_context->camera.rotation = vec3(0, -3.1415 / 4, 0);
 
 	init_Heap(&gfx_context->meshgen_pqueue);
+	init_Heap(&gfx_context->terrgen_pqueue);
 }
 
-bool cull_chunk(Chunk * chunk, Camera * camera, float *distance)
+bool cull_chunk(int x, int y, int z, Camera * camera, float *distance)
 {
 	vec3_t *campos = &camera->position;
 	float factor = CHUNK_SIZE * BLOCK_SIZE;
-	vec3_t chunkpos =
-	  vec3(chunk->x * factor, chunk->y * factor, chunk->z * factor);
+	vec3_t chunkpos = vec3(x * factor, y * factor, z * factor);
 	vec3_t to_corner = v3_sub(chunkpos, *campos);
 	*distance = v3_length(to_corner);
 	if (*distance >= 1024.f) {
@@ -83,22 +83,25 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 		for (int j = cy - RENDER_DISTANCE; j < cy + RENDER_DISTANCE; ++j) {
 			for (int k = cz - RENDER_DISTANCE; k < cz + RENDER_DISTANCE; ++k) {
 				Chunk *c = get_chunk_or_null(map, i, j, k);
+				float distance;
+				if (cull_chunk(i, j, k, camera, &distance)) {
+					continue;
+				}
 				/* if the chunk does not exist */
 				if (!c) {
 					c = new_Chunk(map, i, j, k);
-					randomly_populate(map, c);
-					gen_Chunk_LOD(c);
+					push_Chunk_to_queue(gfx_context, c, distance,
+										PENDING_TERRAIN,
+										&gfx_context->terrgen_pqueue);
 					continue;
 				}
-				float distance;
-				if (cull_chunk(c, camera, &distance)) {
-					continue;
-				}
-				if (!c->pending_meshgen
+				if (!c->pending[PENDING_TERRAIN] && !c->pending[PENDING_MESHGEN]
 					&& ((!c->mesh[0] && !c->empty) || (c->dirty))) {
-					push_Chunk_to_queue(gfx_context, c, distance);
+					push_Chunk_to_queue(gfx_context, c, distance,
+										PENDING_MESHGEN,
+										&gfx_context->meshgen_pqueue);
 				}
-				int lod = 1;
+				int lod = 0;
 				if (distance > 64.f) {
 					lod = 1;
 				}
@@ -159,15 +162,16 @@ void quit_GFX(GFXContext * gfx_context)
 	SDL_Quit();
 }
 
-void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority)
+void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority,
+						 ChunkPending pending, Heap * queue)
 {
-	chunk->pending_meshgen = true;
+	chunk->pending[pending] = true;
 	/* The closer the chunk, the higher its priority */
-	insert_HeapNode(&gfx_context->meshgen_pqueue, chunk, priority);
+	insert_HeapNode(queue, chunk, priority);
 	gfx_context->queue_size++;
 }
 
-void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
+void gen_ChunkMesh_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 {
 	int i;
 	for (i = 0; i < max_gens; ++i) {
@@ -175,8 +179,24 @@ void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 		if (c == NULL) {
 			break;
 		}
-		c->pending_meshgen = false;
+		c->pending[PENDING_MESHGEN] = false;
 		generate_chunk_mesh(c, map);
 		gfx_context->queue_size--;
 	}
+}
+
+void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
+{
+	int i;
+	for (i = 0; i < max_gens; ++i) {
+		Chunk *c = extract_HeapNode(&gfx_context->terrgen_pqueue);
+		if (c == NULL) {
+			break;
+		}
+		c->pending[PENDING_TERRAIN] = false;
+		randomly_populate(map, c);
+		gen_Chunk_LOD(c);
+		gfx_context->queue_size--;
+	}
+
 }

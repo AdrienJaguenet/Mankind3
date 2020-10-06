@@ -5,6 +5,11 @@
 
 #define BLOCK_TYPES_NO 4
 
+typedef enum {
+	PENDING_MESHGEN,
+	PENDING_TERRAIN
+} ChunkPending;
+
 typedef struct {
 	int type;
 	bool has_void;
@@ -16,7 +21,7 @@ typedef struct {
 	mesh_t *mesh[MAX_LOD];
 	bool empty;
 	bool dirty;
-	bool pending_meshgen;
+	bool pending[8];
 } Chunk;
 
 typedef struct {

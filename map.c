@@ -146,10 +146,9 @@ void gen_Chunk_LOD(Chunk * c)
 						for (int n = 0; n < (1 << lod); ++n) {
 							for (int o = 0; o < (1 << lod); ++o) {
 								Block *b =
-								  &c->
-								  blocks[INCHUNK_INDEX
-										 ((i << lod) + m, (j << lod) + n,
-										  (k << lod) + o)][0];
+								  &c->blocks[INCHUNK_INDEX
+											 ((i << lod) + m, (j << lod) + n,
+											  (k << lod) + o)][0];
 								has_void |= b->has_void;
 								if (b->type) {
 									blocks[b->type]++;

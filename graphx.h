@@ -21,6 +21,7 @@ typedef struct {
 	Camera camera;
 	int queue_size;
 	Heap meshgen_pqueue;
+	Heap terrgen_pqueue;
 } GFXContext;
 
 void init_GFX(GFXContext * gfx_context, int window_width, int window_height);
@@ -38,6 +39,8 @@ void begin_draw(GFXContext * gfx_context);
 
 void end_draw(GFXContext * gfx_context);
 
-void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority);
+void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority,
+						 ChunkPending pending, Heap * queue);
 
+void gen_ChunkMesh_in_queue(GFXContext * gfx_context, Map * map, int max_gens);
 void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens);
