@@ -28,7 +28,7 @@ float noise(int x, int y, int *hash)
 {
 	x &= hash_mask;
 	y &= hash_mask;
-	return hash[(hash[x] + y) & hash_mask] * (1.0 / hash_mask);
+	return hash[(hash[x] + y) & hash_mask] * (2.0 / hash_mask) - 1.0;
 }
 
 float cubic_interpolation(float p[4], float x)
