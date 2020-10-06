@@ -36,8 +36,9 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	}
 
 	gfx_context->main_program =
-	  program_new("./resources/default.vs", "./resources/default.fs");
-	load_texture(&gfx_context->tilemap, "gfx/tilemap.png");
+	  program_new("./resources/shaders/default.vs",
+				  "./resources/shaders/default.fs");
+	load_texture(&gfx_context->tilemap, "./resources/gfx/tilemap.png");
 
 	gfx_context->camera.position = vec3(0, CHUNK_SIZE * 2, 0);
 	gfx_context->camera.rotation = vec3(0, -3.1415 / 4, 0);

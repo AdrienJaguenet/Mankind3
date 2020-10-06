@@ -51,9 +51,8 @@ float perlin(float x, float y)
 	/* So, you should add to noise noise_stretched calls multiplied by
 	   their INFLUENCE. The more influence they have, the more
 	   influential they are. Yeah. */
-	noise += noise_stretched(x, y, 40) * 8;	/* Hilly stuff. */
-	noise += noise_stretched(x, y, 4) * 2;	/* A bit of detail. */
-	noise += noise_stretched(x, y, 2) * 1;	/* Single block detail. */
+	noise += noise_stretched(x, y, 80) * 4;	/* Hilly stuff. */
+	noise += noise_stretched(x, y, 20) * 1;	/* Hilly stuff. */
 	/* We can keep layering the stretched noise here to create more interesting terrains. */
-	return noise / (8 + 2 + 1);	/* 1 + 2, because of the multipliers above. */
+	return noise / (4 + 1);		/* 1 + 2, because of the multipliers above. */
 }
