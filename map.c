@@ -110,18 +110,55 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 2;
 				}
 
-				set_Chunk_block_type(chunk, i, j, k, type);
+				set_Chunk_block_type(m, chunk, i, j, k, type);
 			}
 		}
 	}
 }
 
-void set_Chunk_block_type(Chunk * c, int x, int y, int z, int type)
+void set_Chunk_block_type(Map * map, Chunk * c, int x, int y, int z, int type)
 {
 	c->dirty = true;
 	Block *b = &c->blocks[INCHUNK_INDEX(x, y, z)][0];
 	if (type) {
 		c->empty = false;
+	}
+	Chunk *neighbour;
+	if (x == 0) {
+		neighbour = get_chunk_or_null(map, c->x - 1, c->y, c->z);
+		if (neighbour) {
+			neighbour->dirty = true;
+		}
+	}
+	if (y == 0) {
+		neighbour = get_chunk_or_null(map, c->x, c->y - 1, c->z);
+		if (neighbour) {
+			neighbour->dirty = true;
+		}
+	}
+	if (z == 0) {
+		neighbour = get_chunk_or_null(map, c->x, c->y, c->z - 1);
+		if (neighbour) {
+			neighbour->dirty = true;
+		}
+	}
+	if (x == CHUNK_SIZE - 1) {
+		neighbour = get_chunk_or_null(map, c->x + 1, c->y, c->z);
+		if (neighbour) {
+			neighbour->dirty = true;
+		}
+	}
+	if (y == CHUNK_SIZE - 1) {
+		neighbour = get_chunk_or_null(map, c->x, c->y + 1, c->z);
+		if (neighbour) {
+			neighbour->dirty = true;
+		}
+	}
+	if (z == CHUNK_SIZE - 1) {
+		neighbour = get_chunk_or_null(map, c->x, c->y + 1, c->z);
+		if (neighbour) {
+			neighbour->dirty = true;
+		}
 	}
 	b->has_void = type == 0;
 	b->type = type;

@@ -34,7 +34,7 @@ typedef struct {
 
 void randomly_populate(Map * m, Chunk * chunk);
 
-void set_Chunk_block_type(Chunk * c, int x, int y, int z, int type);
+void set_Chunk_block_type(Map * map, Chunk * c, int x, int y, int z, int type);
 
 void gen_Chunk_LOD(Chunk * c);
 
