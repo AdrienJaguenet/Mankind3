@@ -87,7 +87,7 @@ void delete_Map(Map * map)
 
 int get_height(int x, int z, int *hash)
 {
-	return perlin(x, z, hash) * 32.f;
+	return fractal(x, z, hash) * 64.f;
 }
 
 void randomly_populate(Map * m, Chunk * chunk)

@@ -80,7 +80,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	Camera *camera = &gfx_context->camera;
 	vec3_t *campos = &camera->position;
 	int cx, cy, cz;
-	const int RENDER_DISTANCE = 4;
+	const int RENDER_DISTANCE = 7;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
 	for (int i = cx - RENDER_DISTANCE; i < cx + RENDER_DISTANCE; ++i) {
 		for (int j = cy - RENDER_DISTANCE; j < cy + RENDER_DISTANCE; ++j) {

@@ -56,7 +56,7 @@ int main()
 	GFXContext gfx_context;
 	SFXContext sfx_context;
 	(void) sfx_context;
-	init_GFX(&gfx_context, 800, 600);
+	init_GFX(&gfx_context, 1024, 768);
 	init_SFX();
 	Map *map = calloc(sizeof(Map), 1);
 	map->hash = shuffled_hash();

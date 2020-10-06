@@ -1,6 +1,9 @@
 #include "noise.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdarg.h>
+
+#include "utilities.h"
 
 const int hash_size = 256;
 const int hash_mask = 255;
@@ -66,17 +69,33 @@ float noise_stretched(float x, float y, float stretch, int *hash)
 	return (float) cubic_interpolation(p, yf);
 }
 
-float perlin(float x, float y, int *hash)
+float noise_layered(int count, ...)
 {
+	va_list ap;
+
 	float noise = 0;
-	/* So, you should add to noise noise_stretched calls multiplied by
-	   their INFLUENCE. The more influence they have, the more
-	   influential they are. Yeah. */
-	noise += noise_stretched(x, y, 160, hash) * 10;	/* Hilly stuff. */
-	noise += noise_stretched(x, y, 80, hash) * 8;	/* Hilly stuff. */
-	noise += noise_stretched(x, y, 20, hash) * 2;	/* Hilly stuff. */
-	noise += noise_stretched(x, y, 8, hash) * 1;	/* Hilly stuff. */
-	noise += noise_stretched(x, y, 3, hash) * 0.5;	/* Hilly stuff. */
-	/* We can keep layering the stretched noise here to create more interesting terrains. */
-	return noise / (10 + 8 + 2 + 1 + 0.5);	/* 1 + 2, because of the multipliers above. */
+	float influence_total = 0;
+	va_start(ap, count);
+
+	for (int i = 0; i < count; ++i) {
+		float *ns = va_arg(ap, float *);
+		noise += ns[0] * ns[1];
+		influence_total += ns[1];
+	}
+
+	va_end(ap);
+
+	return noise / influence_total;
+}
+
+float fractal(float x, float y, int *hash)
+{
+	return noise_layered(6,
+						 (float[2]) { noise_stretched(x, y, 400, hash), 20.0 },
+						 (float[2]) { noise_stretched(x, y, 160, hash), 10.0 },
+						 (float[2]) { noise_stretched(x, y, 80, hash), 8.0 },
+						 (float[2]) { noise_stretched(x, y, 20, hash), 2.0 },
+						 (float[2]) { noise_stretched(x, y, 8, hash), 1.0 },
+						 (float[2]) { noise_stretched(x, y, 3, hash), 0.5 }
+	);
 }
