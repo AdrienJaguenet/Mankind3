@@ -10,18 +10,13 @@ float noise(int x, int y)
 					  1376312589) & 0x7fffffff) / 1073741824.0);
 }
 
-float cubic_interpolation(float v0, float v1, float v2, float v3, float x)
+float cubic_interpolation(float p[4], float x)
 {
-	float p = (v3 - v2) - (v0 - v1);
-	float q = (v0 - v1) - p;
-	float r = v2 - v0;
-	float s = v1;
-	return p * x * x * x + q * x * x + r * x + s;	/* The fuck is that */
-}
-
-float cubic_nearest(float p[4], float x)
-{
-	return cubic_interpolation(p[0], p[1], p[2], p[3], x);
+	float P = (p[3] - p[2]) - (p[0] - p[1]);
+	float Q = (p[0] - p[1]) - P;
+	float R = p[2] - p[0];
+	float S = p[1];
+	return P * x * x * x + Q * x * x + R * x + S;	/* The fuck is that */
 }
 
 float noise_stretched(float x, float y, float stretch)
@@ -44,10 +39,10 @@ float noise_stretched(float x, float y, float stretch)
 			p2[i] = noise(xw + i - 1, yw + j - 1);
 		}
 		/* Interpolate each row. */
-		p[j] = cubic_nearest(p2, xf);
+		p[j] = cubic_interpolation(p2, xf);
 	}
 
-	return (float) cubic_nearest(p, yf);
+	return (float) cubic_interpolation(p, yf);
 }
 
 float perlin(float x, float y)
