@@ -2,10 +2,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "utilities.h"
-
-#define SEED 1337
-
 const int hash_size = 256;
 const int hash_mask = 255;
 
