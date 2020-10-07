@@ -5,8 +5,21 @@
 #include "sfx.h"
 #include "graphx.h"
 #include "chunkmesh.h"
+#include "boxcol.h"
 
 #define VERSION "0.0.1"
+
+void try_move(AABB * aabb, vec3_t where, Camera * camera, Map * map)
+{
+	AABB translated = translated_AABB(aabb, where);
+
+	if (!map_collides(&translated, map)) {
+		translate_AABB(aabb, where);
+		camera->position =
+		  vec3((aabb->min.x + aabb->max.x) / 2, aabb->min.y - 5,
+			   (aabb->min.z + aabb->max.z) / 2);
+	}
+}
 
 bool handle_event(SDL_Event * e, Camera * camera, unsigned int delta_ticks)
 {
@@ -22,31 +35,35 @@ bool handle_event(SDL_Event * e, Camera * camera, unsigned int delta_ticks)
 	return true;
 }
 
-void handle_keystates(const Uint8 * keystates, Camera * camera,
-					  unsigned int delta_ticks)
+void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
+					  Map * map, unsigned int delta_ticks)
 {
+	/* This shit moves relative to the camera look at, instead of some
+	   front or sum shit. So it be broken kinda. */
 	if (keystates[SDL_SCANCODE_W]) {
-		camera->position =
-		  v3_add(camera->position,
-				 v3_muls(get_Camera_lookAt(camera), 0.02 * delta_ticks));
+		try_move(player, v3_muls(get_Camera_lookAt(camera), 0.02 * delta_ticks),
+				 camera, map);
 	}
 
 	if (keystates[SDL_SCANCODE_S]) {
-		camera->position =
-		  v3_sub(camera->position,
-				 v3_muls(get_Camera_lookAt(camera), 0.02 * delta_ticks));
+		try_move(player,
+				 v3_muls(get_Camera_lookAt(camera), -0.02 * delta_ticks),
+				 camera, map);
 	}
 
 	if (keystates[SDL_SCANCODE_A]) {
-		camera->position =
-		  v3_sub(camera->position,
-				 v3_muls(get_Camera_right(camera), 0.02 * delta_ticks));
+		try_move(player, v3_muls(get_Camera_right(camera), -0.02 * delta_ticks),
+				 camera, map);
 	}
 
 	if (keystates[SDL_SCANCODE_D]) {
-		camera->position =
-		  v3_add(camera->position,
-				 v3_muls(get_Camera_right(camera), 0.02 * delta_ticks));
+		try_move(player, v3_muls(get_Camera_right(camera), 0.02 * delta_ticks),
+				 camera, map);
+	}
+
+	/* This should be an SDL event (not a keystate) in the future, though. */
+	if (keystates[SDL_SCANCODE_SPACE]) {
+		try_move(player, vec3(0.0, 0.05 * delta_ticks, 0.0), camera, map);
 	}
 }
 
@@ -63,6 +80,9 @@ int main()
 
 	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 
+	AABB player =
+	  { vec3(0, CHUNK_SIZE * 2, 0), vec3(0.95, 1.6 * CHUNK_SIZE * 2, 0.95) };
+
 	bool running = true;
 	unsigned int delta_ticks;
 	unsigned int last_ticks = SDL_GetTicks();
@@ -78,9 +98,11 @@ int main()
 			running = handle_event(&event, &gfx_context.camera, delta_ticks);
 		}
 
-		handle_keystates(SDL_GetKeyboardState(NULL), &gfx_context.camera,
-						 delta_ticks);
+		handle_keystates(SDL_GetKeyboardState(NULL), &player,
+						 &gfx_context.camera, map, delta_ticks);
 
+		try_move(&player, vec3(0.0, -0.02 * delta_ticks, 0.0),
+				 &gfx_context.camera, map);
 		gen_ChunkMesh_in_queue(&gfx_context, map, 10);
 		gen_Chunks_in_queue(&gfx_context, map, 10);
 		begin_draw(&gfx_context);
