@@ -90,12 +90,13 @@ float noise_layered(int count, ...)
 
 float fractal(float x, float y, int *hash)
 {
-	return noise_layered(6,
-						 (float[2]) { noise_stretched(x, y, 400, hash), 20.0 },
-						 (float[2]) { noise_stretched(x, y, 160, hash), 10.0 },
-						 (float[2]) { noise_stretched(x, y, 80, hash), 8.0 },
-						 (float[2]) { noise_stretched(x, y, 20, hash), 2.0 },
-						 (float[2]) { noise_stretched(x, y, 8, hash), 1.0 },
-						 (float[2]) { noise_stretched(x, y, 3, hash), 0.5 }
+	return noise_layered(7,
+						 (float[2]) { noise_stretched(x, y, 400, hash), 8.0 },
+						 (float[2]) { noise_stretched(x, y, 100, hash), 1.0 },
+						 (float[2]) { noise_stretched(x, y, 70, hash), 1.0 },
+						 (float[2]) { noise_stretched(x, y, 40, hash), 0.5 },
+						 (float[2]) { noise_stretched(x, y, 20, hash), 0.5 },
+						 (float[2]) { noise_stretched(x, y, 10, hash), 0.1 },
+						 (float[2]) { noise_stretched(x, y, 6, hash), 0.2 }
 	);
 }
