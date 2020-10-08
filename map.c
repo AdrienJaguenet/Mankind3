@@ -87,7 +87,7 @@ void delete_Map(Map * map)
 
 int get_height(int x, int z, int *permutations)
 {
-	return fractal2(x, z, permutations) * 32.f;
+	return fractal2(x, z, permutations) * 24.f;
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
@@ -114,7 +114,7 @@ void randomly_populate(Map * m, Chunk * chunk)
 					|| fractal3(i + chunk->x * CHUNK_SIZE,
 								j + chunk->y * CHUNK_SIZE,
 								k + chunk->z * CHUNK_SIZE,
-								m->permutations) > 0.6) {
+								m->permutations) < -0.35) {
 					type = 0;
 				}
 

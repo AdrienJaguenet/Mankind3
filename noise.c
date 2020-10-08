@@ -40,8 +40,8 @@ float grad3(int hash, float x, float y, float z)
 
 float snoise2(float x, float y, int *perm)
 {
-	x += 0.25;
-	y += 0.25;					/* This is to fix zero point errors... */
+	x += 0.5;
+	y += 0.5;					/* This is to fix zero point errors... */
 
 #define F2 0.366025403			// F2 = 0.5*(sqrt(3.0)-1.0)
 #define G2 0.211324865			// G2 = (3.0-Math.sqrt(3.0))/6.0
@@ -118,9 +118,9 @@ float snoise2(float x, float y, int *perm)
 
 float snoise3(float x, float y, float z, int *perm)
 {
-	x += 0.25;
-	y += 0.25;
-	z += 0.25;					/* This is to fix zero point errors... */
+	x += 0.5;
+	y += 0.5;
+	z += 0.5;					/* This is to fix zero point errors... */
 
 	// Simple skewing factors for the 3D case
 #define F3 0.333333333
@@ -291,30 +291,44 @@ float noise_layered(int count, ...)
 
 float fractal2(float x, float y, int *permutations)
 {
-	return noise_layered(7,
-						 (float[2]) { snoise2(x / 400.f, y / 400.f,
-											  permutations), 8.0 },
+	return noise_layered(7, (float[2]) { snoise2(x / 400.f, y / 400.f,
+												 permutations), 8.0
+						 },
 						 (float[2]) { snoise2(x / 100.f, y / 100.f,
-											  permutations), 1.0 },
+											  permutations), 1.0
+						 },
 						 (float[2]) { snoise2(x / 70.f, y / 70.f, permutations),
-						 1.0 },
+						 1.0
+						 },
 						 (float[2]) { snoise2(x / 40.f, y / 40.f, permutations),
-						 0.5 },
+						 0.5
+						 },
 						 (float[2]) { snoise2(x / 20.f, y / 20.f, permutations),
-						 0.5 },
+						 0.5
+						 },
 						 (float[2]) { snoise2(x / 10.f, y / 10.f, permutations),
-						 0.1 },
+						 0.1
+						 },
 						 (float[2]) { snoise2(x / 6.f, y / 6.f, permutations),
-						 0.2 }
+						 0.2
+						 }
 	);
 }
 
 float fractal3(float x, float y, float z, int *permutations)
 {
-	return noise_layered(2,
+	return noise_layered(4,
+						 (float[2]) { snoise3(x / 100.f, y / 100.f, z / 100.f,
+											  permutations), 4.0
+						 },
+						 (float[2]) { snoise3(x / 80.f, y / 80.f, z / 80.f,
+											  permutations), 1.0
+						 },
+						 (float[2]) { snoise3(x / 30.f, y / 30.f, z / 30.f,
+											  permutations), 1.0
+						 },
 						 (float[2]) { snoise3(x / 20.f, y / 20.f, z / 20.f,
-											  permutations), 8.0 },
-						 (float[2]) { snoise3(x / 5.f, y / 5.f, z / 5.f,
-											  permutations), 1.0 }
+											  permutations), 0.5
+						 }
 	);
 }
