@@ -66,25 +66,21 @@ void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
 		update_physics(physics,
 					   v3_muls(get_Camera_forward(camera),
 							   -0.02 * delta_ticks));
-		try_move(player, physics, map);
 	}
 
 	if (keystates[SDL_SCANCODE_A]) {
 		update_physics(physics,
 					   v3_muls(get_Camera_right(camera), -0.02 * delta_ticks));
-		try_move(player, physics, map);
 	}
 
 	if (keystates[SDL_SCANCODE_D]) {
 		update_physics(physics,
 					   v3_muls(get_Camera_right(camera), 0.02 * delta_ticks));
-		try_move(player, physics, map);
 	}
 
 	/* This should be an SDL event (not a keystate) in the future, though. */
 	if (keystates[SDL_SCANCODE_SPACE]) {
 		physics->velocity = vec3(0.0, 0.05 * delta_ticks, 0.0);
-		try_move(player, physics, map);
 	}
 }
 
