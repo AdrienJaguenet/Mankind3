@@ -2,15 +2,9 @@
 
 void update_physics(Physics * physics, vec3_t speed)
 {
-	/* Add checking for max_velocity. */
 	physics->velocity = v3_add(physics->velocity, speed);
-	physics->velocity.x =
-	  CLAMP(physics->velocity.x, -physics->max_velocity.x,
-			physics->max_velocity.x);
-	physics->velocity.y =
-	  CLAMP(physics->velocity.y, -physics->max_velocity.y,
-			physics->max_velocity.y);
-	physics->velocity.z =
-	  CLAMP(physics->velocity.z, -physics->max_velocity.z,
-			physics->max_velocity.z);
+	float velocity_l = v3_length(physics->velocity);
+	vec3_t velocity_norm = v3_norm(physics->velocity);
+	velocity_l = CLAMP(velocity_l, 0., physics->max_v);
+	physics->velocity = v3_muls(velocity_norm, velocity_l);
 }

@@ -5,7 +5,8 @@
 
 typedef struct Physics {
 	vec3_t velocity;
-	vec3_t max_velocity;
+	float max_v;
+	bool touches_ground;
 } Physics;
 
 void update_physics(Physics * physics, vec3_t speed);

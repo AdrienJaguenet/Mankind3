@@ -26,7 +26,7 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map)
 			diff_l /= 2.f;
 		}
 	} while (diff_l > 0.05);
-	return true;
+	return false;
 }
 
 bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
@@ -40,9 +40,10 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
 		camera->rotation.y -= e->motion.yrel / 100.f;
 		camera->rotation.y =
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
-	} else if (e->type == SDL_KEYUP) {
-		physics->velocity.x = 0;
-		physics->velocity.z = 0;
+	} else if (e->type == SDL_KEYDOWN) {
+		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
+			physics->velocity.y = .2f;
+		}
 	}
 	return true;
 }
@@ -50,9 +51,10 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
 void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
 					  Physics * physics, Map * map, unsigned int delta_ticks)
 {
+	(void) physics;
 	/* This shit moves relative to the camera look at, instead of some
 	   front or sum shit. So it be broken kinda. */
-	float dt_factor = delta_ticks * 0.02;
+	float dt_factor = delta_ticks * 0.008;
 	if (keystates[SDL_SCANCODE_W]) {
 		try_move(player, v3_muls(get_Camera_forward(camera), dt_factor), map);
 	}
@@ -69,10 +71,6 @@ void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
 		try_move(player, v3_muls(get_Camera_right(camera), dt_factor), map);
 	}
 
-	/* This should be an SDL event (not a keystate) in the future, though. */
-	if (keystates[SDL_SCANCODE_SPACE]) {
-		physics->velocity = vec3(0.0, 0.05 * delta_ticks, 0.0);
-	}
 }
 
 void attach_camera_to(Camera * camera, AABB * aabb)
@@ -95,8 +93,8 @@ int main()
 
 	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 
-	AABB player = { vec3(0, 10, 0), vec3(0.95, 2., 0.95) };
-	Physics physics = { vec3(0, 0, 0), vec3(0.1, 0.4, 0.1) };
+	AABB player = { vec3(0, 10, 0), vec3(0.7, 2., 0.7) };
+	Physics physics = { vec3(0, 0, 0), 0.5, false };
 
 	bool running = true;
 	unsigned int delta_ticks;
@@ -117,8 +115,14 @@ int main()
 		handle_keystates(SDL_GetKeyboardState(NULL), &player,
 						 &gfx_context.camera, &physics, map, delta_ticks);
 
-		update_physics(&physics, vec3(0.0, -0.01 * delta_ticks, 0.0));
-		try_move(&player, physics.velocity, map);
+		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));
+		if (!try_move(&player, physics.velocity, map)
+			&& physics.velocity.y < 0.f) {
+			physics.velocity.y = 0;
+			physics.touches_ground = true;
+		} else {
+			physics.touches_ground = false;
+		}
 		attach_camera_to(&gfx_context.camera, &player);
 		gen_ChunkMesh_in_queue(&gfx_context, map, 10);
 		gen_Chunks_in_queue(&gfx_context, map, 10);
