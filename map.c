@@ -85,9 +85,9 @@ void delete_Map(Map * map)
 	}
 }
 
-int get_height(int x, int z, int *hash)
+int get_height(int x, int z, int *permutations)
 {
-	return fractal(x, z, hash) * 64.f;
+	return fractal2(x, z, permutations) * 32.f;
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
@@ -99,7 +99,7 @@ void randomly_populate(Map * m, Chunk * chunk)
 		for (int k = 0; k < CHUNK_SIZE; ++k) {
 			int height =
 			  get_height(i + chunk->x * CHUNK_SIZE, k + chunk->z * CHUNK_SIZE,
-						 m->hash);
+						 m->permutations);
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 				int type = 0;
 				if (j + base_height < height - 4) {
@@ -108,6 +108,14 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 3;
 				} else if (j + base_height == height - 1) {
 					type = 2;
+				}
+
+				if (j < height
+					|| fractal3(i + chunk->x * CHUNK_SIZE,
+								j + chunk->y * CHUNK_SIZE,
+								k + chunk->z * CHUNK_SIZE,
+								m->permutations) > 0.6) {
+					type = 0;
 				}
 
 				set_Chunk_block_type(m, chunk, i, j, k, type);

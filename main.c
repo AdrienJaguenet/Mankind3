@@ -89,7 +89,7 @@ int main()
 	init_GFX(&gfx_context, 1024, 768);
 	init_SFX();
 	Map *map = calloc(sizeof(Map), 1);
-	map->hash = shuffled_hash();
+	map->permutations = shuffled_permutations(512);
 
 	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 
