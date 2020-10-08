@@ -10,27 +10,23 @@
 
 #define VERSION "0.0.1"
 
-void try_move(AABB * aabb, Physics * physics, Map * map)
+bool try_move(AABB * aabb, vec3_t diff, Map * map)
 {
 	/* Calculate the length only once */
-	float diff_l = v3_length(physics->velocity);
+	float diff_l = v3_length(diff);
 
 	do {
-		AABB translated = translated_AABB(aabb, physics->velocity);
+		AABB translated = translated_AABB(aabb, diff);
 		if (!map_collides(&translated, map)) {
 			*aabb = translated;
-			break;
+			return true;
 		} else {
 			/* try again by moving only halfway */
-			physics->velocity = v3_divs(physics->velocity, 2.f);
+			diff = v3_divs(diff, 2.f);
 			diff_l /= 2.f;
 		}
 	} while (diff_l > 0.05);
-
-	if (diff_l <= 0.05) {
-		physics->velocity = vec3(0, 0, 0);
-		physics->velocity.y = 0;
-	}
+	return true;
 }
 
 bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
@@ -56,26 +52,21 @@ void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
 {
 	/* This shit moves relative to the camera look at, instead of some
 	   front or sum shit. So it be broken kinda. */
+	float dt_factor = delta_ticks * 0.02;
 	if (keystates[SDL_SCANCODE_W]) {
-		update_physics(physics,
-					   v3_muls(get_Camera_forward(camera), 0.02 * delta_ticks));
-		try_move(player, physics, map);
+		try_move(player, v3_muls(get_Camera_forward(camera), dt_factor), map);
 	}
 
 	if (keystates[SDL_SCANCODE_S]) {
-		update_physics(physics,
-					   v3_muls(get_Camera_forward(camera),
-							   -0.02 * delta_ticks));
+		try_move(player, v3_muls(get_Camera_forward(camera), -dt_factor), map);
 	}
 
 	if (keystates[SDL_SCANCODE_A]) {
-		update_physics(physics,
-					   v3_muls(get_Camera_right(camera), -0.02 * delta_ticks));
+		try_move(player, v3_muls(get_Camera_right(camera), -dt_factor), map);
 	}
 
 	if (keystates[SDL_SCANCODE_D]) {
-		update_physics(physics,
-					   v3_muls(get_Camera_right(camera), 0.02 * delta_ticks));
+		try_move(player, v3_muls(get_Camera_right(camera), dt_factor), map);
 	}
 
 	/* This should be an SDL event (not a keystate) in the future, though. */
@@ -127,7 +118,7 @@ int main()
 						 &gfx_context.camera, &physics, map, delta_ticks);
 
 		update_physics(&physics, vec3(0.0, -0.01 * delta_ticks, 0.0));
-		try_move(&player, &physics, map);
+		try_move(&player, physics.velocity, map);
 		attach_camera_to(&gfx_context.camera, &player);
 		gen_ChunkMesh_in_queue(&gfx_context, map, 10);
 		gen_Chunks_in_queue(&gfx_context, map, 10);
