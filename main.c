@@ -42,7 +42,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	} else if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
-			physics->velocity.y = .2f;
+			physics->velocity.y = 0.015f * delta_ticks;
 		}
 	}
 	return true;
