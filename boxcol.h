@@ -4,7 +4,7 @@
 #include "map.h"
 
 typedef struct AABB {
-	vec3_t min, max;
+	vec3_t pos, dim;
 } AABB;
 
 void translate_AABB(AABB * aabb, const vec3_t vec);

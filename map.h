@@ -51,3 +51,5 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 Chunk *new_Chunk(Map * map, int px, int py, int pz);
 
 void delete_Map(Map * map);
+
+int get_height(int x, int z, int *hash);

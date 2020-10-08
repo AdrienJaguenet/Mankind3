@@ -3,8 +3,7 @@
 
 vec3_t get_Camera_forward(Camera * camera)
 {
-	return v3_norm(vec3(sinf(camera->rotation.x), 0, cosf(camera->rotation.y))
-	  );
+	return vec3(sinf(camera->rotation.x), 0, cosf(camera->rotation.x));
 }
 
 vec3_t get_Camera_lookAt(Camera * camera)
@@ -17,7 +16,7 @@ vec3_t get_Camera_lookAt(Camera * camera)
 
 vec3_t get_Camera_right(Camera * camera)
 {
-	return v3_cross(get_Camera_lookAt(camera), get_Camera_up(camera));
+	return v3_norm(v3_cross(get_Camera_lookAt(camera), get_Camera_up(camera)));
 }
 
 vec3_t get_Camera_up(Camera * camera)
