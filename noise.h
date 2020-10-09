@@ -1,8 +1,10 @@
 #pragma once
 
-int *shuffled_hash();
-float noise(int x, int y, int *hash);
-float cubic_interpolation(float p[4], float x);
-float noise_stretched(float x, float y, float stretch, int *hash);
+#define FASTFLOOR(x) ( ((int)(x)<=(x)) ? ((int)x) : (((int)x)-1) )
+
+int *shuffled_permutations(int size);
+float snoise2(float x, float y, int *perm);
+float snoise3(float x, float y, float z, int *perm);
 float noise_layered(int count, ...);
-float fractal(float x, float y, int *hash);
+float fractal2(float x, float y, int *permutations);
+float fractal3(float x, float y, float z, int *permutations);

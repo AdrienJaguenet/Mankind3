@@ -42,7 +42,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	} else if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
-			physics->velocity.y = .2f;
+			physics->velocity.y = 0.015f * delta_ticks;
 		}
 	}
 	return true;
@@ -96,7 +96,7 @@ int main()
 	init_GFX(&gfx_context, 1024, 768);
 	init_SFX();
 	Map *map = calloc(sizeof(Map), 1);
-	map->hash = shuffled_hash();
+	map->permutations = shuffled_permutations(512);
 
 	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
 

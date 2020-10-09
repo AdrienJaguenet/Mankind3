@@ -29,7 +29,7 @@ typedef struct {
 typedef struct {
 	Chunk **chunks;
 	int chunks_no;
-	int *hash;
+	int *permutations;
 } Map;
 
 void randomly_populate(Map * m, Chunk * chunk);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include "math_3d.h"
 #include "utilities.h"
 #include <stdbool.h>
