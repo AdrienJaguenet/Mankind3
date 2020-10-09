@@ -194,16 +194,14 @@ void generate_single_chunk_mesh_greedy(Chunk * chunk, Map * map, int lod)
 				if (used[(int) corner.x][(int) corner.y]) {
 					continue;
 				}
-				Block *block =
-				  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
-									y + chunk->y * CHUNK_SIZE,
-									z + chunk->z * CHUNK_SIZE, 0);
+				Block *block = get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+												 y + chunk->y * CHUNK_SIZE,
+												 z + chunk->z * CHUNK_SIZE, 0);
 				/* We increase momentarily the fixed axis to find the block in front of us */
 				*c += direction;
-				Block *front =
-				  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
-									y + chunk->y * CHUNK_SIZE,
-									z + chunk->z * CHUNK_SIZE, 0);
+				Block *front = get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+												 y + chunk->y * CHUNK_SIZE,
+												 z + chunk->z * CHUNK_SIZE, 0);
 				*c -= direction;
 
 				int square_type;
