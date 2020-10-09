@@ -110,11 +110,10 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 2;
 				}
 
-				if (j < height
-					|| fractal3(i + chunk->x * CHUNK_SIZE,
+				if (fractal3(i + chunk->x * CHUNK_SIZE,
 								j + chunk->y * CHUNK_SIZE,
 								k + chunk->z * CHUNK_SIZE,
-								m->permutations) < -0.35) {
+								m->permutations) < -0.5) {
 					type = 0;
 				}
 
