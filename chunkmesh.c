@@ -29,6 +29,16 @@ void push_face(mesh_t * mesh, vec3_t a, vec3_t b, EFace face, int type)
 		vec3(b.x, b.y, b.z),
 	};
 	int indices[4] = { 0 };
+	int face_indices_x[6], face_indices_y[6];
+	face_indices_x[FACE_LEFT] = face_indices_x[FACE_RIGHT] = AXIS_Z;	/* Z is the uv x axis */
+	face_indices_y[FACE_LEFT] = face_indices_y[FACE_RIGHT] = AXIS_Y;	/* Y is the uv y axis */
+
+	face_indices_x[FACE_FRONT] = face_indices_x[FACE_BACK] = AXIS_X;	/* X is the uv x axis */
+	face_indices_y[FACE_FRONT] = face_indices_y[FACE_BACK] = AXIS_Y;	/* Z is the uv y axis */
+
+	face_indices_x[FACE_DOWN] = face_indices_x[FACE_UP] = AXIS_X;	/* X is the uv x axis */
+	face_indices_y[FACE_DOWN] = face_indices_y[FACE_UP] = AXIS_Z;	/* Z is the uv y axis */
+
 	switch (face) {
 	  case FACE_LEFT:
 		  indices[CORNER_TOP_LEFT] = 3;
@@ -73,19 +83,26 @@ void push_face(mesh_t * mesh, vec3_t a, vec3_t b, EFace face, int type)
 		  indices[CORNER_BOTTOM_RIGHT] = 4;
 		  break;
 	}
+	int uv_x_stretch =
+	  fabsl(vertices[indices[CORNER_TOP_RIGHT]].m[face_indices_x[face]] -
+			vertices[indices[CORNER_TOP_LEFT]].m[face_indices_x[face]]);
+	int uv_y_stretch =
+	  fabsl(vertices[indices[CORNER_TOP_LEFT]].m[face_indices_y[face]] -
+			vertices[indices[CORNER_BOTTOM_LEFT]].m[face_indices_y[face]]);
+	vec2_t uv_stretch = vec2(uv_x_stretch, uv_y_stretch);
 	mesh_push_vertex(mesh, CORNER_TOP_LEFT, face,
-					 vertices[indices[CORNER_TOP_LEFT]], type);
+					 vertices[indices[CORNER_TOP_LEFT]], uv_stretch, type);
 	mesh_push_vertex(mesh, CORNER_TOP_RIGHT, face,
-					 vertices[indices[CORNER_TOP_RIGHT]], type);
+					 vertices[indices[CORNER_TOP_RIGHT]], uv_stretch, type);
 	mesh_push_vertex(mesh, CORNER_BOTTOM_LEFT, face,
-					 vertices[indices[CORNER_BOTTOM_LEFT]], type);
+					 vertices[indices[CORNER_BOTTOM_LEFT]], uv_stretch, type);
 	// --
 	mesh_push_vertex(mesh, CORNER_BOTTOM_RIGHT, face,
-					 vertices[indices[CORNER_BOTTOM_RIGHT]], type);
+					 vertices[indices[CORNER_BOTTOM_RIGHT]], uv_stretch, type);
 	mesh_push_vertex(mesh, CORNER_BOTTOM_LEFT, face,
-					 vertices[indices[CORNER_BOTTOM_LEFT]], type);
+					 vertices[indices[CORNER_BOTTOM_LEFT]], uv_stretch, type);
 	mesh_push_vertex(mesh, CORNER_TOP_RIGHT, face,
-					 vertices[indices[CORNER_TOP_RIGHT]], type);
+					 vertices[indices[CORNER_TOP_RIGHT]], uv_stretch, type);
 }
 
 void init_corner_queue(CornerQueue * queue)

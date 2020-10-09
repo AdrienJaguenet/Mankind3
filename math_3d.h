@@ -96,17 +96,22 @@ v1.0  2016-02-15  Initial release
 // So you can just upload the vectors into shaders as they are.
 //
 
-typedef struct { float x, y, z; } vec3_t;
-static inline vec3_t vec3(float x, float y, float z)        { return (vec3_t){ x, y, z }; }
+typedef union {
+  float m[3];
+  struct {
+	float x, y, z; 
+  };
+} vec3_t;
+static inline vec3_t vec3(float x, float y, float z)        { return (vec3_t){ .m = {x, y, z }}; }
 
-static inline vec3_t v3_add   (vec3_t a, vec3_t b)          { return (vec3_t){ a.x + b.x, a.y + b.y, a.z + b.z }; }
-static inline vec3_t v3_adds  (vec3_t a, float s)           { return (vec3_t){ a.x + s,   a.y + s,   a.z + s   }; }
-static inline vec3_t v3_sub   (vec3_t a, vec3_t b)          { return (vec3_t){ a.x - b.x, a.y - b.y, a.z - b.z }; }
-static inline vec3_t v3_subs  (vec3_t a, float s)           { return (vec3_t){ a.x - s,   a.y - s,   a.z - s   }; }
-static inline vec3_t v3_mul   (vec3_t a, vec3_t b)          { return (vec3_t){ a.x * b.x, a.y * b.y, a.z * b.z }; }
-static inline vec3_t v3_muls  (vec3_t a, float s)           { return (vec3_t){ a.x * s,   a.y * s,   a.z * s   }; }
-static inline vec3_t v3_div   (vec3_t a, vec3_t b)          { return (vec3_t){ a.x / b.x, a.y / b.y, a.z / b.z }; }
-static inline vec3_t v3_divs  (vec3_t a, float s)           { return (vec3_t){ a.x / s,   a.y / s,   a.z / s   }; }
+static inline vec3_t v3_add   (vec3_t a, vec3_t b)          { return (vec3_t){ .m = {a.x + b.x, a.y + b.y, a.z + b.z }}; }
+static inline vec3_t v3_adds  (vec3_t a, float s)           { return (vec3_t){ .m = {a.x + s,   a.y + s,   a.z + s   }}; }
+static inline vec3_t v3_sub   (vec3_t a, vec3_t b)          { return (vec3_t){ .m = {a.x - b.x, a.y - b.y, a.z - b.z }}; }
+static inline vec3_t v3_subs  (vec3_t a, float s)           { return (vec3_t){ .m = {a.x - s,   a.y - s,   a.z - s   }}; }
+static inline vec3_t v3_mul   (vec3_t a, vec3_t b)          { return (vec3_t){ .m = {a.x * b.x, a.y * b.y, a.z * b.z }}; }
+static inline vec3_t v3_muls  (vec3_t a, float s)           { return (vec3_t){ .m = {a.x * s,   a.y * s,   a.z * s   }}; }
+static inline vec3_t v3_div   (vec3_t a, vec3_t b)          { return (vec3_t){ .m = {a.x / b.x, a.y / b.y, a.z / b.z }}; }
+static inline vec3_t v3_divs  (vec3_t a, float s)           { return (vec3_t){ .m = {a.x / s,   a.y / s,   a.z / s   }}; }
 static inline float  v3_length(vec3_t v)                    { return sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);          }
 static inline vec3_t v3_norm  (vec3_t v);
 static inline float  v3_dot   (vec3_t a, vec3_t b)          { return a.x*b.x + a.y*b.y + a.z*b.z;                 }
@@ -206,9 +211,9 @@ static inline mat4_t m4_mul          (mat4_t a, mat4_t b);
 static inline vec3_t v3_norm(vec3_t v) {
 	float len = v3_length(v);
 	if (len > 0)
-		return (vec3_t){ v.x / len, v.y / len, v.z / len };
+		return (vec3_t){ .m = {v.x / len, v.y / len, v.z / len }};
 	else
-		return (vec3_t){ 0, 0, 0};
+		return (vec3_t){ .m = {0, 0, 0}};
 }
 
 static inline vec3_t v3_proj(vec3_t v, vec3_t onto) {
@@ -216,10 +221,10 @@ static inline vec3_t v3_proj(vec3_t v, vec3_t onto) {
 }
 
 static inline vec3_t v3_cross(vec3_t a, vec3_t b) {
-	return (vec3_t){
+	return (vec3_t){.m = {
 		a.y * b.z - a.z * b.y,
 		a.z * b.x - a.x * b.z,
-		a.x * b.y - a.y * b.x
+		a.x * b.y - a.y * b.x }
 	};
 }
 

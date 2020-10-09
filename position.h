@@ -28,6 +28,12 @@ typedef enum {
 	CORNER_BOTTOM_RIGHT = 3
 } ECorner;
 
+typedef enum {
+	AXIS_X = 0,
+	AXIS_Y = 1,
+	AXIS_Z = 2
+} EAXIS;
+
 
 typedef enum {
 	NEIGHBOUR_LEFT = 0,

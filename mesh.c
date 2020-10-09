@@ -15,6 +15,12 @@ void mesh_load(mesh_t * mesh)
 	glBufferData(GL_ARRAY_BUFFER, mesh->vertices_no * sizeof(GLuint),
 				 mesh->packed, GL_STATIC_DRAW);
 
+	/* Generate the buffer objects.. */
+	glGenBuffers(1, &mesh->texbo);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->texbo);
+	glBufferData(GL_ARRAY_BUFFER, mesh->vertices_no * sizeof(GLuint),
+				 mesh->texinfo, GL_STATIC_DRAW);
+
 	glGenBuffers(1, &mesh->ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->vertices_no * sizeof(GLuint),
@@ -23,6 +29,10 @@ void mesh_load(mesh_t * mesh)
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->pbo);
 	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, (void *) 0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->texbo);
+	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, 0, (void *) 0);
 	INFO("Pushed %d vertices", mesh->vertices_no);
 }
 
@@ -56,12 +66,14 @@ void resize_mesh(mesh_t * mesh, int new_size)
 	mesh->vertices_max = new_size;
 	mesh->packed =
 	  reallocarray(mesh->packed, sizeof(GLuint), mesh->vertices_max);
+	mesh->texinfo =
+	  reallocarray(mesh->texinfo, sizeof(GLuint), mesh->vertices_max);
 	mesh->indices =
 	  reallocarray(mesh->indices, sizeof(GLuint), mesh->vertices_max);
 }
 
 void mesh_push_vertex(mesh_t * mesh, ECorner corner, EFace face,
-					  vec3_t position, int type)
+					  vec3_t position, vec2_t uv_stretch, int type)
 {
 	/* Resize arrays */
 	if (mesh->vertices_no >= mesh->vertices_max) {
@@ -71,10 +83,16 @@ void mesh_push_vertex(mesh_t * mesh, ECorner corner, EFace face,
 	  (((GLuint) position.x & POS_MASK) << POSX_OFFSET) |
 	  (((GLuint) position.y & POS_MASK) << POSY_OFFSET) |
 	  (((GLuint) position.z & POS_MASK) << POSZ_OFFSET) |
-	  ((corner & CORNER_MASK) << CORNER_OFFSET) |
-	  ((type & TYPE_MASK) << TYPE_OFFSET);
+	  ((corner & CORNER_MASK) << CORNER_OFFSET);
+
+	GLuint texinfo =
+	  (((GLuint) type & TYPE_MASK) << TYPE_OFFSET) |
+	  (((GLuint) uv_stretch.x & STRETCH_MASK) << STRETCHX_OFFSET) |
+	  (((GLuint) uv_stretch.y & STRETCH_MASK) << STRETCHY_OFFSET);
+
 
 	mesh->packed[mesh->vertices_no] = pack;
+	mesh->texinfo[mesh->vertices_no] = texinfo;
 	mesh->indices[mesh->vertices_no] = mesh->vertices_no;
 	++mesh->vertices_no;
 }
