@@ -23,6 +23,7 @@ void mesh_load(mesh_t * mesh)
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->pbo);
 	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, (void *) 0);
+	INFO("Pushed %d vertices", mesh->vertices_no);
 }
 
 void mesh_render(mesh_t * mesh, Texture * texture)

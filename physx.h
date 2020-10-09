@@ -2,6 +2,7 @@
 
 #include "math_3d.h"
 #include "utilities.h"
+#include <stdbool.h>
 
 typedef struct Physics {
 	vec3_t velocity;

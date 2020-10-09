@@ -16,17 +16,17 @@
 	0 -- 4
  */
 
-void push_face(mesh_t * mesh, int x, int y, int z, EFace face, int type)
+void push_face(mesh_t * mesh, vec3_t a, vec3_t b, EFace face, int type)
 {
 	vec3_t vertices[8] = {
-		vec3(x, y, z),
-		vec3(x, y, z + 1),
-		vec3(x, y + 1, z),
-		vec3(x, y + 1, z + 1),
-		vec3(x + 1, y, z),
-		vec3(x + 1, y, z + 1),
-		vec3(x + 1, y + 1, z),
-		vec3(x + 1, y + 1, z + 1),
+		vec3(a.x, a.y, a.z),
+		vec3(a.x, a.y, b.z),
+		vec3(a.x, b.y, a.z),
+		vec3(a.x, b.y, b.z),
+		vec3(b.x, a.y, a.z),
+		vec3(b.x, a.y, b.z),
+		vec3(b.x, b.y, a.z),
+		vec3(b.x, b.y, b.z),
 	};
 	int indices[4] = { 0 };
 	switch (face) {
@@ -58,14 +58,15 @@ void push_face(mesh_t * mesh, int x, int y, int z, EFace face, int type)
 		  indices[CORNER_BOTTOM_RIGHT] = 6;
 		  break;
 
-	  case FACE_BACK:
+		  /* Z seems to be inverted, therefore so are FRONT and BACK */
+	  case FACE_FRONT:
 		  indices[CORNER_TOP_LEFT] = 7;
 		  indices[CORNER_TOP_RIGHT] = 3;
 		  indices[CORNER_BOTTOM_LEFT] = 5;
 		  indices[CORNER_BOTTOM_RIGHT] = 1;
 		  break;
 
-	  case FACE_FRONT:
+	  case FACE_BACK:
 		  indices[CORNER_TOP_LEFT] = 2;
 		  indices[CORNER_TOP_RIGHT] = 6;
 		  indices[CORNER_BOTTOM_LEFT] = 0;
@@ -87,7 +88,29 @@ void push_face(mesh_t * mesh, int x, int y, int z, EFace face, int type)
 					 vertices[indices[CORNER_TOP_RIGHT]], type);
 }
 
-void generate_single_chunk_mesh(Chunk * chunk, Map * map, int lod)
+void init_corner_queue(CornerQueue * queue)
+{
+	queue->start = queue->end = 0;
+}
+
+bool corner_queue_is_empty(CornerQueue * queue)
+{
+	return queue->start == queue->end;
+}
+
+void push_corner(CornerQueue * queue, vec2_t corner)
+{
+	queue->corners[queue->end] = corner;
+	queue->end = (queue->end + 1) % (CHUNK_SIZE * CHUNK_SIZE);
+}
+
+void pop_corner(CornerQueue * queue, vec2_t * corner)
+{
+	*corner = queue->corners[queue->start];
+	queue->start = (queue->start + 1) % (CHUNK_SIZE * CHUNK_SIZE);
+}
+
+void generate_single_chunk_mesh_greedy(Chunk * chunk, Map * map, int lod)
 {
 	(void) map;
 	if (chunk->mesh[lod]) {
@@ -101,60 +124,194 @@ void generate_single_chunk_mesh(Chunk * chunk, Map * map, int lod)
 	chunk->mesh[lod] = calloc(sizeof(mesh_t), 1);
 	resize_mesh(chunk->mesh[lod], 512);
 
-	for (int i = 0; i < CHUNK_SIZE >> lod; ++i) {
-		for (int j = 0; j < CHUNK_SIZE >> lod; ++j) {
-			for (int k = 0; k < CHUNK_SIZE >> lod; ++k) {
-				Block *b = chunk->blocks[INCHUNK_INDEX(i, j, k)] + lod;
-				if (b->type == 0) {
+	int x = 0, y = 0, z = 0, *a, *b, *c, *a0, *b0, *c0, x0, y0, z0;
+	vec2_t corner;
+	CornerQueue queue;
+	init_corner_queue(&queue);
+
+	bool used[CHUNK_SIZE][CHUNK_SIZE];
+
+	for (int face = 0; face < 6; ++face) {
+		int direction = 1;
+		(void) direction;
+		/* Set a, b, c according to the face set we're rendering.
+		 * c will be the "fixed" component, and a and b the moving
+		 * ones. For instance, for the FRONT face, z will be the
+		 * fixed component, and we will work with a and b. */
+		switch (face) {
+		  case FACE_FRONT:
+		  case FACE_BACK:
+			  a = &x;
+			  a0 = &x0;
+			  b = &y;
+			  b0 = &y0;
+			  c = &z;
+			  c0 = &z0;
+			  break;
+
+		  case FACE_RIGHT:
+		  case FACE_LEFT:
+			  a = &z;
+			  a0 = &z0;
+			  b = &y;
+			  b0 = &y0;
+			  c = &x;
+			  c0 = &x0;
+			  break;
+
+		  case FACE_UP:
+		  case FACE_DOWN:
+			  a = &x;
+			  a0 = &x0;
+			  b = &z;
+			  b0 = &z0;
+			  c = &y;
+			  c0 = &y0;
+			  break;
+		}
+
+		/* For these faces, we check in reverse (remove 1 to the fixed component) */
+		switch (face) {
+		  case FACE_BACK:
+		  case FACE_LEFT:
+		  case FACE_DOWN:
+			  direction = -1;
+			  break;
+		}
+		for (*c = 0; *c < CHUNK_SIZE; ++*c) {
+			*c0 = *c;
+			push_corner(&queue, vec2(0, 0));
+			for (int i = 0; i < CHUNK_SIZE; ++i) {
+				for (int j = 0; j < CHUNK_SIZE; ++j) {
+					used[i][j] = false;
+				}
+			}
+			while (!corner_queue_is_empty(&queue)) {
+				pop_corner(&queue, &corner);
+				/* We start at this corner */
+				*a = *a0 = corner.x;
+				*b = *b0 = corner.y;
+				if (used[(int) corner.x][(int) corner.y]) {
 					continue;
 				}
-				int bx = i + ((chunk->x * CHUNK_SIZE) << lod),
-				  by = j + ((chunk->y * CHUNK_SIZE) << lod),
-				  bz = k + ((chunk->z * CHUNK_SIZE) << lod);
-				Block *neighbours[6] = { NULL };
-				get_neighbourhood(map, bx, by, bz, neighbours, lod);
+				Block *block =
+				  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+									y + chunk->y * CHUNK_SIZE,
+									z + chunk->z * CHUNK_SIZE, 0);
+				/* We increase momentarily the fixed axis to find the block in front of us */
+				*c += direction;
+				Block *front =
+				  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+									y + chunk->y * CHUNK_SIZE,
+									z + chunk->z * CHUNK_SIZE, 0);
+				*c -= direction;
 
-				if (neighbours[NEIGHBOUR_LEFT]
-					&& neighbours[NEIGHBOUR_LEFT]->has_void) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_LEFT, b->type);
+				int square_type;
+				if (!front || front->type != 0) {
+					/* No need to draw this */
+					square_type = -1;
+				} else {
+					square_type = block->type;	// <- we will try to form a rectangle with this type
 				}
 
-				if (neighbours[NEIGHBOUR_RIGHT]
-					&& neighbours[NEIGHBOUR_RIGHT]->has_void) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_RIGHT, b->type);
+				/* We go as far as possible on the `a` axis */
+				for (; *a < CHUNK_SIZE; ++*a) {
+					Block *block =
+					  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+										y + chunk->y * CHUNK_SIZE,
+										z + chunk->z * CHUNK_SIZE, 0);
+
+					int type = block->type;
+					/* fetch the front cube */
+					*c += direction;
+					Block *front =
+					  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+										y + chunk->y * CHUNK_SIZE,
+										z + chunk->z * CHUNK_SIZE, 0);
+					*c -= direction;
+					if (!front || front->type != 0) {
+						/* covered front */
+						type = -1;
+					}
+					/* We stumbled upon a block with the incorrect type: we remove 1 to `a` (last correct position)  */
+					if (type != square_type || used[*a][*b]) {
+						break;
+					}
+				}
+				*a -= 1;
+				bool found = false;
+				for (; *b < CHUNK_SIZE && !found; ++*b) {
+					for (int l = *a0; l <= *a; ++l) {
+						int old_a = *a;
+						*a = l;
+						Block *block =
+						  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+											y + chunk->y * CHUNK_SIZE,
+											z + chunk->z * CHUNK_SIZE, 0);
+						int type = block->type;
+
+						/* Same as above, we increase *c to find the block in front of us */
+						*c += direction;
+						Block *front =
+						  get_block_or_null(map, x + chunk->x * CHUNK_SIZE,
+											y + chunk->y * CHUNK_SIZE,
+											z + chunk->z * CHUNK_SIZE, 0);
+						*c -= direction;
+						*a = old_a;
+						if (!front || front->type != 0) {
+							type = -1;
+						}
+						if (type != square_type || used[l][*b]) {
+							found = true;
+							break;
+						}
+					}
+				}
+				*b -= 1;
+				if (found) {
+					*b -= 1;
 				}
 
-
-				if (neighbours[NEIGHBOUR_FRONT]
-					&& neighbours[NEIGHBOUR_FRONT]->has_void) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_FRONT, b->type);
+				/* set cells as used */
+				for (int m = *a0; m <= *a; ++m) {
+					for (int n = *b0; n <= *b; ++n) {
+						used[m][n] = true;
+					}
 				}
 
-				if (neighbours[NEIGHBOUR_BACK]
-					&& neighbours[NEIGHBOUR_BACK]->has_void) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_BACK, b->type);
+				/* We finally have our rectangle. */
+				if (square_type > 0) {
+					push_face(chunk->mesh[lod], vec3(x0, y0, z0),
+							  vec3(x + 1, y + 1, z + 1), face, square_type);
 				}
 
-				if (neighbours[NEIGHBOUR_DOWN]
-					&& neighbours[NEIGHBOUR_DOWN]->has_void) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_DOWN, b->type);
+				for (; *b < CHUNK_SIZE - 1; ++*b) {
+					if (!used[*a0][*b + 1]) {
+						push_corner(&queue, vec2(*a0, *b + 1));
+						break;
+					}
 				}
-
-				if (neighbours[NEIGHBOUR_UP]
-					&& neighbours[NEIGHBOUR_UP]->has_void) {
-					push_face(chunk->mesh[lod], i, j, k, FACE_UP, b->type);
+				for (; *a < CHUNK_SIZE - 1; ++*a) {
+					if (!used[*a + 1][*b0]) {
+						push_corner(&queue, vec2(*a + 1, *b0));
+						break;
+					}
+				}
+			}
+			for (int i = 0; i < CHUNK_SIZE; ++i) {
+				for (int j = 0; j < CHUNK_SIZE; ++j) {
+					if (!used[i][j]) {
+						WARN("Failed to cover");
+					}
 				}
 			}
 		}
 	}
 	mesh_load(chunk->mesh[lod]);
-
 }
 
 void generate_chunk_mesh(Chunk * chunk, Map * map)
 {
 	chunk->dirty = false;
-	for (int i = 0; i < MAX_LOD; ++i) {
-		generate_single_chunk_mesh(chunk, map, i);
-	}
+	generate_single_chunk_mesh_greedy(chunk, map, 0);
 }
