@@ -1,9 +1,4 @@
 #include "noise.h"
-#include <math.h>
-#include <stdlib.h>
-#include <stdarg.h>
-
-#include "utilities.h"
 
 int *shuffled_permutations(int size)
 {
@@ -38,91 +33,42 @@ float grad3(int hash, float x, float y, float z)
 	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
 }
 
-float snoise2(float x, float y, int *perm)
+float noise2(float x, float y, int *perm)
 {
-	x += 0.5;
-	y += 0.5;					/* This is to fix zero point errors... */
+	int ix0, iy0, ix1, iy1;
+	float fx0, fy0, fx1, fy1;
+	float s, t, nx0, nx1, n0, n1;
 
-#define F2 0.366025403			// F2 = 0.5*(sqrt(3.0)-1.0)
-#define G2 0.211324865			// G2 = (3.0-Math.sqrt(3.0))/6.0
+	ix0 = FASTFLOOR(x);			// Integer part of x
+	iy0 = FASTFLOOR(y);			// Integer part of y
+	fx0 = x - ix0;				// Fractional part of x
+	fy0 = y - iy0;				// Fractional part of y
+	fx1 = fx0 - 1.0f;
+	fy1 = fy0 - 1.0f;
+	ix1 = (ix0 + 1) & 0xff;		// Wrap to 0..255
+	iy1 = (iy0 + 1) & 0xff;
+	ix0 = ix0 & 0xff;
+	iy0 = iy0 & 0xff;
 
-	float n0, n1, n2;			// Noise contributions from the three corners
+	t = FADE(fy0);
+	s = FADE(fx0);
 
-	// Skew the input space to determine which simplex cell we're in
-	float s = (x + y) * F2;		// Hairy factor for 2D
-	float xs = x + s;
-	float ys = y + s;
-	int i = FASTFLOOR(xs);
-	int j = FASTFLOOR(ys);
+	nx0 = grad2(perm[ix0 + perm[iy0]], fx0, fy0);
+	nx1 = grad2(perm[ix0 + perm[iy1]], fx0, fy1);
+	n0 = LERP(t, nx0, nx1);
 
-	float t = (float) (i + j) * G2;
-	float X0 = i - t;			// Unskew the cell origin back to (x,y) space
-	float Y0 = j - t;
-	float x0 = x - X0;			// The x,y distances from the cell origin
-	float y0 = y - Y0;
+	nx0 = grad2(perm[ix1 + perm[iy0]], fx1, fy0);
+	nx1 = grad2(perm[ix1 + perm[iy1]], fx1, fy1);
+	n1 = LERP(t, nx0, nx1);
 
-	// For the 2D case, the simplex shape is an equilateral triangle.
-	// Determine which simplex we are in.
-	int i1, j1;					// Offsets for second (middle) corner of simplex in (i,j) coords
-	if (x0 > y0) {
-		i1 = 1;
-		j1 = 0;
-	}							// lower triangle, XY order: (0,0)->(1,0)->(1,1)
-	else {
-		i1 = 0;
-		j1 = 1;
-	}							// upper triangle, YX order: (0,0)->(0,1)->(1,1)
-
-	// A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
-	// a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
-	// c = (3-sqrt(3))/6
-
-	float x1 = x0 - i1 + G2;	// Offsets for middle corner in (x,y) unskewed coords
-	float y1 = y0 - j1 + G2;
-	float x2 = x0 - 1.0f + 2.0f * G2;	// Offsets for last corner in (x,y) unskewed coords
-	float y2 = y0 - 1.0f + 2.0f * G2;
-
-	// Wrap the integer indices at 256, to avoid indexing perm[] out of bounds
-	int ii = i & 0xff;
-	int jj = j & 0xff;
-
-	// Calculate the contribution from the three corners
-	float t0 = 0.5f - x0 * x0 - y0 * y0;
-	if (t0 < 0.0f)
-		n0 = 0.0f;
-	else {
-		t0 *= t0;
-		n0 = t0 * t0 * grad2(perm[ii + perm[jj]], x0, y0);
-	}
-
-	float t1 = 0.5f - x1 * x1 - y1 * y1;
-	if (t1 < 0.0f)
-		n1 = 0.0f;
-	else {
-		t1 *= t1;
-		n1 = t1 * t1 * grad2(perm[ii + i1 + perm[jj + j1]], x1, y1);
-	}
-
-	float t2 = 0.5f - x2 * x2 - y2 * y2;
-	if (t2 < 0.0f)
-		n2 = 0.0f;
-	else {
-		t2 *= t2;
-		n2 = t2 * t2 * grad2(perm[ii + 1 + perm[jj + 1]], x2, y2);
-	}
-
-	// Add contributions from each corner to get the final noise value.
-	// The result is scaled to return values in the interval [-1,1].
-	return 40.0f * (n0 + n1 + n2);	// TODO: The scale factor is preliminary!
+	return 0.507f * (LERP(s, n0, n1));
 }
 
+// 3D simplex noise
 float snoise3(float x, float y, float z, int *perm)
 {
-	x += 0.5;
-	y += 0.5;
-	z += 0.5;					/* This is to fix zero point errors... */
 
-	// Simple skewing factors for the 3D case
+// Simple skewing factors for the 3D case
 #define F3 0.333333333
 #define G3 0.166666667
 
@@ -150,7 +96,7 @@ float snoise3(float x, float y, float z, int *perm)
 	int i1, j1, k1;				// Offsets for second corner of simplex in (i,j,k) coords
 	int i2, j2, k2;				// Offsets for third corner of simplex in (i,j,k) coords
 
-	/* This code would benefit from a backport from the GLSL version! */
+/* This code would benefit from a backport from the GLSL version! */
 	if (x0 >= y0) {
 		if (y0 >= z0) {
 			i1 = 1;
@@ -291,25 +237,25 @@ float noise_layered(int count, ...)
 
 float fractal2(float x, float y, int *permutations)
 {
-	return noise_layered(7, (float[2]) { snoise2(x / 400.f, y / 400.f,
-												 permutations), 8.0
+	return noise_layered(7, (float[2]) { noise2(x / 400.f, y / 400.f,
+												permutations), 8.0
 						 },
-						 (float[2]) { snoise2(x / 100.f, y / 100.f,
-											  permutations), 1.0
+						 (float[2]) { noise2(x / 100.f, y / 100.f,
+											 permutations), 1.0
 						 },
-						 (float[2]) { snoise2(x / 70.f, y / 70.f, permutations),
+						 (float[2]) { noise2(x / 70.f, y / 70.f, permutations),
 						 1.0
 						 },
-						 (float[2]) { snoise2(x / 40.f, y / 40.f, permutations),
+						 (float[2]) { noise2(x / 40.f, y / 40.f, permutations),
 						 0.5
 						 },
-						 (float[2]) { snoise2(x / 20.f, y / 20.f, permutations),
+						 (float[2]) { noise2(x / 20.f, y / 20.f, permutations),
 						 0.5
 						 },
-						 (float[2]) { snoise2(x / 10.f, y / 10.f, permutations),
+						 (float[2]) { noise2(x / 10.f, y / 10.f, permutations),
 						 0.1
 						 },
-						 (float[2]) { snoise2(x / 6.f, y / 6.f, permutations),
+						 (float[2]) { noise2(x / 6.f, y / 6.f, permutations),
 						 0.2
 						 }
 	);
