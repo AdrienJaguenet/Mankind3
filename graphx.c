@@ -7,6 +7,8 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
 		FATAL("Could not initialize SDL: '%s'\n", SDL_GetError());
 	}
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	gfx_context->window = SDL_CreateWindow("Mankind 3", SDL_WINDOWPOS_UNDEFINED,
 										   SDL_WINDOWPOS_UNDEFINED,
 										   window_width, window_height,
@@ -36,6 +38,7 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	}
 
 	glClearColor(0.53, 0.81, 0.92, 1.0);
+	glEnable(GL_MULTISAMPLE);
 
 	gfx_context->main_program =
 	  program_new("./resources/shaders/default.vs",
