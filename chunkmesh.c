@@ -127,19 +127,19 @@ void pop_corner(CornerQueue * queue, vec2_t * corner)
 	queue->start = (queue->start + 1) % (CHUNK_SIZE * CHUNK_SIZE);
 }
 
-void generate_single_chunk_mesh_greedy(Chunk * chunk, Map * map, int lod)
+void generate_single_chunk_mesh_greedy(Chunk * chunk, Map * map)
 {
 	(void) map;
-	if (chunk->mesh[lod]) {
-		mesh_terminate(chunk->mesh[lod]);
+	if (chunk->mesh) {
+		mesh_terminate(chunk->mesh);
 	}
 	if (chunk->empty) {
-		chunk->mesh[lod] = NULL;
+		chunk->mesh = NULL;
 		return;
 	}
 
-	chunk->mesh[lod] = calloc(sizeof(mesh_t), 1);
-	resize_mesh(chunk->mesh[lod], 512);
+	chunk->mesh = calloc(sizeof(mesh_t), 1);
+	resize_mesh(chunk->mesh, 512);
 
 	int x = 0, y = 0, z = 0, *a, *b, *c, *a0, *b0, *c0, x0, y0, z0;
 	vec2_t corner;
@@ -296,7 +296,7 @@ void generate_single_chunk_mesh_greedy(Chunk * chunk, Map * map, int lod)
 
 				/* We finally have our rectangle. */
 				if (square_type > 0) {
-					push_face(chunk->mesh[lod], vec3(x0, y0, z0),
+					push_face(chunk->mesh, vec3(x0, y0, z0),
 							  vec3(x + 1, y + 1, z + 1), face, square_type);
 				}
 
@@ -322,11 +322,11 @@ void generate_single_chunk_mesh_greedy(Chunk * chunk, Map * map, int lod)
 			}
 		}
 	}
-	mesh_load(chunk->mesh[lod]);
+	mesh_load(chunk->mesh);
 }
 
 void generate_chunk_mesh(Chunk * chunk, Map * map)
 {
 	chunk->dirty = false;
-	generate_single_chunk_mesh_greedy(chunk, map, 0);
+	generate_single_chunk_mesh_greedy(chunk, map);
 }

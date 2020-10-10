@@ -84,25 +84,26 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	vec3_t *campos = &camera->position;
 	int cx, cy, cz;
 	const int RENDER_DISTANCE = 4;
+	int lod = 0;
 	get_chunk_pos(campos->x, campos->y, campos->z, &cx, &cy, &cz);
 	for (int i = cx - RENDER_DISTANCE; i < cx + RENDER_DISTANCE; ++i) {
 		for (int j = cy - RENDER_DISTANCE; j < cy + RENDER_DISTANCE; ++j) {
 			for (int k = cz - RENDER_DISTANCE; k < cz + RENDER_DISTANCE; ++k) {
-				Chunk *c = get_chunk_or_null(map, i, j, k);
+				Chunk *c = get_chunk_or_null(map, i, j, k, lod);
 				float distance;
 				if (cull_chunk(i, j, k, camera, &distance)) {
 					continue;
 				}
 				/* if the chunk does not exist */
 				if (!c) {
-					c = new_Chunk(map, i, j, k);
+					c = new_Chunk(map, i, j, k, lod);
 					push_Chunk_to_queue(gfx_context, c, distance,
 										PENDING_TERRAIN,
 										&gfx_context->terrgen_pqueue);
 					continue;
 				}
 				if (!c->pending[PENDING_TERRAIN] && !c->pending[PENDING_MESHGEN]
-					&& ((!c->mesh[0] && !c->empty) || (c->dirty))) {
+					&& ((!c->mesh && !c->empty) || (c->dirty))) {
 					push_Chunk_to_queue(gfx_context, c, distance,
 										PENDING_MESHGEN,
 										&gfx_context->meshgen_pqueue);
@@ -116,8 +117,8 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 
 void draw_Chunk(Chunk * chunk, GFXContext * gfx_context, int lod)
 {
-	if (chunk->mesh[lod]) {
-		draw_Mesh(gfx_context, chunk->mesh[lod],
+	if (chunk->mesh) {
+		draw_Mesh(gfx_context, chunk->mesh,
 				  vec3(chunk->x * CHUNK_SIZE * BLOCK_SIZE,
 					   chunk->y * CHUNK_SIZE * BLOCK_SIZE,
 					   chunk->z * CHUNK_SIZE * BLOCK_SIZE), lod);
@@ -201,7 +202,6 @@ void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 		}
 		c->pending[PENDING_TERRAIN] = false;
 		randomly_populate(map, c);
-		gen_Chunk_LOD(c);
 		gfx_context->queue_size--;
 	}
 

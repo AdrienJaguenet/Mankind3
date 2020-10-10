@@ -18,16 +18,16 @@ typedef struct {
 } Block;
 
 typedef struct {
-	Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE][MAX_LOD];
-	int x, y, z;
-	mesh_t *mesh[MAX_LOD];
+	Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
+	int x, y, z, lod;
+	mesh_t *mesh;
 	bool empty;
 	bool dirty;
 	bool pending[8];
 } Chunk;
 
 typedef struct {
-	Chunk **chunks;
+	Chunk **chunks[MAX_LOD];
 	int chunks_no;
 	int *permutations;
 } Map;
@@ -41,14 +41,14 @@ void gen_Chunk_LOD(Chunk * c);
 
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk);
 
-Chunk *get_chunk_or_null(Map * map, int px, int py, int pz);
+Chunk *get_chunk_or_null(Map * map, int px, int py, int pz, int lod);
 
 Block *get_block_or_null(Map * map, int bx, int by, int bz, int lod);
 
 void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 					   int lod);
 
-Chunk *new_Chunk(Map * map, int px, int py, int pz);
+Chunk *new_Chunk(Map * map, int px, int py, int pz, int lod);
 
 void delete_Map(Map * map);
 

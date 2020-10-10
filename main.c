@@ -98,7 +98,9 @@ int main()
 	Map *map = calloc(sizeof(Map), 1);
 	map->permutations = shuffled_permutations(512);
 
-	map->chunks = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
+	for (int i = 0; i < MAX_LOD; ++i) {
+		map->chunks[i] = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
+	}
 
 	AABB player = { vec3(0, 10, 0), vec3(0.7, 2., 0.7) };
 	Physics physics = { vec3(0, 0, 0), 0.5, false };
@@ -140,7 +142,6 @@ int main()
 
 	quit_GFX(&gfx_context);
 	delete_Map(map);
-	free(map->chunks);
 	free(map);
 	INFO("Goodbye!");
 	return 0;
