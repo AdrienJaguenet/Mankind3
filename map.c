@@ -87,7 +87,12 @@ void delete_Map(Map * map)
 
 int get_height(int x, int z, int *permutations)
 {
-	return fractal2(x, z, permutations) * 24.f;
+	return fractal2(x + 256, z + 256, permutations) * 24.f;
+}
+
+float get_3d(int x, int y, int z, int *permutations)
+{
+	return fractal3(x + 256, y + 256, z + 256, permutations);
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
@@ -110,10 +115,9 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 2;
 				}
 
-				if (fractal3(i + chunk->x * CHUNK_SIZE,
-							 j + chunk->y * CHUNK_SIZE,
-							 k + chunk->z * CHUNK_SIZE,
-							 m->permutations) < -0.5) {
+				if (get_3d(i + chunk->x * CHUNK_SIZE,
+						   j + chunk->y * CHUNK_SIZE,
+						   k + chunk->z * CHUNK_SIZE, m->permutations) < -0.5) {
 					type = 0;
 				}
 
