@@ -74,10 +74,6 @@ void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
 	if (keystates[SDL_SCANCODE_LCTRL]) {
 		try_move(player, v3_muls(get_Camera_up(camera), -dt_factor), map);
 	}
-
-	if (keystates[SDL_SCANCODE_SPACE]) {
-		try_move(player, v3_muls(get_Camera_up(camera), dt_factor), map);
-	}
 }
 
 void attach_camera_to(Camera * camera, AABB * aabb)

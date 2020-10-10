@@ -265,16 +265,16 @@ float fractal3(float x, float y, float z, int *permutations)
 {
 	return noise_layered(4,
 						 (float[2]) { snoise3(x / 100.f, y / 100.f, z / 100.f,
-											  permutations), 4.0
+											  permutations), 3.0
 						 },
 						 (float[2]) { snoise3(x / 80.f, y / 80.f, z / 80.f,
-											  permutations), 1.0
+											  permutations), 2.0
 						 },
 						 (float[2]) { snoise3(x / 30.f, y / 30.f, z / 30.f,
-											  permutations), 1.0
+											  permutations), 4.0
 						 },
 						 (float[2]) { snoise3(x / 20.f, y / 20.f, z / 20.f,
-											  permutations), 0.5
+											  permutations), 3.5
 						 }
 	);
 }
