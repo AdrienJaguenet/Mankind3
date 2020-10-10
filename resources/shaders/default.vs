@@ -48,7 +48,7 @@ void main()
 	                  quad_y * cell_size);
   gl_Position = (projection * view * model) * vec4(position, 1.0);
 
-  fragment_position = position;
+  fragment_position = gl_Position.xyz;
   fragment_normal = normal;
   fragment_uv = uvs[corner] * uv_stretch;
   fragment_uvstretch = uv_stretch;

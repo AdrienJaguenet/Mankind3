@@ -111,9 +111,9 @@ void randomly_populate(Map * m, Chunk * chunk)
 				}
 
 				if (fractal3(i + chunk->x * CHUNK_SIZE,
-								j + chunk->y * CHUNK_SIZE,
-								k + chunk->z * CHUNK_SIZE,
-								m->permutations) < -0.5) {
+							 j + chunk->y * CHUNK_SIZE,
+							 k + chunk->z * CHUNK_SIZE,
+							 m->permutations) < -0.5) {
 					type = 0;
 				}
 

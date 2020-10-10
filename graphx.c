@@ -130,6 +130,9 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
 					   (float *) &model);
 	glUniform3f(glGetUniformLocation
 				(gfx_context->main_program.id, "ambient_light"), .5f, 1.f, .5f);
+	glUniform3f(glGetUniformLocation
+				(gfx_context->main_program.id, "background_color"), 0.53, .82,
+				.92f);
 	glUniform1i(glGetUniformLocation
 				(gfx_context->main_program.id, "tilemap_grid_size"), 8);
 	glUniform1i(glGetUniformLocation(gfx_context->main_program.id, "lod"), lod);
