@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define COLOR_BLUE     "\x1B[34m"
 #define COLOR_RED      "\x1B[31m"

@@ -3,6 +3,7 @@
 
 #include "utilities.h"
 #include "graphx.h"
+#include "soundfx.h"
 #include "chunkmesh.h"
 #include "boxcol.h"
 #include "physx.h"
@@ -30,7 +31,7 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map)
 }
 
 bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
-				  unsigned int delta_ticks)
+				  SFXContext * sfx_context, unsigned int delta_ticks)
 {
 	(void) delta_ticks;
 	if (e->type == SDL_QUIT) {
@@ -52,6 +53,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			if (raycast_block
 				(camera->position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
+				play_Audio(&sfx_context->effects.break_block);
 				set_block_type(map, position.x, position.y, position.z, 0, 0);
 			}
 		} else if (e->button.button == SDL_BUTTON_RIGHT) {
@@ -61,6 +63,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			if (raycast_block
 				(camera->position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
+				play_Audio(&sfx_context->effects.place_block);
 				vec3_t temp = v3_add(position, normal);
 				set_block_type(map, temp.x, temp.y, temp.z, 0, 1);
 			}
@@ -109,7 +112,9 @@ int main()
 {
 	INFO("Mankind %s", VERSION);
 	GFXContext gfx_context;
+	SFXContext sfx_context;
 	init_GFX(&gfx_context, 1024, 768);
+	init_SFX(&sfx_context);
 	Map *map = calloc(sizeof(Map), 1);
 	map->permutations = shuffled_permutations(512);
 
@@ -134,7 +139,7 @@ int main()
 		while (SDL_PollEvent(&event)) {
 			running =
 			  handle_event(&event, &gfx_context.camera, &physics, map,
-						   delta_ticks);
+						   &sfx_context, delta_ticks);
 		}
 
 		handle_keystates(SDL_GetKeyboardState(NULL), &player,
@@ -157,6 +162,7 @@ int main()
 	}
 
 	quit_GFX(&gfx_context);
+	quit_SFX(&sfx_context);
 	delete_Map(map);
 	free(map);
 	INFO("Goodbye!");

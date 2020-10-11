@@ -12,10 +12,11 @@ SRC=main.c\
 	noise.c\
 	boxcol.c\
 	physx.c\
-	raycast.c
+	raycast.c\
+	soundfx.c
 OBJ=$(SRC:.c=.o)
-CFLAGS=-g -Werror -Wextra -Wall `pkg-config --cflags sdl2 SDL2_image openal gl glew`
-LDFLAGS=`pkg-config --libs sdl2 SDL2_image openal gl glew` -lm
+CFLAGS=-g -Werror -Wextra -Wall `pkg-config --cflags sdl2 SDL2_image openal freealut gl glew`
+LDFLAGS=`pkg-config --libs sdl2 SDL2_image openal freealut gl glew` -lm
 TARGET=mankind
 CC=gcc
 LD=gcc
