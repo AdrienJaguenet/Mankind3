@@ -7,7 +7,7 @@ int *shuffled_permutations(int size)
 		hash[i] = i;
 	}
 
-	for (int i = 0; i < size; ++i) {
+	for (int i = 0; i < size - 1; ++i) {
 		int j = i + rand() / (RAND_MAX / (size - i) + 1);
 		int t = hash[j];
 		hash[j] = hash[i];
