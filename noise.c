@@ -274,7 +274,7 @@ float fractal3(float x, float y, float z, int *permutations)
 											  permutations), 4.0
 						 },
 						 (float[2]) { snoise3(x / 20.f, y / 20.f, z / 20.f,
-											  permutations), 3.5
+											  permutations), 8.5
 						 }
 	);
 }

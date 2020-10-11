@@ -7,6 +7,7 @@
 #include "chunkmesh.h"
 #include "boxcol.h"
 #include "physx.h"
+#include "raycast.h"
 
 #define VERSION "0.0.1"
 
@@ -29,7 +30,7 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map)
 	return false;
 }
 
-bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
+bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 				  unsigned int delta_ticks)
 {
 	(void) delta_ticks;
@@ -43,6 +44,28 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics,
 	} else if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
 			physics->velocity.y = 0.015f * delta_ticks;
+		}
+	} else if (e->type == SDL_MOUSEBUTTONDOWN) {
+		if (e->button.button == SDL_BUTTON_LEFT) {
+			vec3_t normal = vec3(0, 0, 0);
+			vec3_t position = vec3(0, 0, 0);
+
+			if (raycast_block
+				(camera->position, get_Camera_lookAt(camera), map, &position,
+				 &normal)) {
+				set_block_type(map, position.x, position.y, position.z, 0, 0);
+			}
+		} else if (e->button.button == SDL_BUTTON_RIGHT) {
+			vec3_t normal = vec3(0, 0, 0);
+			vec3_t position = vec3(0, 0, 0);
+
+			if (raycast_block
+				(camera->position, get_Camera_lookAt(camera), map, &position,
+				 &normal)) {
+				vec3_t temp = v3_add(position, normal);
+				set_block_type(map, temp.x, temp.y, temp.z, 0, 1);
+			}
+
 		}
 	}
 	return true;
@@ -114,7 +137,8 @@ int main()
 
 		while (SDL_PollEvent(&event)) {
 			running =
-			  handle_event(&event, &gfx_context.camera, &physics, delta_ticks);
+			  handle_event(&event, &gfx_context.camera, &physics, map,
+						   delta_ticks);
 		}
 
 		handle_keystates(SDL_GetKeyboardState(NULL), &player,

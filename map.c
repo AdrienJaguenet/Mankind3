@@ -59,6 +59,18 @@ Block *get_block_or_null(Map * map, int x, int y, int z, int lod)
 	return &c->blocks[block_index];
 }
 
+void set_block_type(Map * map, int x, int y, int z, int lod, int type)
+{
+	int cx, cy, cz, bx, by, bz;
+	get_chunk_pos(x, y, z, &cx, &cy, &cz);
+	get_pos_in_chunk(x, y, z, &bx, &by, &bz, lod);
+	Chunk *c = get_chunk_or_null(map, cx, cy, cz, lod);
+
+	if (c != NULL) {
+		set_Chunk_block_type(map, c, bx, by, bz, type);
+	}
+}
+
 void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 					   int lod)
 {
