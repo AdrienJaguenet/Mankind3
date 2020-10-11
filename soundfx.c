@@ -4,8 +4,22 @@ void load_Audio(Audio * audio, const char *path)
 {
 	audio->buffer = alutCreateBufferFromFile(path);
 
+	int error = alGetError();
+
+	if (error != AL_NO_ERROR) {
+		FATAL("OpenAL error.");
+	}
+
 	alGenSources(1, &audio->source);
 	alSourcei(audio->source, AL_BUFFER, audio->buffer);
+}
+
+void load_helloworld(Audio * audio)
+{
+	audio->buffer = alutCreateBufferHelloWorld();
+	alGenSources(1, &audio->source);
+	alSourcei(audio->source, AL_BUFFER, audio->buffer);
+
 }
 
 void play_Audio(Audio * audio)
@@ -29,8 +43,10 @@ void init_SFX(SFXContext * ctx)
 
 void load_SFX(SFXContext * ctx)
 {
-	load_Audio(&ctx->effects.break_block, "resources/sfx/break_block.wav");
-	load_Audio(&ctx->effects.place_block, "resources/sfx/place_block.wav");
+	/* load_Audio(&ctx->effects.break_block, "resources/sfx/random3.wav"); */
+	/* load_Audio(&ctx->effects.place_block, "resources/sfx/random3.wav"); */
+	load_helloworld(&ctx->effects.break_block);
+	load_helloworld(&ctx->effects.place_block);
 }
 
 void quit_SFX(SFXContext * ctx)
