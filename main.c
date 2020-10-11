@@ -113,7 +113,9 @@ int main()
 	SFXContext sfx_context;
 	(void) sfx_context;
 	init_GFX(&gfx_context, 1024, 768);
+	SDL_InitSubSystem(SDL_INIT_AUDIO);
 	init_SFX();
+	load_SFX(&sfx_context);
 	Map *map = calloc(sizeof(Map), 1);
 	map->permutations = shuffled_permutations(512);
 
@@ -161,6 +163,7 @@ int main()
 	}
 
 	quit_GFX(&gfx_context);
+	clean_SFX(&sfx_context);
 	delete_Map(map);
 	free(map);
 	INFO("Goodbye!");

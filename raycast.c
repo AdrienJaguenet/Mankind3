@@ -106,9 +106,8 @@ bool raycast_block(vec3_t origin, vec3_t lookat, Map * map, vec3_t * position,
 			}
 		}
 
-		Block *block =
-		  get_block_or_null(map, current_voxel.x, current_voxel.y,
-							current_voxel.z, 0);
+		Block *block = get_block_or_null(map, current_voxel.x, current_voxel.y,
+										 current_voxel.z, 0);
 
 		if (block != NULL && block->type != 0) {
 			*position = current_voxel;

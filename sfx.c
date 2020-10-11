@@ -17,19 +17,18 @@ void try_load_wav(Mix_Chunk ** chunk, const char *path)
 {
 	*chunk = Mix_LoadWAV(path);
 	if (*chunk == NULL) {
-		printf("Could not load WAV at '%s'. Reason: '%s'.\n", path,
-			   Mix_GetError());
+		INFO("Could not load WAV at '%s': %s", path, Mix_GetError());
 	}
 }
 
-void load_sfx(SFXContext * ctx)
+void load_SFX(SFXContext * ctx)
 {
-	(void) ctx;
-	/* Shit here... */
+	try_load_wav(&ctx->effects.break_block, "resources/sfx/break_block.wav");
+	try_load_wav(&ctx->effects.place_block, "resources/sfx/place_block.wav");
 }
 
-void clean_sfx(SFXContext * ctx)
+void clean_SFX(SFXContext * ctx)
 {
-	Mix_FreeChunk(ctx->effects.popped);
-	Mix_FreeChunk(ctx->effects.cant_pop);
+	Mix_FreeChunk(ctx->effects.break_block);
+	Mix_FreeChunk(ctx->effects.place_block);
 }
