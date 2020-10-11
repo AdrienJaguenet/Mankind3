@@ -9,14 +9,13 @@ SRC=main.c\
 	math_3d.c\
 	graphx.c\
 	heap.c\
-	sfx.c\
 	noise.c\
 	boxcol.c\
 	physx.c\
 	raycast.c
 OBJ=$(SRC:.c=.o)
-CFLAGS=-g -Werror -Wextra -Wall `pkg-config --cflags sdl2 SDL2_image SDL2_mixer gl glew`
-LDFLAGS=`pkg-config --libs sdl2 SDL2_image SDL2_mixer gl glew` -lm
+CFLAGS=-g -Werror -Wextra -Wall `pkg-config --cflags sdl2 SDL2_image openal gl glew`
+LDFLAGS=`pkg-config --libs sdl2 SDL2_image openal gl glew` -lm
 TARGET=mankind
 CC=gcc
 LD=gcc

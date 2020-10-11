@@ -29,7 +29,7 @@ typedef struct {
 typedef struct {
 	Chunk **chunks[MAX_LOD];
 	int chunks_no;
-	int *permutations;
+	char *permutations;
 } Map;
 
 void randomly_populate(Map * m, Chunk * chunk);
@@ -53,5 +53,3 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 Chunk *new_Chunk(Map * map, int px, int py, int pz, int lod);
 
 void delete_Map(Map * map);
-
-int get_height(int x, int z, int *hash);

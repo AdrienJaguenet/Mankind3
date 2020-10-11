@@ -97,12 +97,12 @@ void delete_Map(Map * map)
 	}
 }
 
-int get_height(int x, int z, int *permutations)
+int get_height(int x, int z, char *permutations)
 {
 	return fractal2(x, z, permutations) * 128.f;
 }
 
-float get_3d(int x, int y, int z, int *permutations)
+float get_3d(int x, int y, int z, char *permutations)
 {
 	return fractal3(x, y, z, permutations);
 }

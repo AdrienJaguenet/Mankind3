@@ -1,15 +1,15 @@
 #include "noise.h"
 
-int *shuffled_permutations(int size)
+char *shuffled_permutations(size_t size)
 {
-	int *hash = malloc(sizeof(int) * size);
-	for (int i = 0; i < size; ++i) {
+	char *hash = malloc(sizeof(char) * size);
+	for (size_t i = 0; i < size; ++i) {
 		hash[i] = i;
 	}
 
-	for (int i = 0; i < size - 1; ++i) {
-		int j = i + rand() / (RAND_MAX / (size - i) + 1);
-		int t = hash[j];
+	for (size_t i = 0; i < size - 1; ++i) {
+		size_t j = i + rand() / (RAND_MAX / (size - i) + 1);
+		char t = hash[j];
 		hash[j] = hash[i];
 		hash[i] = t;
 	}
@@ -33,7 +33,7 @@ float grad3(int hash, float x, float y, float z)
 	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
 }
 
-float noise2(float x, float y, int *perm)
+float noise2(float x, float y, char *perm)
 {
 	int ix0, iy0, ix1, iy1;
 	float fx0, fy0, fx1, fy1;
@@ -65,7 +65,7 @@ float noise2(float x, float y, int *perm)
 }
 
 // 3D simplex noise
-float snoise3(float x, float y, float z, int *perm)
+float snoise3(float x, float y, float z, char *perm)
 {
 
 // Simple skewing factors for the 3D case
@@ -235,7 +235,7 @@ float noise_layered(int count, ...)
 /* With the copypasted noise shit, stretching now works by dividing
 	the x and y values. Kinda cool, tbh. */
 
-float fractal2(float x, float y, int *permutations)
+float fractal2(float x, float y, char *permutations)
 {
 	return noise_layered(7, (float[2]) { noise2(x / 400.f, y / 400.f,
 												permutations), 8.0
@@ -261,7 +261,7 @@ float fractal2(float x, float y, int *permutations)
 	);
 }
 
-float fractal3(float x, float y, float z, int *permutations)
+float fractal3(float x, float y, float z, char *permutations)
 {
 	return noise_layered(4,
 						 (float[2]) { snoise3(x / 100.f, y / 100.f, z / 100.f,
