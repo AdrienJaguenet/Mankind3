@@ -1,12 +1,17 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
 
+#include "math_3d.h"
 #include "utilities.h"
 
 typedef struct Audio {
+	bool global;
+	vec3_t origin;
 	ALuint buffer, source;
 } Audio;
 
@@ -20,3 +25,5 @@ void init_SFX(SFXContext * ctx);
 void load_SFX(SFXContext * ctx);
 void quit_SFX(SFXContext * ctx);
 void play_Audio(Audio * audio);
+void play_Audio_at(Audio * audio, vec3_t * position);
+void update_al_listener(vec3_t position, vec3_t direction, vec3_t up);

@@ -53,7 +53,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			if (raycast_block
 				(camera->position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
-				play_Audio(&sfx_context->effects.break_block);
+				play_Audio_at(&sfx_context->effects.break_block, &position);
 				set_block_type(map, position.x, position.y, position.z, 0, 0);
 			}
 		} else if (e->button.button == SDL_BUTTON_RIGHT) {
@@ -63,7 +63,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			if (raycast_block
 				(camera->position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
-				play_Audio(&sfx_context->effects.place_block);
+				play_Audio_at(&sfx_context->effects.place_block, &position);
 				vec3_t temp = v3_add(position, normal);
 				set_block_type(map, temp.x, temp.y, temp.z, 0, 1);
 			}
@@ -136,6 +136,9 @@ int main()
 		delta_ticks = new_ticks - last_ticks;
 		last_ticks = new_ticks;
 
+		update_al_listener(player.pos, get_Camera_lookAt(&gfx_context.camera),
+						   get_Camera_up(&gfx_context.camera));
+
 		while (SDL_PollEvent(&event)) {
 			running =
 			  handle_event(&event, &gfx_context.camera, &physics, map,
@@ -153,6 +156,8 @@ int main()
 		} else {
 			physics.touches_ground = false;
 		}
+		/* This doesn't have to be done every frame, tbh… */
+
 		attach_camera_to(&gfx_context.camera, &player);
 		gen_ChunkMesh_in_queue(&gfx_context, map, 10);
 		gen_Chunks_in_queue(&gfx_context, map, 10);
