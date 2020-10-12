@@ -109,14 +109,16 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 										PENDING_MESHGEN,
 										&gfx_context->meshgen_pqueue);
 				}
-				push_Chunk_to_queue(gfx_context, c, distance, PENDING_RENDER, &gfx_context->render_pqueue);
+				push_Chunk_to_queue(gfx_context, c, distance, PENDING_RENDER,
+									&gfx_context->render_pqueue);
 			}
 		}
 	}
-	draw_Chunks(gfx_context, RENDER_DISTANCE * RENDER_DISTANCE * RENDER_DISTANCE * 8);
+	draw_Chunks(gfx_context,
+				RENDER_DISTANCE * RENDER_DISTANCE * RENDER_DISTANCE * 8);
 }
 
-void draw_Chunks(GFXContext* gfx_context, int max_gens)
+void draw_Chunks(GFXContext * gfx_context, int max_gens)
 {
 	int i;
 	for (i = 0; i < max_gens; ++i) {
@@ -133,7 +135,8 @@ void draw_Chunks(GFXContext* gfx_context, int max_gens)
 		}
 		gfx_context->queue_size--;
 	}
-	INFO("Rendered %d chunks (max %d, %d still in queue)", i, max_gens, gfx_context->render_pqueue.nodes_no);
+	INFO("Rendered %d chunks (max %d, %d still in queue)", i, max_gens,
+		 gfx_context->render_pqueue.nodes_no);
 	clean_Heap(&gfx_context->render_pqueue);
 	init_Heap(&gfx_context->render_pqueue);
 }
