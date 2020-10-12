@@ -118,6 +118,34 @@ float noise3(float x, float y, float z, char *permutations)
 																			   1))));
 }
 
+float fbm2(float x, float y, int octave, char *permutations)
+{
+	float f = 0.0;
+	float w = 0.5;
+	for (int i = 0; i < octave; i++) {
+		f += w * noise2(x, y, permutations);
+		x *= 2.0;
+		y *= 2.0;
+		w *= 0.5;
+	}
+	return f;
+}
+
+float fbm3(float x, float y, float z, int octave, char *permutations)
+{
+	float f = 0.0;
+	float w = 0.5;
+	for (int i = 0; i < octave; i++) {
+		f += w * noise3(x, y, z, permutations);
+		x *= 2.0;
+		y *= 2.0;
+		z *= 2.0;
+		w *= 0.5;
+	}
+	return f;
+}
+
+
 float noise_layered(int count, ...)
 {
 	va_list ap;
@@ -142,43 +170,22 @@ float noise_layered(int count, ...)
 
 float fractal2(float x, float y, char *permutations)
 {
-	return noise_layered(7, (float[2]) { noise2(x / 400.f, y / 400.f,
-												permutations), 8.0
-						 },
-						 (float[2]) { noise2(x / 100.f, y / 100.f,
-											 permutations), 1.0
-						 },
-						 (float[2]) { noise2(x / 70.f, y / 70.f, permutations),
-						 1.0
-						 },
-						 (float[2]) { noise2(x / 40.f, y / 40.f, permutations),
-						 0.5
-						 },
-						 (float[2]) { noise2(x / 20.f, y / 20.f, permutations),
-						 0.5
-						 },
-						 (float[2]) { noise2(x / 10.f, y / 10.f, permutations),
-						 0.1
-						 },
-						 (float[2]) { noise2(x / 6.f, y / 6.f, permutations),
-						 0.2
-						 }
-	);
+	return noise_layered(3,
+						 (float[2]) { fbm2(x / 400.f, y / 400.f, 7,
+										   permutations), 8.0 },
+						 (float[2]) { fbm2(x / 100.f, y / 100.f, 7,
+										   permutations), 1.0 },
+						 (float[2]) { fbm2(x / 70.f, y / 70.f, 7, permutations),
+						 1.0 });
 }
 
 float fractal3(float x, float y, float z, char *permutations)
 {
-	return noise_layered(4, (float[2]) { noise3(x / 100.f, y / 100.f, z / 100.f,
-												permutations), 3.0
-						 },
-						 (float[2]) { noise3(x / 80.f, y / 80.f, z / 80.f,
-											 permutations), 2.0
-						 },
-						 (float[2]) { noise3(x / 30.f, y / 30.f, z / 30.f,
-											 permutations), 4.0
-						 },
-						 (float[2]) { noise3(x / 20.f, y / 20.f, z / 20.f,
-											 permutations), 8.5
-						 }
-	);
+	return noise_layered(3,
+						 (float[2]) { fbm3(x / 100.f, y / 100.f, z / 100.f, 3,
+										   permutations), 3.0 },
+						 (float[2]) { fbm3(x / 80.f, y / 80.f, z / 80.f, 3,
+										   permutations), 2.0 },
+						 (float[2]) { fbm3(x / 30.f, y / 30.f, z / 30.f, 3,
+										   permutations), 4.0 });
 }
