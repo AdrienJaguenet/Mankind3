@@ -118,7 +118,7 @@ int main()
 	init_GFX(&gfx_context, 1024, 768);
 	init_SFX(&sfx_context);
 	Map *map = calloc(sizeof(Map), 1);
-	map->permutations = shuffled_permutations(512);
+	map->permutations = shuffled_permutations(257);
 
 	for (int i = 0; i < MAX_LOD; ++i) {
 		init_HashMap(&map->chunks[i]);
