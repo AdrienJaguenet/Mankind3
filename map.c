@@ -2,24 +2,45 @@
 #include <stdlib.h>
 #include "position.h"
 
+HashMap *get_Chunk_storage(Map * map, int cx, int cy, int lod)
+{
+	HashMap *hashmap = &map->chunks[lod];
+	HashMap *new_map = get_from_HashMap(hashmap, cx);
+	if (!new_map) {
+		new_map = malloc(sizeof(HashMap));
+		init_HashMap(new_map);
+		insert_into_HashMap(hashmap, cx, new_map);
+	}
+	hashmap = new_map;
+	new_map = get_from_HashMap(hashmap, cy);
+	if (!new_map) {
+		new_map = malloc(sizeof(HashMap));
+		init_HashMap(new_map);
+		insert_into_HashMap(hashmap, cy, new_map);
+	}
+
+	hashmap = new_map;
+	return hashmap;
+}
+
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk)
 {
-	int chunk_pos = CHUNK_INMAP(px, py, pz);
-	if (chunk_pos >= 0 && chunk_pos < MAX_CHUNKS_NO) {
-		map->chunks[chunk->lod][chunk_pos] = chunk;
-		map->chunks_no++;
-	}
+	insert_into_HashMap(get_Chunk_storage(map, px, py, chunk->lod), pz, chunk);
+	map->chunks_no++;
 }
 
 Chunk *get_chunk_or_null(Map * map, int px, int py, int pz, int lod)
 {
-	int chunk_pos = CHUNK_INMAP(px, py, pz);
-	if (chunk_pos >= 0 && chunk_pos < MAX_CHUNKS_NO) {
-		Chunk *c = map->chunks[lod][chunk_pos];
-		return c;
-	} else {
-		return NULL;
+	if (map->last_access) {
+		if (map->last_access->x == px &&
+			map->last_access->y == py &&
+			map->last_access->z == pz && map->last_access->lod == lod) {
+			return map->last_access;
+		}
 	}
+	Chunk *c = get_from_HashMap(get_Chunk_storage(map, px, py, lod), pz);
+	map->last_access = c;
+	return c;
 }
 
 Chunk *new_Chunk(Map * map, int px, int py, int pz, int lod)
@@ -82,28 +103,58 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y - 1, z, lod);
 }
 
+void delete_Chunk(Chunk * chunk)
+{
+	if (chunk->mesh) {
+		mesh_terminate(chunk->mesh);
+	}
+	free(chunk);
+}
+
+void del_HashMap_Chunk(Key key, void *chunk, void *extra)
+{
+	(void) extra;
+	(void) key;
+	delete_Chunk(chunk);
+}
+
+void del_HashMap_Y(Key key, void *map_Z, void *extra)
+{
+	(void) extra;
+	(void) key;
+	for_each_in_HashMap(map_Z, del_HashMap_Chunk, NULL);
+}
+
+void del_HashMap_X(Key key, void *map_Y, void *extra)
+{
+	(void) extra;
+	(void) key;
+	for_each_in_HashMap(map_Y, del_HashMap_Y, NULL);
+}
+
+
 void delete_Map(Map * map)
 {
 	for (int lod = 0; lod < MAX_LOD; ++lod) {
-		if (map->chunks[lod]) {
-			for (int j = 0; j < MAX_CHUNKS_NO; ++j) {
-				if (map->chunks[lod][j] && map->chunks[lod][j]->mesh) {
-					mesh_terminate(map->chunks[lod][j]->mesh);
-				}
-				free(map->chunks[lod][j]);
-			}
-		}
-		free(map->chunks[lod]);
+		for_each_in_HashMap(&map->chunks[lod], del_HashMap_X, NULL);
 	}
 }
 
 int get_height(int x, int z, char *permutations)
 {
-	return fractal2(x, z, permutations) * 128.f;
+	(void) x;
+	(void) z;
+	(void) permutations;
+	return 0;
+	//return fractal2(x, z, permutations) * 128.f;
 }
 
 float get_3d(int x, int y, int z, char *permutations)
 {
+	(void) x;
+	(void) y;
+	(void) z;
+	(void) permutations;
 	return fractal3(x, y, z, permutations);
 }
 

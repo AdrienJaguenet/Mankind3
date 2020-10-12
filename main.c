@@ -119,7 +119,7 @@ int main()
 	map->permutations = shuffled_permutations(512);
 
 	for (int i = 0; i < MAX_LOD; ++i) {
-		map->chunks[i] = calloc(sizeof(Chunk *), MAX_CHUNKS_NO);
+		init_HashMap(&map->chunks[i]);
 	}
 
 	AABB player = { vec3(0, 10, 0), vec3(0.7, 2., 0.7) };

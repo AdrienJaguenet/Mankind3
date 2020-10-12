@@ -3,6 +3,7 @@
 #include "position.h"
 #include "mesh.h"
 #include "noise.h"
+#include "hashmap.h"
 
 #define BLOCK_TYPES_NO 4
 #define SEED 1337
@@ -27,7 +28,8 @@ typedef struct {
 } Chunk;
 
 typedef struct {
-	Chunk **chunks[MAX_LOD];
+	HashMap chunks[MAX_LOD];
+	Chunk *last_access;
 	int chunks_no;
 	char *permutations;
 } Map;
@@ -51,5 +53,7 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 					   int lod);
 
 Chunk *new_Chunk(Map * map, int px, int py, int pz, int lod);
+
+void delete_Chunk(Chunk * chunk);
 
 void delete_Map(Map * map);
