@@ -103,6 +103,40 @@ void get_neighbourhood(Map * map, int x, int y, int z, Block * neighbours[6],
 	neighbours[NEIGHBOUR_DOWN] = get_block_or_null(map, x, y - 1, z, lod);
 }
 
+typedef struct
+{
+  void *extra;
+  Map *map;
+  void (*function)(Map* m, Chunk* c, void* extra);
+} ForEachBundle;
+
+void for_each_Chunk_final(Key key, void *value, void *extra)
+{
+  (void) key;
+  ForEachBundle *bundle = (ForEachBundle*) extra;
+  Chunk *chunk = (Chunk*) value;
+  bundle->function(bundle->map, chunk, bundle->extra);
+}
+
+void for_each_Chunk_mapZ(Key key, void *value, void *extra)
+{
+  (void) key;
+  for_each_in_HashMap(value, for_each_Chunk_final, extra);
+}
+
+void for_each_Chunk_mapY(Key key, void *value, void *extra)
+{
+  (void) key;
+  for_each_in_HashMap(value, for_each_Chunk_mapZ, extra);
+}
+
+void for_each_Chunk(Map *map, int lod, void (*fn)(Map* m, Chunk *c, void* extra), void* extra)
+{
+  ForEachBundle bundle = {extra, map, fn};
+  for_each_in_HashMap(&map->chunks[lod], for_each_Chunk_mapY, &bundle);
+}
+
+
 void delete_Chunk(Chunk * chunk)
 {
 	if (chunk->mesh) {

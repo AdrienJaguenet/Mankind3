@@ -50,6 +50,7 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 
 	init_Heap(&gfx_context->meshgen_pqueue);
 	init_Heap(&gfx_context->terrgen_pqueue);
+	init_Heap(&gfx_context->render_pqueue);
 }
 
 bool cull_chunk(int x, int y, int z, Camera * camera, float *distance)
@@ -108,21 +109,33 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 										PENDING_MESHGEN,
 										&gfx_context->meshgen_pqueue);
 				}
-				int lod = 0;
-				draw_Chunk(c, gfx_context, lod);
+				push_Chunk_to_queue(gfx_context, c, distance, PENDING_RENDER, &gfx_context->render_pqueue);
 			}
 		}
 	}
+	draw_Chunks(gfx_context, RENDER_DISTANCE * RENDER_DISTANCE * RENDER_DISTANCE * 8);
 }
 
-void draw_Chunk(Chunk * chunk, GFXContext * gfx_context, int lod)
+void draw_Chunks(GFXContext* gfx_context, int max_gens)
 {
-	if (chunk->mesh) {
-		draw_Mesh(gfx_context, chunk->mesh,
-				  vec3(chunk->x * CHUNK_SIZE * BLOCK_SIZE,
-					   chunk->y * CHUNK_SIZE * BLOCK_SIZE,
-					   chunk->z * CHUNK_SIZE * BLOCK_SIZE), lod);
+	int i;
+	for (i = 0; i < max_gens; ++i) {
+		Chunk *c = extract_HeapNode(&gfx_context->render_pqueue);
+		if (c == NULL) {
+			break;
+		}
+		c->pending[PENDING_MESHGEN] = false;
+		if (c->mesh) {
+			draw_Mesh(gfx_context, c->mesh,
+					  vec3(c->x * CHUNK_SIZE * BLOCK_SIZE,
+						   c->y * CHUNK_SIZE * BLOCK_SIZE,
+						   c->z * CHUNK_SIZE * BLOCK_SIZE), c->lod);
+		}
+		gfx_context->queue_size--;
 	}
+	INFO("Rendered %d chunks (max %d, %d still in queue)", i, max_gens, gfx_context->render_pqueue.nodes_no);
+	clean_Heap(&gfx_context->render_pqueue);
+	init_Heap(&gfx_context->render_pqueue);
 }
 
 void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,

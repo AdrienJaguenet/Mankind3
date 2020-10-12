@@ -20,6 +20,7 @@ typedef struct {
 	Texture tilemap;
 	Camera camera;
 	int queue_size;
+	Heap render_pqueue;
 	Heap meshgen_pqueue;
 	Heap terrgen_pqueue;
 } GFXContext;
@@ -28,7 +29,7 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height);
 
 void draw_Map(GFXContext * gfx_context, Map * map);
 
-void draw_Chunk(Chunk * chunk, GFXContext * gfx_context, int lod);
+void draw_Chunks(GFXContext * gfx_context, int max_gens);
 
 void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
 			   int lod);

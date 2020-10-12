@@ -10,7 +10,8 @@
 
 typedef enum {
 	PENDING_MESHGEN,
-	PENDING_TERRAIN
+	PENDING_TERRAIN,
+	PENDING_RENDER
 } ChunkPending;
 
 typedef struct {
@@ -40,6 +41,7 @@ void set_Chunk_block_type(Map * map, Chunk * c, int x, int y, int z, int type);
 
 void gen_Chunk_LOD(Chunk * c);
 
+void for_each_Chunk(Map *map, int lod, void (*fn)(Map* m, Chunk *c, void* extra), void* extra);
 
 void insert_chunk(Map * map, int px, int py, int pz, Chunk * chunk);
 
