@@ -11,14 +11,14 @@
 
 #define VERSION "0.0.1"
 
-bool try_move(AABB * aabb, vec3_t diff, Map * map)
+bool try_move(AABB * aabb, vec3_t diff, Map * map, vec3_t * collision_normal)
 {
 	/* Calculate the length only once */
 	float diff_l = v3_length(diff);
 
 	do {
 		AABB translated = translated_AABB(aabb, diff);
-		if (!map_collides(&translated, map)) {
+		if (!map_collides(&translated, map, collision_normal)) {
 			*aabb = translated;
 			return true;
 		} else {
@@ -43,7 +43,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	} else if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
-			physics->velocity.y = 0.015f * delta_ticks;
+			physics->velocity.y = 0.15f;
 		}
 	} else if (e->type == SDL_MOUSEBUTTONDOWN) {
 		if (e->button.button == SDL_BUTTON_LEFT) {
@@ -73,32 +73,37 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 	return true;
 }
 
-void handle_keystates(const Uint8 * keystates, AABB * player, Camera * camera,
-					  Physics * physics, Map * map, unsigned int delta_ticks)
+void handle_keystates(const Uint8 * keystates, Camera * camera,
+					  Physics * physics)
 {
-	(void) physics;
-	/* This shit moves relative to the camera look at, instead of some
-	   front or sum shit. So it be broken kinda. */
-	float dt_factor = delta_ticks * 0.008;
+	const float AXIS_VELOCITY = 0.2;
+	vec3_t new_vel = vec3(0, 0, 0);
 	if (keystates[SDL_SCANCODE_W]) {
-		try_move(player, v3_muls(get_Camera_forward(camera), dt_factor), map);
+		new_vel =
+		  v3_add(new_vel, v3_muls(get_Camera_forward(camera), AXIS_VELOCITY));
 	}
 
 	if (keystates[SDL_SCANCODE_S]) {
-		try_move(player, v3_muls(get_Camera_forward(camera), -dt_factor), map);
+		new_vel =
+		  v3_add(new_vel, v3_muls(get_Camera_forward(camera), -AXIS_VELOCITY));
 	}
 
 	if (keystates[SDL_SCANCODE_A]) {
-		try_move(player, v3_muls(get_Camera_right(camera), -dt_factor), map);
+		new_vel =
+		  v3_add(new_vel, v3_muls(get_Camera_right(camera), -AXIS_VELOCITY));
 	}
 
 	if (keystates[SDL_SCANCODE_D]) {
-		try_move(player, v3_muls(get_Camera_right(camera), dt_factor), map);
+		new_vel =
+		  v3_add(new_vel, v3_muls(get_Camera_right(camera), AXIS_VELOCITY));
 	}
 
 	if (keystates[SDL_SCANCODE_LCTRL]) {
-		try_move(player, v3_muls(get_Camera_up(camera), -dt_factor), map);
+		new_vel =
+		  v3_add(new_vel, v3_muls(get_Camera_up(camera), -AXIS_VELOCITY));
 	}
+
+	update_physics(physics, new_vel);
 }
 
 void attach_camera_to(Camera * camera, AABB * aabb)
@@ -142,16 +147,33 @@ int main()
 						   &sfx_context, delta_ticks);
 		}
 
-		handle_keystates(SDL_GetKeyboardState(NULL), &player,
-						 &gfx_context.camera, &physics, map, delta_ticks);
+		handle_keystates(SDL_GetKeyboardState(NULL),
+						 &gfx_context.camera, &physics);
 
+		vec3_t collision_normal = vec3(0, 0, 0);
+		if (!try_move(&player, physics.velocity, map, &collision_normal)) {
+			if (collision_normal.x > 0) {
+				physics.velocity.x = 0;
+			}
+			if (collision_normal.z > 0) {
+				physics.velocity.z = 0;
+			}
+		}
 		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));
-		if (!try_move(&player, physics.velocity, map)
-			&& physics.velocity.y < 0.f) {
-			physics.velocity.y = 0;
-			physics.touches_ground = true;
+		if (!try_move(&player, physics.velocity, map, &collision_normal)) {
+			if (collision_normal.y > 0) {
+				physics.velocity.y = 0;
+				if (!physics.touches_ground) {
+					physics.touches_ground = true;
+				} else {
+					physics.velocity.x = 0;
+					physics.velocity.z = 0;
+				}
+			}
 		} else {
-			physics.touches_ground = false;
+			if (physics.velocity.y != 0) {
+				physics.touches_ground = false;
+			}
 		}
 		/* This doesn't have to be done every frame, tbh… */
 		update_al_listener(player.pos, get_Camera_lookAt(&gfx_context.camera),

@@ -135,8 +135,6 @@ void draw_Chunks(GFXContext * gfx_context, int max_gens)
 		}
 		gfx_context->queue_size--;
 	}
-	INFO("Rendered %d chunks (max %d, %d still in queue)", i, max_gens,
-		 gfx_context->render_pqueue.nodes_no);
 	clean_Heap(&gfx_context->render_pqueue);
 	init_Heap(&gfx_context->render_pqueue);
 }
