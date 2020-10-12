@@ -180,7 +180,7 @@ int get_height(int x, int z, char *permutations)
 	(void) z;
 	(void) permutations;
 	return 0;
-	//return fractal2(x, z, permutations) * 128.f;
+	/* return fractal2(x, z, &permutations) * 128.f; */
 }
 
 float get_3d(int x, int y, int z, char *permutations)
@@ -189,7 +189,7 @@ float get_3d(int x, int y, int z, char *permutations)
 	(void) y;
 	(void) z;
 	(void) permutations;
-	return fractal3(x, y, z, permutations);
+	return fractal3(x, y, z, &permutations);
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
