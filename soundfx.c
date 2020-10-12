@@ -10,8 +10,11 @@ void load_Audio(Audio * audio, const char *path, bool looping)
 
 	alGenSources(1, &audio->source);
 	alSourcei(audio->source, AL_BUFFER, audio->buffer);
+	/* alSourcef(audio->source, AL_PITCH, 1); */
+	/* alSourcef(audio->source, AL_GAIN, 1); */
 	alSourcei(audio->source, AL_LOOPING, looping);
-	alSource3f(audio->source, AL_VELOCITY, 0.0, 0.0, 0.0);
+	/* alSourcef(audio->source, AL_REFERENCE_DISTANCE, 0); */
+	/* alSourcef(audio->source, AL_MAX_DISTANCE, 1); */
 }
 
 void play_Audio(Audio * audio)

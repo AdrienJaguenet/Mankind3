@@ -9,6 +9,8 @@
 #include "math_3d.h"
 #include "utilities.h"
 
+/* BIG note about OpenAL and 3D audio: it can't be stereo. */
+
 typedef struct Audio {
 	bool global;
 	vec3_t origin;

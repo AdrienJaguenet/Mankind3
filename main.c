@@ -136,9 +136,6 @@ int main()
 		delta_ticks = new_ticks - last_ticks;
 		last_ticks = new_ticks;
 
-		update_al_listener(player.pos, get_Camera_lookAt(&gfx_context.camera),
-						   get_Camera_up(&gfx_context.camera));
-
 		while (SDL_PollEvent(&event)) {
 			running =
 			  handle_event(&event, &gfx_context.camera, &physics, map,
@@ -157,6 +154,8 @@ int main()
 			physics.touches_ground = false;
 		}
 		/* This doesn't have to be done every frame, tbh… */
+		update_al_listener(player.pos, get_Camera_lookAt(&gfx_context.camera),
+						   get_Camera_up(&gfx_context.camera));
 
 		attach_camera_to(&gfx_context.camera, &player);
 		gen_ChunkMesh_in_queue(&gfx_context, map, 10);
