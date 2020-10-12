@@ -4,13 +4,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#define FADE(t) ( t * t * t * ( t * ( t * 6 - 15 ) + 10 ) )
-#define FASTFLOOR(x) ( ((int)(x)<(x)) ? ((int)x) : ((int)x-1 ) )
-#define LERP(t, a, b) ((a) + (t)*((b)-(a)))
+#include "utilities.h"
 
 char *shuffled_permutations(size_t size);
-float noise2(float x, float y, char **permutations);
-float snoise3(float x, float y, float z, char **permutations);
+float noise2(float x, float y, char *permutations);
+float noise3(float x, float y, float z, char *permutations);
 float noise_layered(int count, ...);
-float fractal2(float x, float y, char **permutations);
-float fractal3(float x, float y, float z, char **permutations);
+float fractal2(float x, float y, char *permutations);
+float fractal3(float x, float y, float z, char *permutations);
