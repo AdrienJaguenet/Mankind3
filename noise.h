@@ -9,8 +9,8 @@
 #define LERP(t, a, b) ((a) + (t)*((b)-(a)))
 
 char *shuffled_permutations(size_t size);
-float noise2(float x, float y, char *perm);
-float snoise3(float x, float y, float z, char *perm);
+float noise2(float x, float y, char **permutations);
+float snoise3(float x, float y, float z, char **permutations);
 float noise_layered(int count, ...);
-float fractal2(float x, float y, char *permutations);
-float fractal3(float x, float y, float z, char *permutations);
+float fractal2(float x, float y, char **permutations);
+float fractal3(float x, float y, float z, char **permutations);

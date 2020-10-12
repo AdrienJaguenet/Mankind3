@@ -33,8 +33,9 @@ float grad3(int hash, float x, float y, float z)
 	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
 }
 
-float noise2(float x, float y, char *perm)
+float noise2(float x, float y, char **permutations)
 {
+	char *perm = *permutations;
 	int ix0, iy0, ix1, iy1;
 	float fx0, fy0, fx1, fy1;
 	float s, t, nx0, nx1, n0, n1;
@@ -65,9 +66,9 @@ float noise2(float x, float y, char *perm)
 }
 
 // 3D simplex noise
-float snoise3(float x, float y, float z, char *perm)
+float snoise3(float x, float y, float z, char **permutations)
 {
-
+	char *perm = *permutations;
 // Simple skewing factors for the 3D case
 #define F3 0.333333333
 #define G3 0.166666667
@@ -235,7 +236,7 @@ float noise_layered(int count, ...)
 /* With the copypasted noise shit, stretching now works by dividing
 	the x and y values. Kinda cool, tbh. */
 
-float fractal2(float x, float y, char *permutations)
+float fractal2(float x, float y, char **permutations)
 {
 	return noise_layered(7, (float[2]) { noise2(x / 400.f, y / 400.f,
 												permutations), 8.0
@@ -261,7 +262,7 @@ float fractal2(float x, float y, char *permutations)
 	);
 }
 
-float fractal3(float x, float y, float z, char *permutations)
+float fractal3(float x, float y, float z, char **permutations)
 {
 	return noise_layered(4,
 						 (float[2]) { snoise3(x / 100.f, y / 100.f, z / 100.f,
