@@ -53,7 +53,8 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			if (raycast_block
 				(camera->position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
-				play_Audio_at(&sfx_context->effects.break_block, &position);
+				play_Audio_at(sfx_context, &sfx_context->effects.break_block,
+							  &position);
 				set_block_type(map, position.x, position.y, position.z, 0, 0);
 			}
 		} else if (e->button.button == SDL_BUTTON_RIGHT) {
@@ -63,7 +64,8 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			if (raycast_block
 				(camera->position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
-				play_Audio_at(&sfx_context->effects.place_block, &position);
+				play_Audio_at(sfx_context, &sfx_context->effects.place_block,
+							  &position);
 				vec3_t temp = v3_add(position, normal);
 				set_block_type(map, temp.x, temp.y, temp.z, 0, 1);
 			}

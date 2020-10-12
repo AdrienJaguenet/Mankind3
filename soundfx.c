@@ -1,6 +1,6 @@
 #include "soundfx.h"
 
-void load_Audio(Audio * audio, const char *path, bool looping)
+void load_Audio(Audio * audio, const char *path)
 {
 	audio->buffer = alutCreateBufferFromFile(path);
 
@@ -8,30 +8,53 @@ void load_Audio(Audio * audio, const char *path, bool looping)
 		FATAL("ALUT error: %s", alutGetErrorString(alutGetError()));
 	}
 
-	alGenSources(1, &audio->source);
-	alSourcei(audio->source, AL_BUFFER, audio->buffer);
-	/* alSourcef(audio->source, AL_PITCH, 1); */
-	/* alSourcef(audio->source, AL_GAIN, 1); */
-	alSourcei(audio->source, AL_LOOPING, looping);
+	/* alSourcei(audio->source, AL_LOOPING, looping); */
 	/* alSourcef(audio->source, AL_REFERENCE_DISTANCE, 0); */
 	/* alSourcef(audio->source, AL_MAX_DISTANCE, 1); */
 }
 
-void play_Audio(Audio * audio)
+void play_Audio(SFXContext * ctx, Audio * audio)
 {
-	alSourcePlay(audio->source);
+	for (int i = 0; i < NUM_SOURCES; ++i) {
+		ALenum state;
+		alGetSourcei(ctx->sources[i], AL_SOURCE_STATE, &state);
+
+		if (state != AL_PLAYING) {
+			alSourcei(ctx->sources[i], AL_BUFFER, audio->buffer);
+			alSourcePlay(ctx->sources[i]);
+			break;
+		}
+
+		if (i == NUM_SOURCES - 1) {
+			INFO
+			  ("Ran out of OpenAL sources, increase NUM_SOURCES in soundfx.h.");
+		}
+	}
 }
 
-void play_Audio_at(Audio * audio, vec3_t * position)
+void play_Audio_at(SFXContext * ctx, Audio * audio, vec3_t * position)
 {
-	alSource3f(audio->source, AL_POSITION, position->x, position->y,
-			   position->z);
-	alSourcePlay(audio->source);
+	for (int i = 0; i < NUM_SOURCES; ++i) {
+		ALenum state;
+		alGetSourcei(ctx->sources[i], AL_SOURCE_STATE, &state);
+
+		if (state != AL_PLAYING) {
+			alSourcei(ctx->sources[i], AL_BUFFER, audio->buffer);
+			alSource3f(ctx->sources[i], AL_POSITION, position->x, position->y,
+					   position->z);
+			alSourcePlay(ctx->sources[i]);
+			break;
+		}
+
+		if (i == NUM_SOURCES - 1) {
+			INFO
+			  ("Ran out of OpenAL sources, increase NUM_SOURCES in soundfx.h.");
+		}
+	}
 }
 
 void delete_Audio(Audio * audio)
 {
-	alDeleteSources(1, &audio->source);
 	alDeleteBuffers(1, &audio->buffer);
 }
 
@@ -39,6 +62,12 @@ void init_SFX(SFXContext * ctx)
 {
 	alutInit(0, NULL);
 	alGetError();
+
+	ctx->sources = malloc(sizeof(ALuint) * NUM_SOURCES);
+
+	for (int i = 0; i < NUM_SOURCES; ++i) {
+		alGenSources(1, &ctx->sources[i]);
+	}
 
 	load_SFX(ctx);
 }
@@ -54,10 +83,8 @@ void update_al_listener(vec3_t position, vec3_t direction, vec3_t up)
 
 void load_SFX(SFXContext * ctx)
 {
-	load_Audio(&ctx->effects.break_block, "resources/sfx/break_block16.wav",
-			   false);
-	load_Audio(&ctx->effects.place_block, "resources/sfx/place_block16.wav",
-			   false);
+	load_Audio(&ctx->effects.break_block, "resources/sfx/break_block16.wav");
+	load_Audio(&ctx->effects.place_block, "resources/sfx/place_block16.wav");
 }
 
 void quit_SFX(SFXContext * ctx)
