@@ -185,6 +185,11 @@ float get_3d(int x, int y, int z, u_int8_t * permutations)
 				permutations);
 }
 
+float get_wetness(int x, int z, u_int8_t * permutations)
+{
+	return fbm2((x + 256) / 200.f, (z + 256) / 200.f, 2, permutations);
+}
+
 void randomly_populate(Map * m, Chunk * chunk)
 {
 	srand(SEED);
@@ -194,7 +199,7 @@ void randomly_populate(Map * m, Chunk * chunk)
 		for (int k = 0; k < CHUNK_SIZE; ++k) {
 			int height =
 			  get_height(i + chunk->x * CHUNK_SIZE, k + chunk->z * CHUNK_SIZE,
-						 m->permutations);
+						 m->height_perm);
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 				int type = 0;
 				if (j + base_height < height - 4) {
@@ -205,10 +210,18 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 2;
 				}
 
-				if (get_3d(i + chunk->x * CHUNK_SIZE,
-						   j + chunk->y * CHUNK_SIZE,
-						   k + chunk->z * CHUNK_SIZE,
-						   m->permutations) < -0.21) {
+				/* Biomes. */
+				float wet_noise =
+				  get_wetness(i + chunk->x * CHUNK_SIZE,
+							  k + chunk->z * CHUNK_SIZE, m->wet_perm);
+				if (wet_noise > 0 && j + base_height == height - 1) {
+					type = 1;
+				}
+
+				int threed =
+				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
+						 k + chunk->z * CHUNK_SIZE, m->height_perm);
+				if (threed < -0.21) {
 					type = 0;
 				}
 

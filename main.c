@@ -127,7 +127,9 @@ int main()
 	init_SFX(&sfx_context);
 	play_Audio(&sfx_context, &sfx_context.music.ambient, true, 0.5);
 	Map *map = calloc(sizeof(Map), 1);
-	map->permutations = shuffled_permutations(256);
+	map->height_perm = shuffled_permutations(256);
+	map->wet_perm = shuffled_permutations(256);
+	map->temp_perm = shuffled_permutations(256);
 
 	for (int i = 0; i < MAX_LOD; ++i) {
 		init_HashMap(&map->chunks[i]);
