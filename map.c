@@ -174,14 +174,14 @@ void delete_Map(Map * map)
 	}
 }
 
-int get_height(int x, int z, char *permutations)
+int get_height(int x, int z, u_int8_t * permutations)
 {
-	return fractal2(x, z, permutations) * 128.f;
+	return fbm2(x / 400.f, z / 400.f, 6, permutations) * 128.f;
 }
 
-float get_3d(int x, int y, int z, char *permutations)
+float get_3d(int x, int y, int z, u_int8_t * permutations)
 {
-	return fractal3(x, y, z, permutations);
+	return fbm3(x / 80.f, y / 40.f, z / 80.f, 2, permutations);
 }
 
 void randomly_populate(Map * m, Chunk * chunk)

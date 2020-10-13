@@ -3,16 +3,16 @@
 #define FADE(t) (t * t * t * (t * (t * 6 - 15) + 10))
 #define LERP(t, a, b) (a + t * (b - a))
 
-char *shuffled_permutations(size_t size)
+u_int8_t *shuffled_permutations(size_t size)
 {
-	char *hash = malloc(sizeof(char) * size);
+	u_int8_t *hash = malloc(sizeof(u_int8_t) * size);
 	for (size_t i = 0; i < size; ++i) {
 		hash[i] = i;
 	}
 
 	for (size_t i = 0; i < size - 1; ++i) {
 		size_t j = i + rand() / (RAND_MAX / (size - i) + 1);
-		char t = hash[j];
+		u_int8_t t = hash[j];
 		hash[j] = hash[i];
 		hash[i] = t;
 	}
@@ -33,7 +33,7 @@ static float GRAD3(int hash, float x, float y, float z)
 	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
-float noise2(float x, float y, char *permutations)
+float noise2(float x, float y, u_int8_t * permutations)
 {
 	int X = (int) floor(x) & 0xff;
 	int Y = (int) floor(y) & 0xff;
@@ -55,7 +55,7 @@ float noise2(float x, float y, char *permutations)
 																   y - 1)));
 }
 
-float noise3(float x, float y, float z, char *permutations)
+float noise3(float x, float y, float z, u_int8_t * permutations)
 {
 	int X = (int) floor(x) & 0xff;
 	int Y = (int) floor(y) & 0xff;
@@ -118,7 +118,7 @@ float noise3(float x, float y, float z, char *permutations)
 																			   1))));
 }
 
-float fbm2(float x, float y, int octave, char *permutations)
+float fbm2(float x, float y, int octave, u_int8_t * permutations)
 {
 	float f = 0.0;
 	float w = 0.5;
@@ -131,7 +131,7 @@ float fbm2(float x, float y, int octave, char *permutations)
 	return f;
 }
 
-float fbm3(float x, float y, float z, int octave, char *permutations)
+float fbm3(float x, float y, float z, int octave, u_int8_t * permutations)
 {
 	float f = 0.0;
 	float w = 0.5;
@@ -163,17 +163,4 @@ float noise_layered(int count, ...)
 	va_end(ap);
 
 	return noise / influence_total;
-}
-
-/* With the copypasted noise shit, stretching now works by dividing
-	the x and y values. Kinda cool, tbh. */
-
-float fractal2(float x, float y, char *permutations)
-{
-	return fbm2(x / 400.f, y / 400.f, 7, permutations);
-}
-
-float fractal3(float x, float y, float z, char *permutations)
-{
-	return noise3(x / 50.f, y / 50.f, z / 50.f, permutations);
 }

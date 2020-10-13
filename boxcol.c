@@ -67,9 +67,8 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal)
 					collision = true;
 					for (int i = 0; i < 6; ++i) {
 						vec3_t to_block =
-						  v3_sub(vec3
-								 (x + BLOCK_SIZE / 2, y + BLOCK_SIZE / 2,
-								  z + BLOCK_SIZE / 2), collision_points[i]);
+						  v3_sub(vec3(x + BLOCK_SIZE / 2, y + BLOCK_SIZE / 2,
+									  z + BLOCK_SIZE / 2), collision_points[i]);
 						float dist = v3_length(to_block);
 						if (dist < closest_dist) {
 							closest_dist = dist;

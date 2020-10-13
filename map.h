@@ -32,7 +32,7 @@ typedef struct {
 	HashMap chunks[MAX_LOD];
 	Chunk *last_access;
 	int chunks_no;
-	char *permutations;
+	u_int8_t *permutations;
 } Map;
 
 void randomly_populate(Map * m, Chunk * chunk);
