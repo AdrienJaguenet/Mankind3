@@ -125,7 +125,7 @@ int main()
 	SFXContext sfx_context;
 	init_GFX(&gfx_context, 1024, 768);
 	init_SFX(&sfx_context);
-	play_Audio(&sfx_context, &sfx_context.music.ambient, true);
+	play_Audio(&sfx_context, &sfx_context.music.ambient, true, 0.5);
 	Map *map = calloc(sizeof(Map), 1);
 	map->permutations = shuffled_permutations(256);
 

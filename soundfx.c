@@ -12,7 +12,7 @@ void load_Audio(Audio * audio, const char *path)
 	/* alSourcef(audio->source, AL_MAX_DISTANCE, 1); */
 }
 
-void play_Audio(SFXContext * ctx, Audio * audio, bool looping)
+void play_Audio(SFXContext * ctx, Audio * audio, bool looping, float gain)
 {
 	for (int i = 0; i < NUM_SOURCES; ++i) {
 		ALenum state;
@@ -20,6 +20,7 @@ void play_Audio(SFXContext * ctx, Audio * audio, bool looping)
 
 		if (state != AL_PLAYING) {
 			alSourcei(ctx->sources[i], AL_LOOPING, looping);
+			alSourcef(ctx->sources[i], AL_GAIN, gain);
 			alSourcei(ctx->sources[i], AL_BUFFER, audio->buffer);
 			alSourcePlay(ctx->sources[i]);
 			break;

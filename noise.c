@@ -2,6 +2,7 @@
 
 #define FADE(t) (((6*t - 15) * t + 10) * t * t * t)
 #define LERP(t, a, b) (a + t * (b - a))
+#define FASTFLOOR(x)  (((int) (x) < (x)) ? ((int) x) : ((int) x - 1))
 
 u_int8_t *shuffled_permutations(size_t size)
 {
@@ -30,15 +31,15 @@ static inline float GRAD3(int hash, float x, float y, float z)
 	int h = hash & 15;
 	float u = h < 8 ? x : y;
 	float v = h < 4 ? y : (h == 12 || h == 14 ? x : z);
-	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
 }
 
 float noise2(float x, float y, u_int8_t * permutations)
 {
-	int X = (int) floor(x) & 0xff;
-	int Y = (int) floor(y) & 0xff;
-	x -= floor(x);
-	y -= floor(y);
+	int X = (int) FASTFLOOR(x) & 0xff;
+	int Y = (int) FASTFLOOR(y) & 0xff;
+	x -= FASTFLOOR(x);
+	y -= FASTFLOOR(y);
 	float u = FADE(x);
 	float v = FADE(y);
 	int A = (permutations[X] + Y) & 0xff;
@@ -57,12 +58,12 @@ float noise2(float x, float y, u_int8_t * permutations)
 
 float noise3(float x, float y, float z, u_int8_t * permutations)
 {
-	int X = (int) floor(x) & 0xff;
-	int Y = (int) floor(y) & 0xff;
-	int Z = (int) floor(z) & 0xff;
-	x -= floor(x);
-	y -= floor(y);
-	z -= floor(z);
+	int X = (int) FASTFLOOR(x) & 0xff;
+	int Y = (int) FASTFLOOR(y) & 0xff;
+	int Z = (int) FASTFLOOR(z) & 0xff;
+	x -= FASTFLOOR(x);
+	y -= FASTFLOOR(y);
+	z -= FASTFLOOR(z);
 	float u = FADE(x);
 	float v = FADE(y);
 	float w = FADE(z);
