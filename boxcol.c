@@ -35,12 +35,28 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal)
 	   of aabb. So, if block size is 1, then... */
 
 	/* We keep track of the closest block to have collided */
-	vec3_t collision_point = vec3(aabb->pos.x + aabb->dim.x / 2,
-								  aabb->pos.y + aabb->dim.y / 2,
-								  aabb->pos.z + aabb->dim.z / 2);
-	vec3_t closest_pos;
+	vec3_t collision_points[6];
+	collision_points[FACE_LEFT] = vec3(aabb->pos.x,
+									   aabb->pos.y + aabb->dim.y / 2,
+									   aabb->pos.z + aabb->dim.z / 2);
+	collision_points[FACE_RIGHT] = vec3(aabb->pos.x + aabb->dim.x,
+										aabb->pos.y + aabb->dim.y / 2,
+										aabb->pos.z + aabb->dim.z / 2);
+	collision_points[FACE_DOWN] = vec3(aabb->pos.x + aabb->dim.x / 2,
+									   aabb->pos.y,
+									   aabb->pos.z + aabb->dim.z / 2);
+	collision_points[FACE_UP] = vec3(aabb->pos.x + aabb->dim.x / 2,
+									 aabb->pos.y + aabb->dim.y,
+									 aabb->pos.z + aabb->dim.z / 2);
+	collision_points[FACE_BACK] = vec3(aabb->pos.x + aabb->dim.x / 2,
+									   aabb->pos.y + aabb->dim.y / 2,
+									   aabb->pos.z);
+	collision_points[FACE_FRONT] = vec3(aabb->pos.x + aabb->dim.x / 2,
+										aabb->pos.y + aabb->dim.y / 2,
+										aabb->pos.z + aabb->dim.z);
 	bool collision = false;
 	float closest_dist = 9999999;
+	int closest_face = FACE_BACK;
 	for (int z = floor(aabb->pos.z); z < ceil(aabb->pos.z + aabb->dim.z); ++z) {
 		for (int y = floor(aabb->pos.y); y < ceil(aabb->pos.y + aabb->dim.y);
 			 ++y) {
@@ -49,37 +65,36 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal)
 				Block *b = get_block_or_null(map, x, y, z, 0);
 				if (b && b->type != 0) {
 					collision = true;
-					vec3_t to_block = v3_sub(vec3(x, y, z), collision_point);
-					float dist = v3_length(to_block);
-					if (dist < closest_dist) {
-						closest_dist = dist;
-						closest_pos = to_block;
+					for (int i = 0; i < 6; ++i) {
+						vec3_t to_block =
+						  v3_sub(vec3
+								 (x + BLOCK_SIZE / 2, y + BLOCK_SIZE / 2,
+								  z + BLOCK_SIZE / 2), collision_points[i]);
+						float dist = v3_length(to_block);
+						if (dist < closest_dist) {
+							closest_dist = dist;
+							closest_face = i;
+						}
 					}
 				}
 			}
 		}
 	}
+	switch (closest_face) {
+	  case FACE_FRONT:
+	  case FACE_BACK:
+		  *collision_normal = vec3(0, 0, 1);
+		  break;
 
-	closest_pos.x = fabs(closest_pos.x);
-	closest_pos.y = fabs(closest_pos.y);
-	closest_pos.z = fabs(closest_pos.z);
-	if (collision) {
-		if (closest_pos.x > closest_pos.y) {
-			if (closest_pos.x > closest_pos.z) {	/* X bigger than Y and Z */
-				*collision_normal = vec3(1, 0, 0);
-			} else {			/* Z is bigger than X (and therefore Y) */
-				*collision_normal = vec3(0, 0, 1);
-			}
-		} else if (closest_pos.y > closest_pos.x) {
-			if (closest_pos.y > closest_pos.z) {	/* Y bigger than either Z and Y */
-				*collision_normal = vec3(0, 1, 0);
-			} else {			/* Z bigger than either Y or X */
-				*collision_normal = vec3(0, 0, 1);
-			}
-		} else {				/* Z is bigger */
-			*collision_normal = vec3(0, 0, 1);
-		}
+	  case FACE_UP:
+	  case FACE_DOWN:
+		  *collision_normal = vec3(0, 1, 0);
+		  break;
+
+	  case FACE_RIGHT:
+	  case FACE_LEFT:
+		  *collision_normal = vec3(1, 0, 0);
+		  break;
 	}
-
 	return collision;
 }

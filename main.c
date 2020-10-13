@@ -26,7 +26,7 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map, vec3_t * collision_normal)
 			diff = v3_divs(diff, 2.f);
 			diff_l /= 2.f;
 		}
-	} while (diff_l > 0.05);
+	} while (diff_l > 0.01);
 	return false;
 }
 
@@ -43,7 +43,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	} else if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
-			physics->velocity.y = .13f;
+			physics->velocity.y = .2f;
 		}
 	} else if (e->type == SDL_MOUSEBUTTONDOWN) {
 		if (e->button.button == SDL_BUTTON_LEFT) {
@@ -115,7 +115,7 @@ void attach_camera_to(Camera * camera, AABB * aabb)
 {
 	camera->position =
 	  vec3((aabb->pos.x + aabb->dim.x / 2),
-		   (aabb->pos.y + aabb->dim.y), (aabb->pos.z + aabb->dim.z / 2));
+		   (aabb->pos.y + 0.75 * aabb->dim.y), (aabb->pos.z + aabb->dim.z / 2));
 }
 
 int main()
@@ -156,25 +156,41 @@ int main()
 						 &gfx_context.camera, &physics);
 
 		vec3_t collision_normal = vec3(0, 0, 0);
+		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));
 		if (!try_move(&player, physics.velocity, map, &collision_normal)) {
 			if (collision_normal.x != 0) {
 				physics.velocity.x = 0;
 				try_move(&player, physics.velocity, map, &collision_normal);
+				if (collision_normal.z != 0) {
+					physics.velocity.z = 0;
+					try_move(&player, physics.velocity, map, &collision_normal);
+				} else if (collision_normal.y != 0) {
+					physics.velocity.y = 0;
+					try_move(&player, physics.velocity, map, &collision_normal);
+				}
 			}
 			if (collision_normal.z != 0) {
 				physics.velocity.z = 0;
 				try_move(&player, physics.velocity, map, &collision_normal);
+				if (collision_normal.x != 0) {
+					physics.velocity.x = 0;
+					try_move(&player, physics.velocity, map, &collision_normal);
+				} else if (collision_normal.y != 0) {
+					physics.velocity.y = 0;
+					try_move(&player, physics.velocity, map, &collision_normal);
+				}
 			}
-		}
-		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));
-		if (!try_move(&player, physics.velocity, map, &collision_normal)) {
-			if (collision_normal.y > 0) {
-				physics.velocity.y = 0;
+			if (collision_normal.y != 0) {
 				if (!physics.touches_ground) {
 					physics.touches_ground = true;
+				}
+				physics.velocity.y = 0;
+				try_move(&player, physics.velocity, map, &collision_normal);
+				if (collision_normal.x != 0) {
 					physics.velocity.x = 0;
+					try_move(&player, physics.velocity, map, &collision_normal);
+				} else if (collision_normal.z != 0) {
 					physics.velocity.z = 0;
-				} else {
 					try_move(&player, physics.velocity, map, &collision_normal);
 				}
 			}

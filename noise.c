@@ -175,5 +175,5 @@ float fractal2(float x, float y, char *permutations)
 
 float fractal3(float x, float y, float z, char *permutations)
 {
-	return fbm3(x / 50.f, y / 50.f, z / 50.f, 5, permutations);
+	return noise3(x / 50.f, y / 50.f, z / 50.f, permutations);
 }
