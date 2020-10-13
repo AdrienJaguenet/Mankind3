@@ -207,7 +207,8 @@ void randomly_populate(Map * m, Chunk * chunk)
 
 				if (get_3d(i + chunk->x * CHUNK_SIZE,
 						   j + chunk->y * CHUNK_SIZE,
-						   k + chunk->z * CHUNK_SIZE, m->permutations) < -0.2) {
+						   k + chunk->z * CHUNK_SIZE,
+						   m->permutations) < -0.21) {
 					type = 0;
 				}
 

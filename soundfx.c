@@ -8,18 +8,18 @@ void load_Audio(Audio * audio, const char *path)
 		FATAL("ALUT error: %s", alutGetErrorString(alutGetError()));
 	}
 
-	/* alSourcei(audio->source, AL_LOOPING, looping); */
 	/* alSourcef(audio->source, AL_REFERENCE_DISTANCE, 0); */
 	/* alSourcef(audio->source, AL_MAX_DISTANCE, 1); */
 }
 
-void play_Audio(SFXContext * ctx, Audio * audio)
+void play_Audio(SFXContext * ctx, Audio * audio, bool looping)
 {
 	for (int i = 0; i < NUM_SOURCES; ++i) {
 		ALenum state;
 		alGetSourcei(ctx->sources[i], AL_SOURCE_STATE, &state);
 
 		if (state != AL_PLAYING) {
+			alSourcei(ctx->sources[i], AL_LOOPING, looping);
 			alSourcei(ctx->sources[i], AL_BUFFER, audio->buffer);
 			alSourcePlay(ctx->sources[i]);
 			break;
@@ -85,11 +85,17 @@ void load_SFX(SFXContext * ctx)
 {
 	load_Audio(&ctx->effects.break_block, "resources/sfx/break_block16.wav");
 	load_Audio(&ctx->effects.place_block, "resources/sfx/place_block16.wav");
+	load_Audio(&ctx->music.ambient, "resources/sfx/ambient16.wav");
 }
 
 void quit_SFX(SFXContext * ctx)
 {
-	alutExit();
+	for (int i = 0; i < NUM_SOURCES; ++i) {
+		alDeleteSources(1, &ctx->sources[i]);
+	}
+
 	delete_Audio(&ctx->effects.break_block);
 	delete_Audio(&ctx->effects.place_block);
+	delete_Audio(&ctx->music.ambient);
+	alutExit();
 }

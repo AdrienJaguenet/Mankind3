@@ -1,6 +1,6 @@
 #include "noise.h"
 
-#define FADE(t) (t * t * t * (t * (t * 6 - 15) + 10))
+#define FADE(t) (((6*t - 15) * t + 10) * t * t * t)
 #define LERP(t, a, b) (a + t * (b - a))
 
 u_int8_t *shuffled_permutations(size_t size)
