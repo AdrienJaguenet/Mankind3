@@ -181,7 +181,7 @@ int get_height(int x, int z, u_int8_t * permutations)
 
 float get_3d(int x, int y, int z, u_int8_t * permutations)
 {
-	return fbm3(x / 80.f, y / 40.f, z / 80.f, 2, permutations);
+	return fbm3(x / 80.f, y / 40.f, z / 80.f, 1, permutations);
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
