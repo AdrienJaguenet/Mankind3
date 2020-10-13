@@ -43,7 +43,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	} else if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
-			physics->velocity.y = 0.15f;
+			physics->velocity.y = .13f;
 		}
 	} else if (e->type == SDL_MOUSEBUTTONDOWN) {
 		if (e->button.button == SDL_BUTTON_LEFT) {
@@ -78,8 +78,9 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 void handle_keystates(const Uint8 * keystates, Camera * camera,
 					  Physics * physics)
 {
-	const float AXIS_VELOCITY = 0.2;
-	vec3_t new_vel = vec3(0, 0, 0);
+	float AXIS_VELOCITY = !physics->touches_ground ? 0.001 : 0.1;
+	vec3_t new_vel =
+	  !physics->touches_ground ? physics->velocity : vec3(0, 0, 0);
 	if (keystates[SDL_SCANCODE_W]) {
 		new_vel =
 		  v3_add(new_vel, v3_muls(get_Camera_forward(camera), AXIS_VELOCITY));
@@ -105,7 +106,9 @@ void handle_keystates(const Uint8 * keystates, Camera * camera,
 		  v3_add(new_vel, v3_muls(get_Camera_up(camera), -AXIS_VELOCITY));
 	}
 
-	update_physics(physics, new_vel);
+	physics->velocity.x = new_vel.x;
+	physics->velocity.z = new_vel.z;
+	//update_physics(physics, new_vel);
 }
 
 void attach_camera_to(Camera * camera, AABB * aabb)
@@ -154,11 +157,13 @@ int main()
 
 		vec3_t collision_normal = vec3(0, 0, 0);
 		if (!try_move(&player, physics.velocity, map, &collision_normal)) {
-			if (collision_normal.x > 0) {
+			if (collision_normal.x != 0) {
 				physics.velocity.x = 0;
+				try_move(&player, physics.velocity, map, &collision_normal);
 			}
-			if (collision_normal.z > 0) {
+			if (collision_normal.z != 0) {
 				physics.velocity.z = 0;
+				try_move(&player, physics.velocity, map, &collision_normal);
 			}
 		}
 		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));
@@ -167,9 +172,10 @@ int main()
 				physics.velocity.y = 0;
 				if (!physics.touches_ground) {
 					physics.touches_ground = true;
-				} else {
 					physics.velocity.x = 0;
 					physics.velocity.z = 0;
+				} else {
+					try_move(&player, physics.velocity, map, &collision_normal);
 				}
 			}
 		} else {

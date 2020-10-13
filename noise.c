@@ -170,22 +170,27 @@ float noise_layered(int count, ...)
 
 float fractal2(float x, float y, char *permutations)
 {
-	return noise_layered(3,
-						 (float[2]) { fbm2(x / 400.f, y / 400.f, 7,
-										   permutations), 8.0 },
+	return noise_layered(3, (float[2]) { fbm2(x / 400.f, y / 400.f, 7,
+											  permutations), 8.0
+						 },
 						 (float[2]) { fbm2(x / 100.f, y / 100.f, 7,
-										   permutations), 1.0 },
+										   permutations), 1.0
+						 },
 						 (float[2]) { fbm2(x / 70.f, y / 70.f, 7, permutations),
-						 1.0 });
+						 1.0
+						 });
 }
 
 float fractal3(float x, float y, float z, char *permutations)
 {
 	return noise_layered(3,
 						 (float[2]) { fbm3(x / 100.f, y / 100.f, z / 100.f, 3,
-										   permutations), 3.0 },
+										   permutations), 3.0
+						 },
 						 (float[2]) { fbm3(x / 80.f, y / 80.f, z / 80.f, 3,
-										   permutations), 2.0 },
+										   permutations), 2.0
+						 },
 						 (float[2]) { fbm3(x / 30.f, y / 30.f, z / 30.f, 3,
-										   permutations), 4.0 });
+										   permutations), 4.0
+						 });
 }
