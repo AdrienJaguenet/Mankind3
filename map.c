@@ -221,6 +221,8 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 3;
 				} else if (j + base_height == height - 1) {
 					type = 2;
+				} else if (j + base_height >= height && j + base_height < 0) {
+					type = 6;
 				}
 
 				/* Desert biome. */
@@ -242,15 +244,8 @@ void randomly_populate(Map * m, Chunk * chunk)
 				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
 						 k + chunk->z * CHUNK_SIZE, m->height_perm);
-				if (threed < -0.21) {
+				if (threed < -0.21 && type != 6) {	// Do not cut into water
 					type = 0;
-				}
-
-				float water_level = base_height + (0.22 * CHUNK_SIZE);
-
-				if (height_noise < -0.22 && j + base_height < water_level
-					&& j + base_height > base_height) {
-					type = 6;
 				}
 
 				set_Chunk_block_type(m, chunk, i, j, k, type);
