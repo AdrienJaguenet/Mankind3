@@ -211,14 +211,14 @@ void randomly_populate(Map * m, Chunk * chunk)
 				}
 
 				/* Biomes. */
-				float wet_noise =
-				  get_wetness(i + chunk->x * CHUNK_SIZE,
-							  k + chunk->z * CHUNK_SIZE, m->wet_perm);
+				float wet_noise = get_wetness(i + chunk->x * CHUNK_SIZE,
+											  k + chunk->z * CHUNK_SIZE,
+											  m->wet_perm);
 				if (wet_noise > 0 && j + base_height == height - 1) {
-					type = 1;
+					type = 4;
 				}
 
-				int threed =
+				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
 						 k + chunk->z * CHUNK_SIZE, m->height_perm);
 				if (threed < -0.21) {
