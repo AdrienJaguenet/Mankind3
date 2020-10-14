@@ -10,4 +10,5 @@ typedef struct AABB {
 void translate_AABB(AABB * aabb, const vec3_t vec);
 AABB translated_AABB(AABB * aabb, const vec3_t vec);
 bool collides(AABB * aabb1, AABB * aabb2);
-bool map_collides(AABB * aabb, Map * map, vec3_t * colliding_normal);
+bool map_collides(AABB * aabb, Map * map, vec3_t * colliding_normal,
+				  bool enabled_faces[6]);

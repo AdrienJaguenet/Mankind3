@@ -24,7 +24,8 @@ bool collides(AABB * aabb1, AABB * aabb2)
 			aabb1->dim.z > aabb2->pos.z && aabb1->pos.z < aabb2->dim.z);
 }
 
-bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal)
+bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal,
+				  bool enabled_faces[6])
 {
 	/* Of course, this assumes that AABB contains the actual position of
 	   the box itself. This could be modified by adding an additional
@@ -66,32 +67,41 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal)
 				if (b && b->type != 0) {
 					collision = true;
 					for (int face = 0; face < 6; ++face) {
+						if (!enabled_faces[face]) {
+							continue;
+						}
 						float dist = 0.f;
-						switch(face) {
-						  /* Z axis, compare against the BACK face of the cube */
+						switch (face) {
+							  /* Z axis, compare against the BACK face of the cube */
 						  case FACE_BACK:
-							dist = fabs(collision_points[face].z - z);
-							break;
+							  dist = fabs(collision_points[face].z - z);
+							  break;
 
 						  case FACE_FRONT:
-							dist = fabs(collision_points[face].z - (z + BLOCK_SIZE));
-							break;
+							  dist =
+								fabs(collision_points[face].z -
+									 (z + BLOCK_SIZE));
+							  break;
 
 						  case FACE_RIGHT:
-							dist = fabs(collision_points[face].x - x);
-							break;
+							  dist = fabs(collision_points[face].x - x);
+							  break;
 
 						  case FACE_LEFT:
-							dist = fabs(collision_points[face].x - (x + BLOCK_SIZE));
-							break;
+							  dist =
+								fabs(collision_points[face].x -
+									 (x + BLOCK_SIZE));
+							  break;
 
 						  case FACE_UP:
-							dist = fabs(collision_points[face].y - y);
-							break;
+							  dist = fabs(collision_points[face].y - y);
+							  break;
 
 						  case FACE_DOWN:
-							dist = fabs(collision_points[face].y - (y + BLOCK_SIZE));
-							break;
+							  dist =
+								fabs(collision_points[face].y -
+									 (y + BLOCK_SIZE));
+							  break;
 						}
 						if (dist < closest_dist) {
 							closest_dist = dist;

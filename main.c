@@ -15,10 +15,28 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map, vec3_t * collision_normal)
 {
 	/* Calculate the length only once */
 	float diff_l = v3_length(diff);
+	bool enabled_faces[6] = { false };
+	if (diff.x > 0) {
+		enabled_faces[FACE_RIGHT] = true;
+	} else if (diff.x < 0) {
+		enabled_faces[FACE_LEFT] = true;
+	}
+
+	if (diff.y > 0) {
+		enabled_faces[FACE_UP] = true;
+	} else if (diff.y < 0) {
+		enabled_faces[FACE_DOWN] = true;
+	}
+
+	if (diff.z > 0) {
+		enabled_faces[FACE_FRONT] = true;
+	} else if (diff.z < 0) {
+		enabled_faces[FACE_BACK] = true;
+	}
 
 	do {
 		AABB translated = translated_AABB(aabb, diff);
-		if (!map_collides(&translated, map, collision_normal)) {
+		if (!map_collides(&translated, map, collision_normal, enabled_faces)) {
 			*aabb = translated;
 			return true;
 		} else {
@@ -78,7 +96,7 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 void handle_keystates(const Uint8 * keystates, Camera * camera,
 					  Physics * physics)
 {
-	float AXIS_VELOCITY = !physics->touches_ground ? 0.001 : 0.1;
+	float AXIS_VELOCITY = !physics->touches_ground ? 0.1 : 0.1;
 	vec3_t new_vel =
 	  !physics->touches_ground ? physics->velocity : vec3(0, 0, 0);
 	if (keystates[SDL_SCANCODE_W]) {
@@ -106,6 +124,7 @@ void handle_keystates(const Uint8 * keystates, Camera * camera,
 		  v3_add(new_vel, v3_muls(get_Camera_up(camera), -AXIS_VELOCITY));
 	}
 
+	new_vel = v3_muls(v3_norm(new_vel), AXIS_VELOCITY);
 	physics->velocity.x = new_vel.x;
 	physics->velocity.z = new_vel.z;
 	//update_physics(physics, new_vel);
