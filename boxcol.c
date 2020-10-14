@@ -65,14 +65,37 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal)
 				Block *b = get_block_or_null(map, x, y, z, 0);
 				if (b && b->type != 0) {
 					collision = true;
-					for (int i = 0; i < 6; ++i) {
-						vec3_t to_block =
-						  v3_sub(vec3(x + BLOCK_SIZE / 2, y + BLOCK_SIZE / 2,
-									  z + BLOCK_SIZE / 2), collision_points[i]);
-						float dist = v3_length(to_block);
+					for (int face = 0; face < 6; ++face) {
+						float dist = 0.f;
+						switch(face) {
+						  /* Z axis, compare against the BACK face of the cube */
+						  case FACE_BACK:
+							dist = fabs(collision_points[face].z - z);
+							break;
+
+						  case FACE_FRONT:
+							dist = fabs(collision_points[face].z - (z + BLOCK_SIZE));
+							break;
+
+						  case FACE_RIGHT:
+							dist = fabs(collision_points[face].x - x);
+							break;
+
+						  case FACE_LEFT:
+							dist = fabs(collision_points[face].x - (x + BLOCK_SIZE));
+							break;
+
+						  case FACE_UP:
+							dist = fabs(collision_points[face].y - y);
+							break;
+
+						  case FACE_DOWN:
+							dist = fabs(collision_points[face].y - (y + BLOCK_SIZE));
+							break;
+						}
 						if (dist < closest_dist) {
 							closest_dist = dist;
-							closest_face = i;
+							closest_face = face;
 						}
 					}
 				}
