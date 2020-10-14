@@ -174,9 +174,9 @@ void delete_Map(Map * map)
 	}
 }
 
-int get_height(int x, int z, u_int8_t * permutations)
+float get_height(int x, int z, u_int8_t * permutations)
 {
-	return fbm2((x + 256) / 400.f, (z + 256) / 400.f, 6, permutations) * 128.f;
+	return fbm2((x + 256) / 400.f, (z + 256) / 400.f, 6, permutations);
 }
 
 float get_3d(int x, int y, int z, u_int8_t * permutations)
@@ -201,9 +201,18 @@ void randomly_populate(Map * m, Chunk * chunk)
 	int base_height = chunk->y * CHUNK_SIZE;
 	for (int i = 0; i < CHUNK_SIZE; ++i) {
 		for (int k = 0; k < CHUNK_SIZE; ++k) {
-			int height =
+			float height_noise =
 			  get_height(i + chunk->x * CHUNK_SIZE, k + chunk->z * CHUNK_SIZE,
 						 m->height_perm);
+			float wet_noise = get_wetness(i + chunk->x * CHUNK_SIZE,
+										  k + chunk->z * CHUNK_SIZE,
+										  m->wet_perm);
+			float temp_noise = get_temperature(i + chunk->x * CHUNK_SIZE,
+											   k + chunk->z * CHUNK_SIZE,
+											   m->temp_perm);
+
+			int height = height_noise * 128.f;
+
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 				int type = 0;
 				if (j + base_height < height - 4) {
@@ -213,13 +222,6 @@ void randomly_populate(Map * m, Chunk * chunk)
 				} else if (j + base_height == height - 1) {
 					type = 2;
 				}
-
-				float wet_noise = get_wetness(i + chunk->x * CHUNK_SIZE,
-											  k + chunk->z * CHUNK_SIZE,
-											  m->wet_perm);
-				float temp_noise = get_temperature(i + chunk->x * CHUNK_SIZE,
-												   k + chunk->z * CHUNK_SIZE,
-												   m->temp_perm);
 
 				/* Desert biome. */
 				if (wet_noise < 0 && temp_noise > 0.25
@@ -232,12 +234,23 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 5;
 				}
 
+				/* Wa'ah & sand */
+				if (height_noise < -0.2 && j + base_height == height - 1) {
+					type = 4;
+				}
 
 				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
 						 k + chunk->z * CHUNK_SIZE, m->height_perm);
 				if (threed < -0.21) {
 					type = 0;
+				}
+
+				float water_level = base_height + (0.22 * CHUNK_SIZE);
+
+				if (height_noise < -0.22 && j + base_height < water_level
+					&& j + base_height > base_height) {
+					type = 6;
 				}
 
 				set_Chunk_block_type(m, chunk, i, j, k, type);
