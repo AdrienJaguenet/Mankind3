@@ -44,7 +44,7 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map, vec3_t * collision_normal)
 			diff = v3_divs(diff, 2.f);
 			diff_l /= 2.f;
 		}
-	} while (diff_l > 0.01);
+	} while (diff_l > 0.001);
 	return false;
 }
 
@@ -155,7 +155,7 @@ int main()
 		init_HashMap(&map->chunks[i]);
 	}
 
-	AABB player = { vec3(0, 10, 0), vec3(0.7, 2., 0.7) };
+	AABB player = { vec3(0, 10, 0), vec3(0.7, 1.9, 0.7) };
 	Physics physics = { vec3(0, 0, 0), 0.5, false };
 
 	bool running = true;

@@ -112,21 +112,6 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal,
 			}
 		}
 	}
-	switch (closest_face) {
-	  case FACE_FRONT:
-	  case FACE_BACK:
-		  *collision_normal = vec3(0, 0, 1);
-		  break;
-
-	  case FACE_UP:
-	  case FACE_DOWN:
-		  *collision_normal = vec3(0, 1, 0);
-		  break;
-
-	  case FACE_RIGHT:
-	  case FACE_LEFT:
-		  *collision_normal = vec3(1, 0, 0);
-		  break;
-	}
+	*collision_normal = FACE_NORMALS[closest_face];
 	return collision;
 }

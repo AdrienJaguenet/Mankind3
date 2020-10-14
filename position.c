@@ -2,6 +2,16 @@
 
 #include <math.h>
 
+const vec3_t FACE_NORMALS[6] = {
+	{.m = { -1, 0, 0} },
+	{.m = { 1, 0, 0} },
+	{.m = { 0, 1, 0} },
+	{.m = { 0, -1, 0} },
+	{.m = { 0, 0, -1} },
+	{.m = { 0, 0, 1} }
+};
+
+
 void get_chunk_pos(int px, int py, int pz, int *cx, int *cy, int *cz)
 {
 	*cx = floor((float) px / CHUNK_SIZE);

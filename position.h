@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math_3d.h"
+
 #define MAP_SIZE_IN_CHUNKS 32
 #define MAX_CHUNKS_NO MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS
 #define BLOCK_SIZE 1.f
@@ -43,6 +45,8 @@ typedef enum {
 	NEIGHBOUR_FRONT = 4,
 	NEIGHBOUR_BACK = 5
 } NeighbourhoodPosition;
+
+extern const vec3_t FACE_NORMALS[6];
 
 void get_chunk_pos(int px, int py, int pz, int *cx, int *cy, int *cz);
 void get_pos_in_chunk(int px, int py, int pz, int *bx, int *by, int *bz,
