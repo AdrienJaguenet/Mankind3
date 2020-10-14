@@ -127,6 +127,7 @@ int main()
 	init_SFX(&sfx_context);
 	play_Audio(&sfx_context, &sfx_context.music.ambient, true, 0.0);	/* Muted... LOL */
 	Map *map = calloc(sizeof(Map), 1);
+	srand(SEED);
 	map->height_perm = shuffled_permutations(256);
 	map->wet_perm = shuffled_permutations(256);
 	map->temp_perm = shuffled_permutations(256);
