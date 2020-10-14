@@ -187,13 +187,17 @@ float get_3d(int x, int y, int z, u_int8_t * permutations)
 
 float get_wetness(int x, int z, u_int8_t * permutations)
 {
+	return fbm2((x + 256) / 100.f, (z + 256) / 100.f, 2, permutations);
+}
+
+float get_temperature(int x, int z, u_int8_t * permutations)
+{
 	return fbm2((x + 256) / 200.f, (z + 256) / 200.f, 2, permutations);
 }
 
+
 void randomly_populate(Map * m, Chunk * chunk)
 {
-	srand(SEED);
-
 	int base_height = chunk->y * CHUNK_SIZE;
 	for (int i = 0; i < CHUNK_SIZE; ++i) {
 		for (int k = 0; k < CHUNK_SIZE; ++k) {
@@ -210,13 +214,24 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 2;
 				}
 
-				/* Biomes. */
 				float wet_noise = get_wetness(i + chunk->x * CHUNK_SIZE,
 											  k + chunk->z * CHUNK_SIZE,
 											  m->wet_perm);
-				if (wet_noise > 0 && j + base_height == height - 1) {
+				float temp_noise = get_temperature(i + chunk->x * CHUNK_SIZE,
+												   k + chunk->z * CHUNK_SIZE,
+												   m->temp_perm);
+
+				/* Desert biome. */
+				if (wet_noise < 0 && temp_noise > 0.25
+					&& j + base_height == height - 1) {
 					type = 4;
 				}
+				/* Snow biome. */
+				if (wet_noise > 0 && temp_noise < -0.25
+					&& j + base_height == height - 1) {
+					type = 5;
+				}
+
 
 				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,

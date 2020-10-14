@@ -6,7 +6,7 @@
 #include "hashmap.h"
 
 #define BLOCK_TYPES_NO 4
-#define SEED 1337
+#define SEED 666
 
 typedef enum {
 	PENDING_MESHGEN,
