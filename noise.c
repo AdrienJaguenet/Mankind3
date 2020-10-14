@@ -23,7 +23,7 @@ u_int8_t *shuffled_permutations(size_t size)
 
 static inline float GRAD2(int hash, float x, float y)
 {
-	return ((hash & 1) == 0 ? x : -x) + ((hash & 2) == 0 ? y : -y);
+	return ((hash & 1) ? -x : x) + ((hash & 2) ? -y : y);
 }
 
 static inline float GRAD3(int hash, float x, float y, float z)
