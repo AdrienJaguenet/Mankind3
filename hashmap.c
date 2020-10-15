@@ -108,7 +108,7 @@ void for_each_in_HashMap(HashMap * map,
 						 void (*fn)(Key key, void *value, void *extra),
 						 void *extra)
 {
-	for(int i = 0; i < map->array_size; ++i) {
+	for (int i = 0; i < map->array_size; ++i) {
 		HashMapNode *list = map->data[i];
 		while (list) {
 			fn(list->key, list->value, extra);

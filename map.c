@@ -231,7 +231,8 @@ void randomly_populate(Map * m, Chunk * chunk)
 				Biome *biome =
 				  get_Biome_from_noise_or_null(&(NoiseSet) { height_noise,
 											   heat_noise, wet_noise,
-											   river_noise }, &m->biome_table);
+											   river_noise
+											   }, &m->biome_table);
 
 				if (biome && j + base_height == height - 1) {
 					type = biome->type;
@@ -239,14 +240,15 @@ void randomly_populate(Map * m, Chunk * chunk)
 
 				if (biome->type == 6
 					&& j + base_height <
-					m->biome_table.biomes[0].descriptor.height_max * 128.f) {
+					m->biome_table.biomes[0].descriptor.height_max * 128.f
+					&& j + base_height >= height) {
 					type = biome->type;
 				}
 
 				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
 						 k + chunk->z * CHUNK_SIZE, m->height_perm);
-				if (threed < -0.21 && type != 6 && j + base_height > -0.20 * 128.f) {	// Do not cut into water
+				if (threed < -0.21 && biome->type != 6) {	// Do not cut into water
 					type = 0;
 				}
 
