@@ -149,7 +149,9 @@ int main()
 	srand(SEED);
 	map->height_perm = shuffled_permutations(256);
 	map->wet_perm = shuffled_permutations(256);
-	map->temp_perm = shuffled_permutations(256);
+	map->heat_perm = shuffled_permutations(256);
+	map->river_perm = shuffled_permutations(256);
+	preset_BiomeTable(&map->biome_table);
 
 	for (int i = 0; i < MAX_LOD; ++i) {
 		init_HashMap(&map->chunks[i]);

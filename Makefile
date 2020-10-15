@@ -14,7 +14,8 @@ SRC=main.c\
 	physx.c\
 	raycast.c\
 	soundfx.c\
-	hashmap.c
+	hashmap.c\
+	biome.c
 
 OBJ=$(SRC:.c=.o)
 CFLAGS=-g -Werror -Wextra -Wall `pkg-config --cflags sdl2 SDL2_image openal freealut gl glew`

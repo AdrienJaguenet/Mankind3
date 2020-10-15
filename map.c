@@ -190,11 +190,15 @@ float get_wetness(int x, int z, u_int8_t * permutations)
 	return fbm2((x + 256) / 100.f, (z + 256) / 100.f, 2, permutations);
 }
 
-float get_temperature(int x, int z, u_int8_t * permutations)
+float get_heat(int x, int z, u_int8_t * permutations)
 {
 	return fbm2((x + 256) / 200.f, (z + 256) / 200.f, 2, permutations);
 }
 
+float get_river(int x, int z, u_int8_t * permutations)
+{
+	return fbm2((x + 256) / 200.f, (z + 256) / 200.f, 2, permutations);
+}
 
 void randomly_populate(Map * m, Chunk * chunk)
 {
@@ -207,9 +211,12 @@ void randomly_populate(Map * m, Chunk * chunk)
 			float wet_noise = get_wetness(i + chunk->x * CHUNK_SIZE,
 										  k + chunk->z * CHUNK_SIZE,
 										  m->wet_perm);
-			float temp_noise = get_temperature(i + chunk->x * CHUNK_SIZE,
-											   k + chunk->z * CHUNK_SIZE,
-											   m->temp_perm);
+			float heat_noise = get_heat(i + chunk->x * CHUNK_SIZE,
+										k + chunk->z * CHUNK_SIZE,
+										m->heat_perm);
+			float river_noise = get_river(i + chunk->x * CHUNK_SIZE,
+										  k + chunk->z * CHUNK_SIZE,
+										  m->river_perm);
 
 			int height = height_noise * 128.f;
 
@@ -219,32 +226,27 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 1;
 				} else if (j + base_height < height - 1) {
 					type = 3;
-				} else if (j + base_height == height - 1) {
-					type = 2;
-				} else if (j + base_height >= height && j + base_height < 0) {
-					type = 6;
 				}
 
-				/* Desert biome. */
-				if (wet_noise < 0 && temp_noise > 0.25
-					&& j + base_height == height - 1) {
-					type = 4;
-				}
-				/* Snow biome. */
-				if (wet_noise > 0 && temp_noise < -0.25
-					&& j + base_height == height - 1) {
-					type = 5;
+				Biome *biome =
+				  get_Biome_from_noise_or_null(&(NoiseSet) { height_noise,
+											   heat_noise, wet_noise,
+											   river_noise }, &m->biome_table);
+
+				if (biome && j + base_height == height - 1) {
+					type = biome->type;
 				}
 
-				/* Wa'ah & sand */
-				if (height_noise < -0.2 && j + base_height == height - 1) {
-					type = 4;
+				if (biome->type == 6
+					&& j + base_height <
+					m->biome_table.biomes[0].descriptor.height_max * 128.f) {
+					type = biome->type;
 				}
 
 				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
 						 k + chunk->z * CHUNK_SIZE, m->height_perm);
-				if (threed < -0.21 && type != 6) {	// Do not cut into water
+				if (threed < -0.21 && type != 6 && j + base_height > -0.20 * 128.f) {	// Do not cut into water
 					type = 0;
 				}
 

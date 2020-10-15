@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+
+#include "biome.h"
 #include "position.h"
 #include "mesh.h"
 #include "noise.h"
@@ -32,7 +34,8 @@ typedef struct {
 	HashMap chunks[MAX_LOD];
 	Chunk *last_access;
 	int chunks_no;
-	u_int8_t *height_perm, *wet_perm, *temp_perm;
+	u_int8_t *height_perm, *wet_perm, *heat_perm, *river_perm;
+	BiomeTable biome_table;
 } Map;
 
 void randomly_populate(Map * m, Chunk * chunk);
