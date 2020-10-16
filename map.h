@@ -7,8 +7,9 @@
 #include "noise.h"
 #include "hashmap.h"
 
-#define BLOCK_TYPES_NO 4
+#define BLOCK_TYPES_NO 8
 #define SEED 666
+#define TERRAIN_HEIGHT 128
 
 typedef enum {
 	PENDING_MESHGEN,
@@ -34,7 +35,7 @@ typedef struct {
 	HashMap chunks[MAX_LOD];
 	Chunk *last_access;
 	int chunks_no;
-	u_int8_t *height_perm, *wet_perm, *heat_perm, *river_perm;
+	u_int8_t *height_perm, *wet_perm, *heat_perm;
 	BiomeTable biome_table;
 } Map;
 

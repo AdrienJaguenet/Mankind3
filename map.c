@@ -176,28 +176,31 @@ void delete_Map(Map * map)
 
 float get_height(int x, int z, u_int8_t * permutations)
 {
-	return fbm2((x + 256) / 400.f, (z + 256) / 400.f, 6, permutations);
+	return fbm2((x + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 400.f,
+				(z + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 400.f, 6,
+				permutations);
 }
 
 float get_3d(int x, int y, int z, u_int8_t * permutations)
 {
-	return fbm3((x + 256) / 40.f, (y + 256) / 20.f, (z + 256) / 40.f, 1,
+	return fbm3((x + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 40.f,
+				(y + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 20.f,
+				(z + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 40.f, 1,
 				permutations);
 }
 
 float get_wetness(int x, int z, u_int8_t * permutations)
 {
-	return fbm2((x + 256) / 100.f, (z + 256) / 100.f, 2, permutations);
+	return fbm2((x + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 100.f,
+				(z + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 100.f, 2,
+				permutations);
 }
 
 float get_heat(int x, int z, u_int8_t * permutations)
 {
-	return fbm2((x + 256) / 200.f, (z + 256) / 200.f, 2, permutations);
-}
-
-float get_river(int x, int z, u_int8_t * permutations)
-{
-	return fbm2((x + 256) / 200.f, (z + 256) / 200.f, 2, permutations);
+	return fbm2((x + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 200.f,
+				(z + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 200.f, 2,
+				permutations);
 }
 
 void randomly_populate(Map * m, Chunk * chunk)
@@ -214,41 +217,35 @@ void randomly_populate(Map * m, Chunk * chunk)
 			float heat_noise = get_heat(i + chunk->x * CHUNK_SIZE,
 										k + chunk->z * CHUNK_SIZE,
 										m->heat_perm);
-			float river_noise = get_river(i + chunk->x * CHUNK_SIZE,
-										  k + chunk->z * CHUNK_SIZE,
-										  m->river_perm);
 
-			int height = height_noise * 128.f;
+			int height = height_noise * TERRAIN_HEIGHT;
 
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 				int type = 0;
+				Biome *biome =
+				  get_Biome_from_noise_or_null(&(NoiseSet) { height_noise,
+											   heat_noise, wet_noise,
+											   }, &m->biome_table);
+				(void) biome;
 				if (j + base_height < height - 4) {
 					type = 1;
 				} else if (j + base_height < height - 1) {
 					type = 3;
-				}
-
-				Biome *biome =
-				  get_Biome_from_noise_or_null(&(NoiseSet) { height_noise,
-											   heat_noise, wet_noise,
-											   river_noise
-											   }, &m->biome_table);
-
-				if (biome && j + base_height == height - 1) {
+				} else if (biome != NULL && j + base_height == height - 1
+						   && biome->type != 6) {
 					type = biome->type;
-				}
-
-				if (biome->type == 6
-					&& j + base_height <
-					m->biome_table.biomes[0].descriptor.height_max * 128.f
-					&& j + base_height >= height) {
-					type = biome->type;
+				} else if (biome != NULL && biome->type == 6
+						   && j + base_height + 2 >= height
+						   && j + base_height <=
+						   biome->descriptor.height_max * TERRAIN_HEIGHT) {
+					/* I think all of the above is largely bruteforced. I don't know why it bugs out without `base_height + 2'. */
+					type = 6;
 				}
 
 				float threed =
 				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
 						 k + chunk->z * CHUNK_SIZE, m->height_perm);
-				if (threed < -0.21 && biome->type != 6) {	// Do not cut into water
+				if (threed < -0.21 && type != 6) {	// Do not cut into water
 					type = 0;
 				}
 
