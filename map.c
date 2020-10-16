@@ -176,9 +176,9 @@ void delete_Map(Map * map)
 
 float get_height(int x, int z, u_int8_t * permutations)
 {
-	return fbm2((x + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 400.f,
-				(z + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 400.f, 6,
-				permutations);
+	return mankind_noise2((x + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 400.f,
+						  (z + MAP_SIZE_IN_CHUNKS * MAP_SIZE_IN_CHUNKS) / 400.f,
+						  permutations);
 }
 
 float get_3d(int x, int y, int z, u_int8_t * permutations)
@@ -242,12 +242,12 @@ void randomly_populate(Map * m, Chunk * chunk)
 					type = 6;
 				}
 
-				float threed =
-				  get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE,
-						 k + chunk->z * CHUNK_SIZE, m->height_perm);
-				if (threed < -0.21 && type != 6) {	// Do not cut into water
-					type = 0;
-				}
+				/* float threed = */
+				/*   get_3d(i + chunk->x * CHUNK_SIZE, j + chunk->y * CHUNK_SIZE, */
+				/*       k + chunk->z * CHUNK_SIZE, m->height_perm); */
+				/* if (threed < -0.21 && type != 6) {   // Do not cut into water */
+				/*  type = 0; */
+				/* } */
 
 				set_Chunk_block_type(m, chunk, i, j, k, type);
 			}

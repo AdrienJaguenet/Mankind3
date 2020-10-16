@@ -7,7 +7,7 @@ void preset_BiomeTable(BiomeTable * table)
 	Biome water;
 	water.type = 6;
 	water.descriptor = (BiomeDescriptor) {
-	-1.0, -0.3, -1.0, 1., -1.0, 1.1};
+	-1.0, -0.2, -1.0, 1., -1.0, 1.1};
 
 	Biome polar;
 	polar.type = 5;

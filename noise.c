@@ -146,6 +146,20 @@ float fbm3(float x, float y, float z, int octave, u_int8_t * permutations)
 	return f;
 }
 
+float mankind_noise2(float x, float y, u_int8_t * permutations)
+{
+	/* Do the domain warping. */
+	float X1 = fbm2(x + 0.0, y + 0.0, 2, permutations);
+	float Y1 = fbm2(x + 5.2, y + 1.3, 2, permutations);
+
+	/* float X2 = fbm2(x + 4.0 * X1 + 1.7, y + 4.0 * Y1 + 9.2, 6, permutations); */
+	/* float Y2 = fbm2(x + 4.0 * X1 + 8.3, y + 4.0 * Y1 + 2.8, 6, permutations); */
+
+	float fbm = fbm2(x + X1 * 4.0, y + Y1 * 4.0, 6, permutations);
+
+	return noise_layered(2, (float[2]) { fbm, 1 },
+						 (float[2]) { fbm2(x, y, 3, permutations), 2 });
+}
 
 float noise_layered(int count, ...)
 {
