@@ -67,9 +67,12 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 		if (e->button.button == SDL_BUTTON_LEFT) {
 			vec3_t normal = vec3(0, 0, 0);
 			vec3_t position = vec3(0, 0, 0);
+			vec3_t real_position = vec3(camera->position.x / BLOCK_SIZE,
+				camera->position.y / BLOCK_SIZE,
+				camera->position.z / BLOCK_SIZE);
 
 			if (raycast_block
-				(camera->position, get_Camera_lookAt(camera), map, &position,
+				(real_position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
 				play_Audio_at(sfx_context, &sfx_context->effects.break_block,
 							  &position);
@@ -77,10 +80,13 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			}
 		} else if (e->button.button == SDL_BUTTON_RIGHT) {
 			vec3_t normal = vec3(0, 0, 0);
+			vec3_t real_position = vec3(camera->position.x / BLOCK_SIZE,
+				camera->position.y / BLOCK_SIZE,
+				camera->position.z / BLOCK_SIZE);
 			vec3_t position = vec3(0, 0, 0);
 
 			if (raycast_block
-				(camera->position, get_Camera_lookAt(camera), map, &position,
+				(real_position, get_Camera_lookAt(camera), map, &position,
 				 &normal)) {
 				play_Audio_at(sfx_context, &sfx_context->effects.place_block,
 							  &position);
