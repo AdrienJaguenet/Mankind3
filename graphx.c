@@ -1,4 +1,5 @@
 #include "graphx.h"
+#include <SDL2/SDL_image.h>
 
 #include "chunkmesh.h"
 
@@ -43,7 +44,10 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	gfx_context->main_program =
 	  program_new("./resources/shaders/default.vs",
 				  "./resources/shaders/default.fs");
+
 	load_texture(&gfx_context->tilemap, "./resources/gfx/tilemap.png");
+
+	init_UI(gfx_context);
 
 	gfx_context->camera.position = vec3(0, CHUNK_SIZE * 2, 0);
 	gfx_context->camera.rotation = vec3(0, -3.1415 / 4, 0);
@@ -51,6 +55,18 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	init_Heap(&gfx_context->meshgen_pqueue);
 	init_Heap(&gfx_context->terrgen_pqueue);
 	init_Heap(&gfx_context->render_pqueue);
+}
+
+void init_UI(GFXContext * gfx_context)
+{
+	load_UI(&gfx_context->ui);
+	gfx_context->ui.root = UIElement_new("resources/gfx/crosshair.png");
+}
+
+void draw_UI(GFXContext * gfx_context)
+{
+	program_use(&gfx_context->ui.program);
+	UIElement_draw(gfx_context->ui.root);
 }
 
 bool cull_chunk(int x, int y, int z, Camera * camera, float *distance)
@@ -120,6 +136,11 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 
 void draw_Chunks(GFXContext * gfx_context, int max_gens)
 {
+	program_use(&gfx_context->main_program);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	setup_camera(&gfx_context->main_program, gfx_context->window,
+				 &gfx_context->camera);
 	int i;
 	for (i = 0; i < max_gens; ++i) {
 		Chunk *c = extract_HeapNode(&gfx_context->render_pqueue);
@@ -159,15 +180,9 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
 
 void begin_draw(GFXContext * gfx_context)
 {
-	setup_camera(&gfx_context->main_program, gfx_context->window,
-				 &gfx_context->camera);
+	(void) gfx_context;
 	/* clean */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/* Render shit here. */
-	program_use(&gfx_context->main_program);
-
-	glEnable(GL_DEPTH_TEST);
 }
 
 void end_draw(GFXContext * gfx_context)
@@ -219,4 +234,15 @@ void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens)
 		gfx_context->queue_size--;
 	}
 
+}
+
+void dbg_gl()
+{
+	GLint current_program;
+	GLboolean is_depth_test_on;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
+	glGetBooleanv(GL_CURRENT_PROGRAM, &is_depth_test_on);
+	INFO("OpenGL state:");
+	INFO("\tProgram:\t%d", current_program);
+	INFO("\tDepth test?\t%s", is_depth_test_on ? "true" : "false");
 }

@@ -11,6 +11,7 @@
 #include "texture.h"
 #include "camera.h"
 #include "heap.h"
+#include "ui.h"
 
 typedef struct {
 	SDL_Window *window;
@@ -23,9 +24,14 @@ typedef struct {
 	Heap render_pqueue;
 	Heap meshgen_pqueue;
 	Heap terrgen_pqueue;
+	UI ui;
 } GFXContext;
 
 void init_GFX(GFXContext * gfx_context, int window_width, int window_height);
+
+void init_UI(GFXContext * gfx_context);
+
+void draw_UI(GFXContext * gfx_context);
 
 void draw_Map(GFXContext * gfx_context, Map * map);
 
@@ -45,3 +51,5 @@ void push_Chunk_to_queue(GFXContext * gfx_context, Chunk * chunk, int priority,
 
 void gen_ChunkMesh_in_queue(GFXContext * gfx_context, Map * map, int max_gens);
 void gen_Chunks_in_queue(GFXContext * gfx_context, Map * map, int max_gens);
+
+void dbg_gl();

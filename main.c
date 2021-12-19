@@ -68,8 +68,8 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 			vec3_t normal = vec3(0, 0, 0);
 			vec3_t position = vec3(0, 0, 0);
 			vec3_t real_position = vec3(camera->position.x / BLOCK_SIZE,
-				camera->position.y / BLOCK_SIZE,
-				camera->position.z / BLOCK_SIZE);
+										camera->position.y / BLOCK_SIZE,
+										camera->position.z / BLOCK_SIZE);
 
 			if (raycast_block
 				(real_position, get_Camera_lookAt(camera), map, &position,
@@ -81,8 +81,8 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 		} else if (e->button.button == SDL_BUTTON_RIGHT) {
 			vec3_t normal = vec3(0, 0, 0);
 			vec3_t real_position = vec3(camera->position.x / BLOCK_SIZE,
-				camera->position.y / BLOCK_SIZE,
-				camera->position.z / BLOCK_SIZE);
+										camera->position.y / BLOCK_SIZE,
+										camera->position.z / BLOCK_SIZE);
 			vec3_t position = vec3(0, 0, 0);
 
 			if (raycast_block
@@ -238,6 +238,7 @@ int main()
 		gen_Chunks_in_queue(&gfx_context, map, 10);
 		begin_draw(&gfx_context);
 		draw_Map(&gfx_context, map);
+		draw_UI(&gfx_context);
 		end_draw(&gfx_context);
 	}
 

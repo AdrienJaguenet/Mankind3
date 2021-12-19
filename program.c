@@ -66,6 +66,7 @@ program_t program_new(const char *vs_path, const char *fs_path)
 		glGetShaderInfoLog(fs_id, 1024, &max_length, error_txt);
 		FATAL("Couldn't link program.\n%s", error_txt);
 	}
+	INFO("Done loading program %d", program.id);
 
 	return program;
 }
