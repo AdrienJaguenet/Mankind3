@@ -58,12 +58,10 @@ bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal,
 	bool collision = false;
 	float closest_dist = 9999999;
 	int closest_face = FACE_BACK;
-	vec3_t real_start =
-	  vec3(aabb->pos.x / BLOCK_SIZE, aabb->pos.y / BLOCK_SIZE,
-		   aabb->pos.z / BLOCK_SIZE);
-	vec3_t real_dim =
-	  vec3(aabb->dim.x / BLOCK_SIZE, aabb->dim.y / BLOCK_SIZE,
-		   aabb->dim.z / BLOCK_SIZE);
+	vec3_t real_start = vec3(aabb->pos.x / BLOCK_SIZE, aabb->pos.y / BLOCK_SIZE,
+							 aabb->pos.z / BLOCK_SIZE);
+	vec3_t real_dim = vec3(aabb->dim.x / BLOCK_SIZE, aabb->dim.y / BLOCK_SIZE,
+						   aabb->dim.z / BLOCK_SIZE);
 
 	for (int z = floor(real_start.z); z < ceil(real_start.z + real_dim.z); ++z) {
 		for (int y = floor(real_start.y); y < ceil(real_start.y + real_dim.y);

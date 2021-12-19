@@ -6,21 +6,21 @@ UIElement *UIElement_new(UI * ui, const char *texture_path)
 	INFO("Creating UIElement");
 	UIElement *element = malloc(sizeof(UIElement));
 	element->position = POSITION_ABSOLUTE;
-	element->top_px = 0.0f;
-	element->left_px = 0.0f;
-	element->width_px = 0.0f;
-	element->height_px = 0.0f;
+	element->top_px = 0;
+	element->left_px = 0;
+	element->width_px = 0;
+	element->height_px = 0;
 	element->children_no = 0;
 	element->children = NULL;
 	element->parent = NULL;
-    element->ui = ui;
+	element->ui = ui;
 
 	INFO("UIElement GL initialization");
 	load_texture(&element->texture, texture_path);
 	const int vertices_no = 6;
 	GLuint vbo;
-    /* Always send a simple quad to OpenGL. We then use
-    uniform values to calculate the actual vertex positions. */
+	/* Always send a simple quad to OpenGL. We then use
+	   uniform values to calculate the actual vertex positions. */
 	GLfloat vertices[] = {
 		/*(X,Y) (U,V)
 		 */
@@ -57,7 +57,9 @@ void UIElement_draw(UIElement * element)
 		UIElement_draw(element->children[i]);
 	}
 
-    program_t * program = &element->ui->program;
+	UIElement_center(element);
+
+	program_t *program = &element->ui->program;
 
 	/* set texture0 to active */
 	glActiveTexture(GL_TEXTURE0);
@@ -68,16 +70,33 @@ void UIElement_draw(UIElement * element)
 	/* Enable attributes 0 (x, y) and 1 (u, v) */
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-    /* Pass uniform values */
-    glUniform1i(glGetUniformLocation(program->id, "screen_width_px"), element->ui->width_px);
-    glUniform1i(glGetUniformLocation(program->id, "screen_height_px"), element->ui->height_px);
-    glUniform1i(glGetUniformLocation(program->id, "top_px"), element->top_px);
-    glUniform1i(glGetUniformLocation(program->id, "left_px"), element->left_px);
-    glUniform1i(glGetUniformLocation(program->id, "width_px"), element->width_px);
-    glUniform1i(glGetUniformLocation(program->id, "height_px"), element->height_px);
+	/* Pass uniform values */
+	INFO("Screen width: %d", element->ui->width_px);
+	INFO("Screen height: %d", element->ui->height_px);
+	INFO("Element width: %d", element->width_px);
+	INFO("Element height: %d", element->height_px);
+	INFO("Element top: %d", element->top_px);
+	INFO("Element left: %d", element->top_px);
+	glUniform1i(glGetUniformLocation(program->id, "screen_width_px"),
+				element->ui->width_px);
+	glUniform1i(glGetUniformLocation(program->id, "screen_height_px"),
+				element->ui->height_px);
+	glUniform1i(glGetUniformLocation(program->id, "top_px"), element->top_px);
+	glUniform1i(glGetUniformLocation(program->id, "left_px"), element->left_px);
+	glUniform1i(glGetUniformLocation(program->id, "width_px"),
+				element->width_px);
+	glUniform1i(glGetUniformLocation(program->id, "height_px"),
+				element->height_px);
 	/* draw */
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+void UIElement_center(UIElement * element)
+{
+	UI *ui = element->ui;
+	element->top_px = ui->height_px / 2 + element->height_px / 2;
+	element->left_px = ui->width_px / 2 + element->width_px / 2;
 }
 
 void UIElement_delete(UIElement * element)

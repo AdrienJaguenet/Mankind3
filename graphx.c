@@ -60,11 +60,19 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 void init_UI(GFXContext * gfx_context)
 {
 	load_UI(&gfx_context->ui);
-	gfx_context->ui.root = UIElement_new("resources/gfx/crosshair.png");
+	gfx_context->ui.root =
+	  UIElement_new(&gfx_context->ui, "resources/gfx/crosshair.png");
+	UIElement *root = gfx_context->ui.root;
+	root->height_px = 50;
+	root->width_px = 50;
 }
 
 void draw_UI(GFXContext * gfx_context)
 {
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+	gfx_context->ui.width_px = viewport[2];
+	gfx_context->ui.height_px = viewport[3];
 	program_use(&gfx_context->ui.program);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
