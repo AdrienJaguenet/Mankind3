@@ -66,7 +66,10 @@ void init_UI(GFXContext * gfx_context)
 void draw_UI(GFXContext * gfx_context)
 {
 	program_use(&gfx_context->ui.program);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	UIElement_draw(gfx_context->ui.root);
+	glDisable(GL_BLEND);
 }
 
 bool cull_chunk(int x, int y, int z, Camera * camera, float *distance)
