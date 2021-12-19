@@ -71,12 +71,6 @@ void UIElement_draw(UIElement * element)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	/* Pass uniform values */
-	INFO("Screen width: %d", element->ui->width_px);
-	INFO("Screen height: %d", element->ui->height_px);
-	INFO("Element width: %d", element->width_px);
-	INFO("Element height: %d", element->height_px);
-	INFO("Element top: %d", element->top_px);
-	INFO("Element left: %d", element->top_px);
 	glUniform1i(glGetUniformLocation(program->id, "screen_width_px"),
 				element->ui->width_px);
 	glUniform1i(glGetUniformLocation(program->id, "screen_height_px"),
