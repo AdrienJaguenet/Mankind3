@@ -17,7 +17,7 @@ typedef struct {
 	SDL_Window *window;
 	SDL_GLContext gl_context;
 
-	program_t main_program;
+	program_t chunk_program;
 	Texture tilemap;
 	Camera camera;
 	int queue_size;

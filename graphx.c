@@ -41,9 +41,9 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	glClearColor(0.53, 0.81, 0.92, 1.0);
 	glEnable(GL_MULTISAMPLE);
 
-	gfx_context->main_program =
-	  program_new("./resources/shaders/default.vs",
-				  "./resources/shaders/default.fs");
+	gfx_context->chunk_program =
+	  program_new("./resources/shaders/chunk.vs",
+				  "./resources/shaders/chunk.fs");
 
 	load_texture(&gfx_context->tilemap, "./resources/gfx/tilemap.png");
 
@@ -147,10 +147,10 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 
 void draw_Chunks(GFXContext * gfx_context, int max_gens)
 {
-	program_use(&gfx_context->main_program);
+	program_use(&gfx_context->chunk_program);
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
-	setup_camera(&gfx_context->main_program, gfx_context->window,
+	setup_camera(&gfx_context->chunk_program, gfx_context->window,
 				 &gfx_context->camera);
 	int i;
 	for (i = 0; i < max_gens; ++i) {
@@ -176,16 +176,18 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
 {
 	mat4_t model = m4_translation(position);
 	glUniformMatrix4fv(glGetUniformLocation
-					   (gfx_context->main_program.id, "model"), 1, GL_FALSE,
+					   (gfx_context->chunk_program.id, "model"), 1, GL_FALSE,
 					   (float *) &model);
 	glUniform3f(glGetUniformLocation
-				(gfx_context->main_program.id, "ambient_light"), .5f, 1.f, .5f);
+				(gfx_context->chunk_program.id, "ambient_light"), .5f, 1.f,
+				.5f);
 	glUniform3f(glGetUniformLocation
-				(gfx_context->main_program.id, "background_color"), 0.53, .82,
+				(gfx_context->chunk_program.id, "background_color"), 0.53, .82,
 				.92f);
 	glUniform1i(glGetUniformLocation
-				(gfx_context->main_program.id, "tilemap_grid_size"), 8);
-	glUniform1i(glGetUniformLocation(gfx_context->main_program.id, "lod"), lod);
+				(gfx_context->chunk_program.id, "tilemap_grid_size"), 8);
+	glUniform1i(glGetUniformLocation(gfx_context->chunk_program.id, "lod"),
+				lod);
 	mesh_render(mesh, &gfx_context->tilemap);
 }
 
