@@ -89,8 +89,8 @@ void UIElement_draw(UIElement * element)
 void UIElement_center(UIElement * element)
 {
 	UI *ui = element->ui;
-	element->top_px = ui->height_px / 2 + element->height_px / 2;
-	element->left_px = ui->width_px / 2 + element->width_px / 2;
+	element->top_px = ui->height_px / 2 - element->height_px / 2;
+	element->left_px = ui->width_px / 2 - element->width_px / 2;
 }
 
 void UIElement_delete(UIElement * element)
