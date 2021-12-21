@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "chunkmesh.h"
+#include "raycast.h"
 
 void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 {
@@ -51,6 +52,8 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 
 	gfx_context->camera.position = vec3(0, CHUNK_SIZE * 2, 0);
 	gfx_context->camera.rotation = vec3(0, -3.1415 / 4, 0);
+
+	CubeHighlight_init(&gfx_context->cube_highlight);
 
 	init_Heap(&gfx_context->meshgen_pqueue);
 	init_Heap(&gfx_context->terrgen_pqueue);
@@ -143,6 +146,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 	}
 	draw_Chunks(gfx_context,
 				RENDER_DISTANCE * RENDER_DISTANCE * RENDER_DISTANCE * 8);
+	draw_CubeHighlight(gfx_context, map);
 }
 
 void draw_Chunks(GFXContext * gfx_context, int max_gens)
@@ -189,6 +193,33 @@ void draw_Mesh(GFXContext * gfx_context, mesh_t * mesh, vec3_t position,
 	glUniform1i(glGetUniformLocation(gfx_context->chunk_program.id, "lod"),
 				lod);
 	mesh_render(mesh, &gfx_context->tilemap);
+}
+
+void draw_CubeHighlight(GFXContext * gfx_context, Map * map)
+{
+	/* Extract variables of interest */
+	Camera camera = gfx_context->camera;
+	program_t * program = &gfx_context->cube_highlight.program;
+	CubeHighlight * cube = &gfx_context->cube_highlight;
+	/* Get player's pointed cube */
+	vec3_t normal = vec3(0.0, 0.0, 0.0);
+	vec3_t pos = vec3(0.0, 0.0, 0.0);
+	vec3_t real_pos = vec3(
+		camera.position.x / BLOCK_SIZE,
+		camera.position.y / BLOCK_SIZE,
+		camera.position.z / BLOCK_SIZE
+	);
+
+	if (! raycast_block(real_pos, get_Camera_lookAt(&camera), map, &pos, &normal)) {
+		return;
+	}
+	/* draw the cube */
+	program_use(program);
+	mat4_t model = m4_translation(pos);
+	setup_camera(program, gfx_context->window, &camera);
+	glUniformMatrix4fv(glGetUniformLocation(program->id, "model"), 1, GL_FALSE, (float*) &model);
+	glBindVertexArray(cube->vao);
+	glDrawElements(GL_LINES, 12, GL_UNSIGNED_INT, NULL);
 }
 
 void begin_draw(GFXContext * gfx_context)
