@@ -54,7 +54,6 @@ program_t program_new(const char *vs_path, const char *fs_path)
 	glBindAttribLocation(program.id, 0, "position");
 	glBindAttribLocation(program.id, 1, "normal");
 	glBindAttribLocation(program.id, 2, "uv");
-	glUniform1i(glGetUniformLocation(program.id, "texture_1"), 0);
 
 	glLinkProgram(program.id);
 	GLint linked = GL_FALSE;
@@ -68,6 +67,7 @@ program_t program_new(const char *vs_path, const char *fs_path)
 	}
 	INFO("Done loading program %d", program.id);
 
+	DEBUG_GL();
 	return program;
 }
 
@@ -79,4 +79,36 @@ void program_use(program_t * program)
 void program_terminate(program_t * program)
 {
 	glDeleteProgram(program->id);
+}
+
+void program_debug(program_t * program)
+{
+	GLint current_program;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
+	if (current_program != program->id) {
+		INFO("Current program (%d) is not debugged program (%d)", current_program, program->id);
+	} else {
+		INFO("Current program(%d) is active.", current_program);
+	}
+	GLint uniforms_no, attributes_no;
+	GLint size;
+	GLenum type;
+	const GLsizei bufSize = 16;
+	GLchar name[bufSize];
+	GLsizei length;
+	glGetProgramiv(program->id, GL_ACTIVE_UNIFORMS, &uniforms_no);
+	glGetProgramiv(program->id, GL_ACTIVE_ATTRIBUTES, &attributes_no);
+	INFO("Uniforms in program: %d", uniforms_no);
+	INFO("Attributes in program: %d", attributes_no);
+	for(GLint i = 0; i < uniforms_no; i++) {
+		glGetActiveUniform(uniforms_no, i, bufSize, &length, &size, &type, name);
+		INFO("Uniform #%d Type: %u Name: %s\n", i, type, name);
+	}
+
+	for (GLint i = 0; i < attributes_no; i++)
+	{
+		glGetActiveAttrib(program->id, (GLuint)i, bufSize, &length, &size, &type, name);
+
+		INFO("Attribute #%d Type: %u Name: %s\n", i, type, name);
+	}
 }

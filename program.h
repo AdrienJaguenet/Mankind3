@@ -16,3 +16,4 @@ typedef struct program_t {
 program_t program_new(const char *vs_path, const char *fs_path);
 void program_use();
 void program_terminate();
+void program_debug(program_t * program);

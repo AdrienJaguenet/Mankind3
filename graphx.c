@@ -151,7 +151,7 @@ void draw_Map(GFXContext * gfx_context, Map * map)
 
 void draw_Chunks(GFXContext * gfx_context, int max_gens)
 {
-	program_use(&gfx_context->chunk_program);
+	program_use(&gfx_context->chunk_program.id);
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
 	setup_camera(&gfx_context->chunk_program, gfx_context->window,
@@ -219,7 +219,8 @@ void draw_CubeHighlight(GFXContext * gfx_context, Map * map)
 	setup_camera(program, gfx_context->window, &camera);
 	glUniformMatrix4fv(glGetUniformLocation(program->id, "model"), 1, GL_FALSE, (float*) &model);
 	glBindVertexArray(cube->vao);
-	glDrawElements(GL_LINES, 12, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, NULL);
+	glBindVertexArray(0);
 }
 
 void begin_draw(GFXContext * gfx_context)
