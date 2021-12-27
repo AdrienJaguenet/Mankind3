@@ -86,7 +86,8 @@ void program_debug(program_t * program)
 	GLint current_program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
 	if (current_program != program->id) {
-		INFO("Current program (%d) is not debugged program (%d)", current_program, program->id);
+		INFO("Current program (%d) is not debugged program (%d)",
+			 current_program, program->id);
 	} else {
 		INFO("Current program(%d) is active.", current_program);
 	}
@@ -100,14 +101,15 @@ void program_debug(program_t * program)
 	glGetProgramiv(program->id, GL_ACTIVE_ATTRIBUTES, &attributes_no);
 	INFO("Uniforms in program: %d", uniforms_no);
 	INFO("Attributes in program: %d", attributes_no);
-	for(GLint i = 0; i < uniforms_no; i++) {
-		glGetActiveUniform(uniforms_no, i, bufSize, &length, &size, &type, name);
+	for (GLint i = 0; i < uniforms_no; i++) {
+		glGetActiveUniform(uniforms_no, i, bufSize, &length, &size, &type,
+						   name);
 		INFO("Uniform #%d Type: %u Name: %s\n", i, type, name);
 	}
 
-	for (GLint i = 0; i < attributes_no; i++)
-	{
-		glGetActiveAttrib(program->id, (GLuint)i, bufSize, &length, &size, &type, name);
+	for (GLint i = 0; i < attributes_no; i++) {
+		glGetActiveAttrib(program->id, (GLuint) i, bufSize, &length, &size,
+						  &type, name);
 
 		INFO("Attribute #%d Type: %u Name: %s\n", i, type, name);
 	}

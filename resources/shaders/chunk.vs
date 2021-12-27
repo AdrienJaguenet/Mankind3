@@ -15,9 +15,9 @@ out vec2 fragment_uvbase;
 
 const vec2 uvs[4] = {
   vec2(0, 0),
-  vec2(0, 1),
-  vec2(1, 0),
-  vec2(1, 1)
+  vec2(0, .99),
+  vec2(.99, 0),
+  vec2(.99, .99)
 };
 
 const vec3 normals[6] = {

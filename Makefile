@@ -17,7 +17,9 @@ SRC=main.c\
 	hashmap.c\
 	biome.c\
 	ui.c\
-	cubehighlight.c
+	cubehighlight.c\
+	movement.c\
+	events.c
 
 OBJ=$(SRC:.c=.o)
 CFLAGS=-g -Werror -Wextra -Wall `pkg-config --cflags sdl2 SDL2_image openal freealut gl glew`
