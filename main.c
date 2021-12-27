@@ -34,6 +34,7 @@ int main()
 	map->wet_perm = shuffled_permutations(256);
 	map->heat_perm = shuffled_permutations(256);
 	preset_BiomeTable(&map->biome_table);
+	InputState input_state = { false };
 
 	for (int i = 0; i < MAX_LOD; ++i) {
 		init_HashMap(&map->chunks[i]);
@@ -56,11 +57,10 @@ int main()
 		while (SDL_PollEvent(&event)) {
 			running =
 			  handle_event(&event, &gfx_context.camera, &physics, map,
-						   &sfx_context, delta_ticks);
+						   &sfx_context, delta_ticks, &input_state);
 		}
 
-		handle_keystates(SDL_GetKeyboardState(NULL),
-						 &gfx_context.camera, &physics);
+		handle_input(&input_state, &gfx_context.camera, &physics);
 
 		vec3_t collision_normal = vec3(0, 0, 0);
 		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));

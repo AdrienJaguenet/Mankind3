@@ -16,7 +16,7 @@ typedef struct {
 vec3_t get_wanted_movement_vector(InputState * state, Camera * camera);
 
 bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
-				  SFXContext * sfx_context, unsigned int delta_ticks);
+				  SFXContext * sfx_context, unsigned int delta_ticks,
+				  InputState * state);
 
-void handle_keystates(const Uint8 * keystates, Camera * camera,
-					  Physics * physics);
+void handle_input(InputState * state, Camera * camera, Physics * physics);

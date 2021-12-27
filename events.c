@@ -5,23 +5,25 @@ vec3_t get_wanted_movement_vector(InputState * state, Camera * camera)
 {
 	vec3_t movement = vec3(0, 0, 0);
 	if (state->moving_forward) {
-		v3_add(movement, get_Camera_forward(camera));
+		movement = v3_add(movement, get_Camera_forward(camera));
 	}
 	if (state->moving_backward) {
-		v3_sub(movement, get_Camera_forward(camera));
+		movement = v3_sub(movement, get_Camera_forward(camera));
 	}
 	if (state->moving_left) {
-		v3_sub(movement, get_Camera_right(camera));
+		movement = v3_sub(movement, get_Camera_right(camera));
 	}
 	if (state->moving_right) {
-		v3_add(movement, get_Camera_right(camera));
+		movement = v3_add(movement, get_Camera_right(camera));
 	}
 	// normalize the vector
+	movement = v3_norm(movement);
 	return movement;
 }
 
 bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
-				  SFXContext * sfx_context, unsigned int delta_ticks)
+				  SFXContext * sfx_context, unsigned int delta_ticks,
+				  InputState * state)
 {
 	(void) delta_ticks;
 	if (e->type == SDL_QUIT) {
@@ -32,8 +34,59 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 		camera->rotation.y =
 		  CLAMP(camera->rotation.y, -M_PI / 2 + 0.025, M_PI / 2 - 0.025);
 	} else if (e->type == SDL_KEYDOWN) {
-		if (e->key.keysym.sym == SDLK_SPACE && physics->touches_ground) {
-			physics->velocity.y = .2f;
+		switch (e->key.keysym.sym) {
+		  case SDLK_SPACE:
+			  if (physics->touches_ground) {
+				  physics->velocity.y = .2f;
+				  state->jumping = true;
+			  }
+			  break;
+
+		  case SDLK_w:
+			  state->moving_forward = true;
+			  break;
+
+		  case SDLK_s:
+			  state->moving_backward = true;
+			  break;
+
+		  case SDLK_a:
+			  state->moving_left = true;
+			  break;
+
+		  case SDLK_d:
+			  state->moving_right = true;
+			  break;
+
+		  case SDLK_LSHIFT:
+			  state->running = true;
+			  break;
+		}
+	} else if (e->type == SDL_KEYUP) {
+		switch (e->key.keysym.sym) {
+		  case SDLK_SPACE:
+			  state->jumping = false;
+			  break;
+
+		  case SDLK_w:
+			  state->moving_forward = false;
+			  break;
+
+		  case SDLK_s:
+			  state->moving_backward = false;
+			  break;
+
+		  case SDLK_a:
+			  state->moving_left = false;
+			  break;
+
+		  case SDLK_d:
+			  state->moving_right = false;
+			  break;
+
+		  case SDLK_LSHIFT:
+			  state->running = false;
+			  break;
 		}
 	} else if (e->type == SDL_MOUSEBUTTONDOWN) {
 		if (e->button.button == SDL_BUTTON_LEFT) {
@@ -71,36 +124,16 @@ bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 	return true;
 }
 
-void handle_keystates(const Uint8 * keystates, Camera * camera,
-					  Physics * physics)
+void handle_input(InputState * state, Camera * camera, Physics * physics)
 {
-	float AXIS_VELOCITY = !physics->touches_ground ? 0.1 : 0.1;
+	float AXIS_VELOCITY = 0.1;
+	if (state->running) {
+		AXIS_VELOCITY *= 2.0;
+	}
 	vec3_t new_vel =
-	  !physics->touches_ground ? physics->velocity : vec3(0, 0, 0);
-	if (keystates[SDL_SCANCODE_W]) {
-		new_vel =
-		  v3_add(new_vel, v3_muls(get_Camera_forward(camera), AXIS_VELOCITY));
-	}
-
-	if (keystates[SDL_SCANCODE_S]) {
-		new_vel =
-		  v3_add(new_vel, v3_muls(get_Camera_forward(camera), -AXIS_VELOCITY));
-	}
-
-	if (keystates[SDL_SCANCODE_A]) {
-		new_vel =
-		  v3_add(new_vel, v3_muls(get_Camera_right(camera), -AXIS_VELOCITY));
-	}
-
-	if (keystates[SDL_SCANCODE_D]) {
-		new_vel =
-		  v3_add(new_vel, v3_muls(get_Camera_right(camera), AXIS_VELOCITY));
-	}
-
-	if (keystates[SDL_SCANCODE_LCTRL]) {
-		new_vel =
-		  v3_add(new_vel, v3_muls(get_Camera_up(camera), -AXIS_VELOCITY));
-	}
+	  !physics->touches_ground ? physics->
+	  velocity : get_wanted_movement_vector(state,
+											camera);
 
 	new_vel = v3_muls(v3_norm(new_vel), AXIS_VELOCITY);
 	physics->velocity.x = new_vel.x;
