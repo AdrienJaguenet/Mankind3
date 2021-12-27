@@ -1,4 +1,24 @@
 #include "events.h"
+#include "raycast.h"
+
+vec3_t get_wanted_movement_vector(InputState * state, Camera * camera)
+{
+	vec3_t movement = vec3(0, 0, 0);
+	if (state->moving_forward) {
+		v3_add(movement, get_Camera_forward(camera));
+	}
+	if (state->moving_backward) {
+		v3_sub(movement, get_Camera_forward(camera));
+	}
+	if (state->moving_left) {
+		v3_sub(movement, get_Camera_right(camera));
+	}
+	if (state->moving_right) {
+		v3_add(movement, get_Camera_right(camera));
+	}
+	// normalize the vector
+	return movement;
+}
 
 bool handle_event(SDL_Event * e, Camera * camera, Physics * physics, Map * map,
 				  SFXContext * sfx_context, unsigned int delta_ticks)

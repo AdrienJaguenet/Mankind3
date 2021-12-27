@@ -9,6 +9,7 @@
 #include "physx.h"
 #include "raycast.h"
 #include "movement.h"
+#include "events.h"
 
 #define VERSION "0.0.1"
 
