@@ -3,6 +3,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 
 #include "utilities.h"
@@ -19,7 +20,11 @@ typedef struct {
 	int size;					// All texture are assumed to be be square
 } Texture;
 
-bool load_texture(Texture * texture, const char *path);
+bool load_texture_img(Texture * texture, const char *path);
+
+bool load_texture_txt(Texture * texture, TTF_Font * font, const char *text);
+
+bool load_texture_fromSurface(Texture * texture, SDL_Surface * surface);
 
 void get_tex_quad(Texture * texture, int index, int quad_size,
 				  vec2_t corners[4]);

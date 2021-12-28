@@ -2,7 +2,7 @@
 #include "utilities.h"
 #include <SDL2/SDL_image.h>
 
-bool load_texture(Texture * texture, const char *path)
+bool load_texture_img(Texture * texture, const char *path)
 {
 	SDL_Surface *surface = IMG_Load(path);
 	if (surface == NULL) {
@@ -12,6 +12,18 @@ bool load_texture(Texture * texture, const char *path)
 	if (surface->w != surface->h) {
 		WARN("Texture '%s' is not a square\n", path);
 	}
+	return load_texture_fromSurface(texture, surface);
+}
+
+bool load_texture_txt(Texture * texture, TTF_Font * font, const char * txt)
+{
+	SDL_Color fg = {255, 255, 255, 255};
+	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, txt, fg);
+	return load_texture_fromSurface(texture, surface);
+}
+
+bool load_texture_fromSurface(Texture * texture, SDL_Surface * surface)
+{
 	texture->size = surface->w;
 	glGenTextures(1, &texture->index);
 	glBindTexture(GL_TEXTURE_2D, texture->index);

@@ -3,6 +3,7 @@
 
 #include "chunkmesh.h"
 #include "raycast.h"
+#include "constants.h"
 
 void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 {
@@ -46,7 +47,7 @@ void init_GFX(GFXContext * gfx_context, int window_width, int window_height)
 	  program_new("./resources/shaders/chunk.vs",
 				  "./resources/shaders/chunk.fs");
 
-	load_texture(&gfx_context->tilemap, "./resources/gfx/tilemap.png");
+	load_texture_img(&gfx_context->tilemap, "./resources/gfx/tilemap.png");
 
 	init_UI(gfx_context);
 
@@ -64,10 +65,13 @@ void init_UI(GFXContext * gfx_context)
 {
 	load_UI(&gfx_context->ui);
 	gfx_context->ui.root =
-	  UIElement_new(&gfx_context->ui, "resources/gfx/crosshair.png");
+	  UIElement_new_image(&gfx_context->ui, "resources/gfx/crosshair.png");
 	UIElement *root = gfx_context->ui.root;
+	UIElement *version = UIElement_new_image(&gfx_context->ui, VERSION);
+	UIElement_addChild(root, version);
 	root->height_px = 50;
 	root->width_px = 50;
+	root->centered = true;
 }
 
 void draw_UI(GFXContext * gfx_context)

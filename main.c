@@ -10,8 +10,7 @@
 #include "raycast.h"
 #include "movement.h"
 #include "events.h"
-
-#define VERSION "0.0.1"
+#include "constants.h"
 
 void attach_camera_to(Camera * camera, AABB * aabb)
 {
