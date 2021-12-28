@@ -1,12 +1,6 @@
 #include "boxcol.h"
 #include "utilities.h"
 
-void translate_AABB(AABB * aabb, vec3_t vec)
-{
-	aabb->pos = v3_add(aabb->pos, vec);
-	aabb->dim = v3_add(aabb->dim, vec);
-}
-
 AABB translated_AABB(AABB * aabb, vec3_t vec)
 {
 	return (AABB) {
