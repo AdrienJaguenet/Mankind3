@@ -24,7 +24,8 @@ bool load_texture_txt(Texture * texture, TTF_Font * font, const char * txt)
 
 bool load_texture_fromSurface(Texture * texture, SDL_Surface * surface)
 {
-	texture->size = surface->w;
+	texture->width_px = surface->w;
+	texture->height_px = surface->h;
 	glGenTextures(1, &texture->index);
 	glBindTexture(GL_TEXTURE_2D, texture->index);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
@@ -39,7 +40,7 @@ bool load_texture_fromSurface(Texture * texture, SDL_Surface * surface)
 void get_tex_quad(Texture * texture, int index, int quad_size,
 				  vec2_t corners[4])
 {
-	int tex_grid_size = texture->size / quad_size;
+	int tex_grid_size = texture->width_px / quad_size;
 	float cell_size = 1 / (float) tex_grid_size;
 	int quad_y = index / tex_grid_size, quad_x = index % tex_grid_size;
 	corners[UV_TOP_LEFT] = vec2(quad_x * cell_size, quad_y * cell_size);

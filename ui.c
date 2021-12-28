@@ -14,6 +14,8 @@ UIElement *UIElement_new_text(UI * ui, const char *txt)
 {
 	UIElement * element = UIElement_load(ui);
 	load_texture_txt(&element->texture, ui->main_font, txt);
+	element->width_px = element->texture.width_px;
+	element->height_px = element->texture.height_px;
 	return element;
 }
 
@@ -38,6 +40,7 @@ UIElement *UIElement_load(UI * ui)
 
 void UIElement_addChild(UIElement * parent, UIElement * child)
 {
+	child->parent = parent;
 	parent->children_no++;
 	parent->children = realloc(parent->children, sizeof(UIElement) * parent->children_no);
 	parent->children[parent->children_no - 1] = child;

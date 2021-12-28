@@ -17,7 +17,8 @@ typedef enum {
 
 typedef struct {
 	GLuint index;
-	int size;					// All texture are assumed to be be square
+	int width_px;
+	int height_px;
 } Texture;
 
 bool load_texture_img(Texture * texture, const char *path);
