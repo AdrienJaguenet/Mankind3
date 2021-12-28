@@ -13,17 +13,6 @@ AABB translated_AABB(AABB * aabb, vec3_t vec)
 	v3_add(aabb->pos, vec), aabb->dim};
 }
 
-
-/* This needa be fixed. */
-bool collides(AABB * aabb1, AABB * aabb2)
-{
-	return (aabb1->dim.x > aabb2->pos.x &&
-			aabb1->pos.x < aabb2->dim.x &&
-			aabb1->dim.y > aabb2->pos.y &&
-			aabb1->pos.y < aabb2->dim.y &&
-			aabb1->dim.z > aabb2->pos.z && aabb1->pos.z < aabb2->dim.z);
-}
-
 bool map_collides(AABB * aabb, Map * map, vec3_t * collision_normal,
 				  bool enabled_faces[6])
 {
