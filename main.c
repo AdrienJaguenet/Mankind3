@@ -64,47 +64,21 @@ int main()
 
 		vec3_t collision_normal = vec3(0, 0, 0);
 		update_physics(&physics, vec3(0.0, -0.0005 * delta_ticks, 0.0));
-		if (!try_move(&player, physics.velocity, map, &collision_normal)) {
-			if (collision_normal.x != 0) {
-				physics.velocity.x = 0;
-				try_move(&player, physics.velocity, map, &collision_normal);
-				if (collision_normal.z != 0) {
-					physics.velocity.z = 0;
-					try_move(&player, physics.velocity, map, &collision_normal);
-				} else if (collision_normal.y != 0) {
-					physics.velocity.y = 0;
-					try_move(&player, physics.velocity, map, &collision_normal);
-				}
-			}
-			if (collision_normal.z != 0) {
-				physics.velocity.z = 0;
-				try_move(&player, physics.velocity, map, &collision_normal);
-				if (collision_normal.x != 0) {
-					physics.velocity.x = 0;
-					try_move(&player, physics.velocity, map, &collision_normal);
-				} else if (collision_normal.y != 0) {
-					physics.velocity.y = 0;
-					try_move(&player, physics.velocity, map, &collision_normal);
-				}
-			}
-			if (collision_normal.y != 0) {
-				if (!physics.touches_ground) {
-					physics.touches_ground = true;
-				}
+		do {
+			try_move(&player, physics.velocity, map, &collision_normal);
+			if (collision_normal.y != 0.f) {
 				physics.velocity.y = 0;
-				try_move(&player, physics.velocity, map, &collision_normal);
-				if (collision_normal.x != 0) {
-					physics.velocity.x = 0;
-					try_move(&player, physics.velocity, map, &collision_normal);
-				} else if (collision_normal.z != 0) {
-					physics.velocity.z = 0;
-					try_move(&player, physics.velocity, map, &collision_normal);
-				}
+			} else if (collision_normal.x != 0.f) {
+				physics.velocity.x = 0;
+				physics.touches_ground = true;
+			} else if (collision_normal.z != 0.f) {
+				physics.velocity.z = 0;
 			}
-		} else {
-			if (physics.velocity.y != 0) {
-				physics.touches_ground = false;
-			}
+		} while (!(collision_normal.x == 0.f || physics.velocity.x == 0.f) &&
+				 !(collision_normal.y == 0.f || physics.velocity.y == 0.f) &&
+				 !(collision_normal.z == 0.f || physics.velocity.z == 0.f));
+		if (physics.velocity.y) {
+			physics.touches_ground = true;
 		}
 		/* This doesn't have to be done every frame, tbh… */
 		update_al_listener(player.pos, get_Camera_lookAt(&gfx_context.camera),

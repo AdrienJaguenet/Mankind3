@@ -131,12 +131,11 @@ void handle_input(InputState * state, Camera * camera, Physics * physics)
 		AXIS_VELOCITY *= 2.0;
 	}
 	vec3_t new_vel =
-	  !physics->touches_ground ? physics->
-	  velocity : get_wanted_movement_vector(state,
-											camera);
+	  !physics->
+	  touches_ground ? physics->velocity : get_wanted_movement_vector(state,
+																	  camera);
 
 	new_vel = v3_muls(v3_norm(new_vel), AXIS_VELOCITY);
 	physics->velocity.x = new_vel.x;
 	physics->velocity.z = new_vel.z;
-	//update_physics(physics, new_vel);
 }

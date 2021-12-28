@@ -5,6 +5,7 @@ bool try_move(AABB * aabb, vec3_t diff, Map * map, vec3_t * collision_normal)
 	/* Calculate the length only once */
 	float diff_l = v3_length(diff);
 	bool enabled_faces[6] = { false };
+	/* Do not check for collitions if we're not going there */
 	if (diff.x > 0) {
 		enabled_faces[FACE_RIGHT] = true;
 	} else if (diff.x < 0) {
